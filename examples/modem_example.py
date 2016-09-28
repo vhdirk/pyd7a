@@ -31,3 +31,6 @@ modem.d7asp_fifo_flush(
   )
 )
 
+
+for cmd in modem.read_async():
+  print cmd
