@@ -10,13 +10,19 @@ from d7a.sp.qos import QoS
 from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
+
+def received_command_callback(cmd):
+  print cmd
+
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
 config = argparser.parse_args()
 
-modem = Modem(config.device, config.rate)
+modem = Modem(config.device, config.rate, receive_callback=received_command_callback)
+modem.start_reading()
+
 modem.d7asp_fifo_flush(
   alp_command=Command.create_with_read_file_action_system_file(
     file=UidFile(),
@@ -31,6 +37,5 @@ modem.d7asp_fifo_flush(
   )
 )
 
-
-for cmd in modem.read_async():
-  print cmd
+while True:
+  pass

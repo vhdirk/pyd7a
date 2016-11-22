@@ -1,22 +1,18 @@
 #!/usr/bin/env python
-import argparse
 import time
 
 from datetime import datetime
 
-import binascii
 import struct
 from threading import Thread
 
 import serial
 
-from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.regular_action import RegularAction
 from d7a.serial_console_interface.parser import Parser
 
 from d7a.alp.command import Command
-from d7a.system_files.dll_config import DllConfigFile
 from d7a.system_files.uid import UidFile
 
 from d7a.system_files.system_file_ids import SystemFileIds
@@ -36,6 +32,7 @@ class Modem:
     else:
       raise ModemConnectionError
 
+    self.read_async_active = False
     self.receive_callback = receive_callback
 
   def _connect_serial_modem(self):
@@ -79,6 +76,15 @@ class Modem:
   def d7asp_fifo_flush(self, alp_command):
     self.send_command(alp_command)
     flush_done = False
+    should_restart_async_read = False
+    if self.read_async_active:
+      self.log("stopping read thread")
+      should_restart_async_read = True
+      self.read_async_active = False
+      self.read_thread.shutdown = True
+      self.read_thread.join()
+      self.log("read thread stopped")
+
     start_time = datetime.now()
     timeout = False
     self.log("flush start of command with tag {}".format(alp_command.tag_id))
@@ -104,6 +110,9 @@ class Modem:
         timeout = True
         self.log("Flush timed out, skipping")
 
+    if should_restart_async_read:
+      self.start_reading()
+
   def read(self):
     try:
       data = self.dev.read_all()
@@ -117,16 +126,15 @@ class Modem:
     self.stop_reading = True
 
   def start_reading(self):
+    self.read_async_active = True
     self.read_thread = Thread(target=self.read_async)
     self.read_thread.daemon = True
     self.read_thread.start()
-    self.log("read thread running")
 
   def read_async(self):
     self.log("starting read thread")
-    self.stop_reading = False
 
-    while not self.stop_reading:
+    while self.read_async_active:
       data_received = self.dev.read()
       if len(data_received) > 0:
         (cmds, info) = self.parser.parse(data_received)
@@ -135,7 +143,10 @@ class Modem:
           print error
 
         for cmd in cmds:
-          self.receive_callback(cmd)
+          if self.receive_callback != None:
+            self.receive_callback(cmd)
+
+    self.log("end read thread")
 
 
 class ModemConnectionError(Exception):
