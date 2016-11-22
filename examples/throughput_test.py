@@ -1,5 +1,4 @@
 import argparse
-import threading
 import time
 
 import sys
@@ -29,8 +28,8 @@ class ThroughtPutTest:
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
-    self.writer_modem = Modem(self.config.serial_writer, self.config.rate, show_logging=self.config.verbose)
-    self.reader_modem = Modem(self.config.serial_reader, self.config.rate, show_logging=self.config.verbose)
+    self.writer_modem = Modem(self.config.serial_writer, self.config.rate, None, show_logging=self.config.verbose)
+    self.reader_modem = Modem(self.config.serial_reader, self.config.rate, self.reader_received_cmd_callback, show_logging=self.config.verbose)
 
   def start(self):
     payload = range(self.config.payload_size)
@@ -63,11 +62,7 @@ class ThroughtPutTest:
   def test_throughput(self, interface_configuration, payload):
     print("Running throughput test with payload size {} and interface_configuration {}\n\nrunning ...\n".format(len(payload), interface_configuration))
     self.received_commands = []
-    self.reading_done_event = threading.Event()
-    self.reading_done_event.clear()
-    self.stop_reading_thread = False
-    reader_thread = threading.Thread(target=self.run_reader)
-    reader_thread.start()
+    self.reader_modem.start_reading()
 
     command = Command.create_with_return_file_data_action(
       file_id=0x40,
@@ -89,12 +84,12 @@ class ThroughtPutTest:
       (self.config.msg_count * self.config.payload_size * 8) / (end - start), self.config.payload_size)
     )
 
-    reading_timeout = 5
-    success = self.reading_done_event.wait(reading_timeout)
-    if not success:
-      self.stop_reading_thread = True
-      print("reading timeout after {} s".format(reading_timeout))
+    while len(self.received_commands) < self.config.msg_count and time.time() - start < 5:
+      time.sleep(0.5)
+      print("waiting for reader to finish ...")
 
+    print("finished reading or timeout")
+    self.reader_modem.cancel_read()
     payload_has_errors = False
     for cmd in self.received_commands:
       if type(cmd.actions[0].op) != ReturnFileData and cmd.actions[0].operand.data != payload:
@@ -106,16 +101,8 @@ class ThroughtPutTest:
     else:
       print("reader: NOK: received {} messages".format(len(self.received_commands)))
 
-  def run_reader(self):
-    for cmd in self.reader_modem.read_async():
-      if self.stop_reading_thread:
-        return
-
-      self.received_commands.append(cmd)
-      if len(self.received_commands) == self.config.msg_count:
-        self.reader_modem.cancel_read()
-        self.reading_done_event.set()
-
+  def reader_received_cmd_callback(self, cmd):
+    self.received_commands.append(cmd)
 
 
 if __name__ == "__main__":

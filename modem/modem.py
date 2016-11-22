@@ -123,7 +123,10 @@ class Modem:
     return self.parser.parse(data)
 
   def cancel_read(self):
-    self.stop_reading = True
+    if self.read_async_active:
+      self.read_async_active = False
+      self.read_thread.shutdown = True
+      self.read_thread.join()
 
   def start_reading(self):
     self.read_async_active = True
