@@ -6,6 +6,8 @@ from datetime import datetime
 
 import binascii
 import struct
+from threading import Thread
+
 import serial
 
 from d7a.alp.operations.requests import ReadFileData
@@ -19,38 +21,50 @@ from d7a.system_files.uid import UidFile
 
 from d7a.system_files.system_file_ids import SystemFileIds
 
-
 class Modem:
-  def __init__(self, device, baudrate, show_logging=True):
+  def __init__(self, device, baudrate, receive_callback, show_logging=True):
     self.show_logging = show_logging
     self.parser = Parser()
     self.config = {
       "device"   : device,
       "baudrate" : baudrate
     }
-    self.setup_serial_device()
 
-  def setup_serial_device(self):
+    connected = self._connect_serial_modem()
+    if connected:
+      print("connected to {}, node UID {}".format(self.config["device"], hex(self.uid)))
+    else:
+      raise ModemConnectionError
+
+    self.receive_callback = receive_callback
+
+  def _connect_serial_modem(self):
     self.dev = serial.Serial(
       port     = self.config["device"],
       baudrate = self.config["baudrate"],
       timeout  = 0.5,
     )
 
-    self.uid = self.read_uid()
-    print("connected to {}, node UID {}".format(self.config["device"], hex(self.uid)))
-
-  def read_uid(self):
     self.send_command(Command.create_with_read_file_action_system_file(UidFile()))
 
-    while True: # TODO timeout
+    # read thread not yet running here, read sync
+    start_time = datetime.now()
+    timeout = False
+    while not timeout:
       commands, info = self.read()
       for command in commands:
         for action in command.actions:
           if type(action) is RegularAction \
               and type(action.operation) is ReturnFileData \
               and action.operand.offset.id == SystemFileIds.UID:
-            return struct.unpack(">Q", bytearray(action.operand.data))[0]
+            self.uid = struct.unpack(">Q", bytearray(action.operand.data))[0]
+            return True
+
+      if (datetime.now() - start_time).total_seconds() > 2:
+        timeout = True
+        self.log("Timed out reading node information")
+
+    return False
 
 
   def log(self, *msg):
@@ -102,8 +116,16 @@ class Modem:
   def cancel_read(self):
     self.stop_reading = True
 
+  def start_reading(self):
+    self.read_thread = Thread(target=self.read_async)
+    self.read_thread.daemon = True
+    self.read_thread.start()
+    self.log("read thread running")
+
   def read_async(self):
+    self.log("starting read thread")
     self.stop_reading = False
+
     while not self.stop_reading:
       data_received = self.dev.read()
       if len(data_received) > 0:
@@ -113,4 +135,8 @@ class Modem:
           print error
 
         for cmd in cmds:
-          yield cmd
+          self.receive_callback(cmd)
+
+
+class ModemConnectionError(Exception):
+  pass
