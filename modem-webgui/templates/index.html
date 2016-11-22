@@ -12,6 +12,7 @@
 
             socket.on('connect', function() {
                 console.log('connected');
+                $('#module_info').empty();
             });
 
             socket.on('module_info', function(data) {
@@ -24,7 +25,7 @@
             });
 
             $('form#emit').submit(function(event) {
-                socket.emit('my_event', {data: $('#emit_data').val()});
+                socket.emit('execute_raw_alp', {raw_alp: $('#raw_alp').val()});
                 return false;
             });
         });
@@ -33,10 +34,10 @@
 <body>
     <h1>modem-webgui</h1>
     <div id="module_info"></div>
-    <h2>Send:</h2>
+    <h2>Execute ALP command:</h2>
     <form id="emit" method="POST" action='#'>
-        <input type="text" name="emit_data" id="emit_data" placeholder="Message">
-        <input type="submit" value="Echo">
+        <input type="text" name="raw_alp" id="raw_alp" placeholder="raw ALP">
+        <input type="submit" value="Execute">
     </form>
     <h2>Receive:</h2>
     <div id="log"></div>

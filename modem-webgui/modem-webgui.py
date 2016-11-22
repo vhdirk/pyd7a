@@ -18,9 +18,11 @@ def index():
   return render_template('index.html')
 
 
-# @socketio.on('my_event')
-# def on_message(message):
-#   pass
+@socketio.on('execute_raw_alp')
+def on_execute_raw_alp(data):
+  alp_hex_string = data['raw_alp'].replace(" ", "").strip()
+  modem.send_command(bytearray(alp_hex_string.decode("hex")))
+
 
 @socketio.on('connect')
 def on_connect():
