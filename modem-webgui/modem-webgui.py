@@ -2,9 +2,11 @@
 import argparse
 
 import eventlet
+import sys
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
+from d7a.alp.command import Command
 from modem.modem import Modem
 
 app = Flask(__name__)
@@ -22,6 +24,17 @@ def index():
 def on_execute_raw_alp(data):
   alp_hex_string = data['raw_alp'].replace(" ", "").strip()
   modem.send_command(bytearray(alp_hex_string.decode("hex")))
+
+@socketio.on('read_local_file')
+def on_read_local_file(data):
+  print("read_local_file")
+  cmd = Command.create_with_read_file_action(
+    file_id=int(data['file_id']),
+    offset=int(data['offset']),
+    length=int(data['length'])
+  )
+
+  modem.send_command(cmd)
 
 
 @socketio.on('connect')
