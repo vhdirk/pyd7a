@@ -7,6 +7,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 from d7a.alp.command import Command
+from d7a.system_files.system_files import SystemFiles
 from modem.modem import Modem
 
 app = Flask(__name__)
@@ -17,13 +18,20 @@ modem = None
 
 @app.route('/')
 def index():
-  return render_template('index.html')
+  return render_template('index.html', systemfiles=SystemFiles().get_all_system_files())
 
 
 @socketio.on('execute_raw_alp')
 def on_execute_raw_alp(data):
   alp_hex_string = data['raw_alp'].replace(" ", "").strip()
   modem.send_command(bytearray(alp_hex_string.decode("hex")))
+
+@socketio.on('read_local_system_file')
+def on_read_local_system_file(data):
+  print("read local system file")
+  modem.send_command(
+    Command.create_with_read_file_action_system_file(SystemFiles.files[int(data['file_id'])])
+  )
 
 @socketio.on('read_local_file')
 def on_read_local_file(data):

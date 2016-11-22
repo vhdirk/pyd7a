@@ -1,10 +1,11 @@
 import struct
 
 from d7a.support.schema import Validatable, Types
+from d7a.system_files.file import File
 from d7a.system_files.system_file_ids import SystemFileIds
 
 
-class DllConfigFile(Validatable):
+class DllConfigFile(File, Validatable):
   SCHEMA = [{
     "active_access_class": Types.INTEGER(min=0, max=20),
     "vid": Types.INTEGER(min=0, max=0xFFFF)
@@ -14,10 +15,8 @@ class DllConfigFile(Validatable):
   def __init__(self, active_access_class=0, vid=0xFFFF):
     self.active_access_class = active_access_class
     self.vid = vid
-    super(DllConfigFile, self).__init__()
-
-  def file_id(self):  # TODO base class
-    return SystemFileIds.DLL_CONFIG
+    Validatable.__init__(self)
+    File.__init__(self, SystemFileIds.DLL_CONFIG, 6)
 
   @staticmethod
   def parse(s):

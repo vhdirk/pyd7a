@@ -1,23 +1,20 @@
 import struct
 
 from d7a.support.schema import Validatable, Types
+from d7a.system_files.file import File
 from d7a.system_files.system_file_ids import SystemFileIds
 
 
-class UidFile(Validatable):
+class UidFile(File, Validatable):
   SCHEMA = [{
     "uid": Types.INTEGER(min=0, max=0xFFFFFFFFFFFFFFFF)
   }]
 
+
   def __init__(self, uid=0):
     self.uid = uid
-    super(UidFile, self).__init__()
-
-  def file_id(self):  # TODO base class
-    return SystemFileIds.UID
-
-  def length(self):  # TODO base class
-    return 8 # TODO get from SCHEMA?
+    File.__init__(self, SystemFileIds.UID, 8)
+    Validatable.__init__(self)
 
   @staticmethod
   def parse(s):
