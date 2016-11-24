@@ -71,7 +71,8 @@ class Modem:
     data = self.parser.build_serial_frame(alp_command)
     self.dev.write(data)
     self.dev.flush()
-    self.log("Sending command of size", len(data))
+    self.log("Sending command of size ", len(data))
+    self.log("> " + " ".join(map(lambda b: format(b, "02x"), data)))
 
   def d7asp_fifo_flush(self, alp_command):
     self.send_command(alp_command)
@@ -90,6 +91,7 @@ class Modem:
     self.log("flush start of command with tag {}".format(alp_command.tag_id))
     while not flush_done and not timeout:
       data_received = self.dev.read()
+      self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
       if len(data_received) > 0:
         (cmds, info) = self.parser.parse(data_received)
 
@@ -116,6 +118,7 @@ class Modem:
   def read(self):
     try:
       data = self.dev.read_all()
+      self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
     except serial.SerialException:
       time.sleep(5)
       self.setup_serial_device()
@@ -140,6 +143,7 @@ class Modem:
     while self.read_async_active:
       data_received = self.dev.read()
       if len(data_received) > 0:
+        self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(["0x{:02x}".format(ord(b)) for b in error["buffer"]])
