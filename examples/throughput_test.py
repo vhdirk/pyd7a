@@ -58,6 +58,17 @@ class ThroughtPutTest:
 
     self.test_throughput(interface_configuration=interface_configuration, payload=payload)
 
+    print("\n==> unicast, no QoS, writer active access class = 2")
+    interface_configuration = Configuration(
+      qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+      addressee=Addressee(
+        access_class=2,
+        id_type=IdType.UID,
+        id=self.reader_modem.uid
+      )
+    )
+
+    self.test_throughput(interface_configuration=interface_configuration, payload=payload)
 
   def test_throughput(self, interface_configuration, payload):
     print("Running throughput test with payload size {} and interface_configuration {}\n\nrunning ...\n".format(len(payload), interface_configuration))
