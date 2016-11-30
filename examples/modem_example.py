@@ -18,11 +18,10 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
+argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
 config = argparser.parse_args()
 
-modem = Modem(config.device, config.rate, receive_callback=received_command_callback)
-modem.start_reading()
-
+modem = Modem(config.device, config.rate, receive_callback=received_command_callback, show_logging=config.verbose)
 modem.d7asp_fifo_flush(
   alp_command=Command.create_with_read_file_action_system_file(
     file=UidFile(),
@@ -37,5 +36,6 @@ modem.d7asp_fifo_flush(
   )
 )
 
+modem.start_reading()
 while True:
   pass
