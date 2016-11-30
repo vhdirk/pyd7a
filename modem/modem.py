@@ -141,7 +141,8 @@ class Modem:
   def read(self):
     try:
       data = self.dev.read_all()
-      self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
+      if len(data) > 0:
+        self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
     except serial.SerialException:
       time.sleep(5)
       self.setup_serial_device()
