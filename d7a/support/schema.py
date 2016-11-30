@@ -61,6 +61,14 @@ class Types(object):
     return { "type": "integer", "nullable": False, "min": 0, "max": 0xFF }
 
   @staticmethod
+  def STRING(maxlength=None):
+    s = { "type": "string" }
+    if maxlength is not None:
+      s["maxlength"] = maxlength
+
+    return s
+
+  @staticmethod
   def BYTES():
     return {
       "type": "list",
