@@ -28,7 +28,7 @@ modem.d7asp_fifo_flush(
     file=UidFile(),
     interface_type=InterfaceType.D7ASP,
     interface_configuration=Configuration(
-      qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+      qos=QoS(resp_mod=QoS.RESP_MODE_ALL),
       addressee=Addressee(
         access_class=0,
         id_type=IdType.BCAST
