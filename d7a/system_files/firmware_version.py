@@ -34,3 +34,5 @@ class FirmwareVersionFile(File, Validatable):
     for byte in bytearray(self.git_sha1.encode("ASCII")):
       yield byte
 
+  def __str__(self):
+    return "application_name={}, git_sha1={}".format(self.application_name, self.git_sha1)

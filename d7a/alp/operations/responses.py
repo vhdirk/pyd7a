@@ -5,7 +5,6 @@
 
 from d7a.alp.operations.operation import Operation
 
-from d7a.alp.regular_action       import RegularAction
 from d7a.alp.operands.file        import Data, Offset
 
 class ReturnFileData(Operation):

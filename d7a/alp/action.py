@@ -10,11 +10,15 @@
 #   b6    RESP  Return ALP Error Template
 #   b5-b0 OP    Operation describing the action
 # ALP Operand   N Bytes
+from bitstring import ConstBitStream
 
+from d7a.alp.operations.responses import ReturnFileData
 from d7a.support.schema           import Validatable, Types
 
 from d7a.alp.operations.operation import Operation
 from d7a.alp.operations.nop       import NoOperation
+from d7a.system_files.system_files import SystemFiles
+
 
 class Action(Validatable):
 
@@ -37,5 +41,11 @@ class Action(Validatable):
     return self.operation.operand
 
   def __str__(self):
-    output = "op={}, operand={}({})".format(type(self.operation).__name__, type(self.operand).__name__, self.operand)
-    return output
+    # when reading a known system files we output the parsed data
+    if isinstance(self.operation, ReturnFileData):
+      systemfile_type = SystemFiles().get_all_system_files()[self.operand.offset.id]
+      if systemfile_type is not None and systemfile_type.length == self.operand.length:
+        systemfile = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
+        return "op=ReturnFileData, systemfile={}: {}".format(systemfile_type.__class__.__name__, systemfile)
+
+    return "op={}, operand={}({})".format(type(self.operation).__name__, type(self.operand).__name__, self.operand)

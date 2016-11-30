@@ -25,3 +25,6 @@ class UidFile(File, Validatable):
     for byte in bytearray(struct.pack(">Q", self.uid)):
       yield byte
 
+
+  def __str__(self):
+    return "uid={}".format(hex(self.uid))

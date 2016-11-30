@@ -29,3 +29,6 @@ class DllConfigFile(File, Validatable):
     for byte in bytearray(struct.pack(">H", self.vid)):
       yield byte
 
+
+  def __str__(self):
+    return "active_access_class={}, vid={}".format(self.active_access_class, self.vid)
