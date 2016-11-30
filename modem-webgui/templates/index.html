@@ -17,7 +17,10 @@
 
             socket.on('module_info', function(data) {
                 console.log('connected to module: ' + data.uid)
-                $('#module_info').append('Connected to ' + data.uid);
+                $('#module_info').append(
+                    'Connected to ' + data.uid + ' running app \'' + data.application_name +
+                    '\' using git sha1' + data.git_sha1
+                )
             });
 
             socket.on('received_alp_command', function(msg) {

@@ -48,7 +48,11 @@ def on_read_local_file(data):
 @socketio.on('connect')
 def on_connect():
   print("modem: " + str(modem.uid))
-  emit('module_info', {'uid': str(modem.uid)}, broadcast=True)
+  emit('module_info', {
+    'uid': hex(modem.uid),
+    'application_name': modem.firmware_version.application_name,
+    'git_sha1': modem.firmware_version.git_sha1
+  }, broadcast=True)
 
 
 @socketio.on('disconnect')
