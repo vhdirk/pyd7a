@@ -51,7 +51,8 @@ def on_connect():
   emit('module_info', {
     'uid': hex(modem.uid),
     'application_name': modem.firmware_version.application_name,
-    'git_sha1': modem.firmware_version.git_sha1
+    'git_sha1': modem.firmware_version.git_sha1,
+    'd7ap_version': modem.firmware_version.d7ap_version
   }, broadcast=True)
 
 

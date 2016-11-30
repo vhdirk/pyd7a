@@ -18,7 +18,7 @@
             socket.on('module_info', function(data) {
                 console.log('connected to module: ' + data.uid)
                 $('#module_info').append(
-                    'Connected to ' + data.uid + ' running app \'' + data.application_name +
+                    'Connected to ' + data.uid + ' using D7AP v' + data.d7ap_version + ' running app \'' + data.application_name +
                     '\' using git sha1' + data.git_sha1
                 )
             });

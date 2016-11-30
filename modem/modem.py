@@ -35,8 +35,10 @@ class Modem:
     self.firmware_version = None
     connected = self._connect_serial_modem()
     if connected:
-      print("connected to {}, node UID {} running application \"{}\" with git sha1 {}".format(
-        self.config["device"], hex(self.uid), self.firmware_version.application_name, self.firmware_version.git_sha1))
+      print("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
+        self.config["device"], hex(self.uid), self.firmware_version.d7ap_version,
+        self.firmware_version.application_name, self.firmware_version.git_sha1)
+      )
     else:
       raise ModemConnectionError
 
