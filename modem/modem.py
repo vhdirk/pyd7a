@@ -7,12 +7,17 @@ import struct
 from threading import Thread
 
 import serial
+from bitstring import ConstBitStream
 
+from d7a.alp.operands.file import DataRequest
+from d7a.alp.operands.file import Offset
+from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.regular_action import RegularAction
 from d7a.serial_console_interface.parser import Parser
 
 from d7a.alp.command import Command
+from d7a.system_files.firmware_version import FirmwareVersionFile
 from d7a.system_files.uid import UidFile
 
 from d7a.system_files.system_file_ids import SystemFileIds
@@ -26,9 +31,12 @@ class Modem:
       "baudrate" : baudrate
     }
 
+    self.uid = None
+    self.firmware_version = None
     connected = self._connect_serial_modem()
     if connected:
-      print("connected to {}, node UID {}".format(self.config["device"], hex(self.uid)))
+      print("connected to {}, node UID {} running application \"{}\" with git sha1 {}".format(
+        self.config["device"], hex(self.uid), self.firmware_version.application_name, self.firmware_version.git_sha1))
     else:
       raise ModemConnectionError
 
@@ -42,7 +50,19 @@ class Modem:
       timeout  = 0.5,
     )
 
-    self.send_command(Command.create_with_read_file_action_system_file(UidFile()))
+    read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
+    read_modem_info_action.add_action(
+      RegularAction(
+        operation=ReadFileData(
+          operand=DataRequest(
+            offset=Offset(id=FirmwareVersionFile().id, offset=0),  # TODO offset size
+            length=FirmwareVersionFile().length
+          )
+        )
+      )
+    )
+
+    self.send_command(read_modem_info_action)
 
     # read thread not yet running here, read sync
     start_time = datetime.now()
@@ -51,11 +71,14 @@ class Modem:
       commands, info = self.read()
       for command in commands:
         for action in command.actions:
-          if type(action) is RegularAction \
-              and type(action.operation) is ReturnFileData \
-              and action.operand.offset.id == SystemFileIds.UID:
-            self.uid = struct.unpack(">Q", bytearray(action.operand.data))[0]
-            return True
+          if type(action) is RegularAction and type(action.operation) is ReturnFileData:
+              if action.operand.offset.id == SystemFileIds.UID:
+                self.uid = struct.unpack(">Q", bytearray(action.operand.data))[0]
+              if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION:
+                self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
+
+        if self.uid and self.firmware_version:
+          return True
 
       if (datetime.now() - start_time).total_seconds() > 2:
         timeout = True
