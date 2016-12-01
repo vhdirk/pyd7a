@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import argparse
+import json
 
 import eventlet
 import sys
+
+from datetime import time, datetime
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
@@ -30,7 +33,7 @@ def on_execute_raw_alp(data):
 def on_read_local_system_file(data):
   print("read local system file")
   modem.send_command(
-    Command.create_with_read_file_action_system_file(SystemFiles.files[int(data['file_id'])])
+    Command.create_with_read_file_action_system_file(SystemFiles.files[int(data['system_file_id'])])
   )
 
 @socketio.on('read_local_file')
@@ -47,6 +50,11 @@ def on_read_local_file(data):
 
 @socketio.on('connect')
 def on_connect():
+  global modem
+  if modem == None:
+    modem = Modem(config.device, config.rate, command_received_callback)
+    modem.start_reading()
+
   print("modem: " + str(modem.uid))
   emit('module_info', {
     'uid': hex(modem.uid),
@@ -64,8 +72,9 @@ def on_disconnect():
 def command_received_callback(cmd):
   print("cmd received: {}".format(cmd))
   with app.test_request_context('/'):
-    socketio.emit("received_alp_command", {'cmd': str(cmd) }, broadcast=True)
+    socketio.emit("received_alp_command", {'ts': datetime.now().isoformat(), 'cmd': str(cmd)}, broadcast=True)
     print("broadcasted recv command")
+
 
 if __name__ == '__main__':
   argparser = argparse.ArgumentParser()
@@ -73,7 +82,5 @@ if __name__ == '__main__':
                          default="/dev/ttyUSB0")
   argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
   config = argparser.parse_args()
-
-  modem = Modem(config.device, config.rate, command_received_callback)
-  modem.start_reading()
-  socketio.run(app, debug=False)
+  modem = None
+  socketio.run(app, debug=True)
