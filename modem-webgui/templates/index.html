@@ -17,14 +17,13 @@
 
             socket.on('connect', function() {
                 console.log('connected');
-                $('#module_info').empty();
             });
 
             socket.on('module_info', function(data) {
                 console.log('connected to module: ' + data.uid);
-                $$('module_info').setHTML(
+                $$('header').setValues({header:"oss7", status:
                         'Connected to ' + data.uid + ' using D7AP v' + data.d7ap_version + ' running app \'' + data.application_name +
-                        '\' using git sha1' + data.git_sha1
+                        '\' using git sha1' + data.git_sha1}
                 )
             });
 
@@ -40,57 +39,70 @@
 <script type="text/javascript" charset="utf-8">
     webix.ui({
         rows:[
-            { view:"template", type:"header", template:"oss7 modem interface" },
-            { view:"template", type:"clean", template:"<not connected>", id:"module_info"},
-            { view:"form", id:"read_local_file_form", elements:[
-                { view:"template", type:"header", template:"Read local file" },
-                { view:"text", label:'file ID', validate:webix.rules.isNumber, name:"file_id" },
-                { view:"text", label:'offset', validate:webix.rules.isNumber, name:"offset", value: 0 },
-                { view:"text", label:'length', validate:webix.rules.isNumber, name:"length", value: 0 },
-                { view:"button", type:"form", value:"Read file", width:150,
-                    click:function () {
-                        var form = $$("read_local_file_form")
-                        if(form.validate()) {
-                            // TODO post?
-                            socket.emit('read_local_file', form.getValues())
-                        }
-                    }
-                }
-            ]},
-            { view:"form", id:"read_local_system_file_form", elements:[
-                { view:"template", type:"header", template:"Read system file" },
-                {view:"select", label:"System file", value: 0, name:"system_file_id", options:[
-                    {% for id, file in systemfiles.iteritems() %}
-                        {id: "{{ id}}", value:  "{{ file.__class__.__name__ }}"},
-                    {% endfor %}
-                ]},
-                { view:"button", type:"form", value:"Read file", width:150,
-                    click:function () {
-                        var form = $$("read_local_system_file_form")
-                        if(form.validate()) {
-                            // TODO post?
-                            console.log(form.getValues())
-                            socket.emit('read_local_system_file', form.getValues())
-                        }
-                    }
-                }
-            ]},
-            {
-                view:"form", id:"execute_raw_alp_form", elements:[
-                    { view:"template", type:"header", template:"Execute raw ALP command" },
-                    { view:"text", "label":"Raw ALP command", "placeholder":"Raw ALP command", name:"raw_alp"},
-                    { view:"button", type:"form", value:"Execute", width:150,
-                        click:function () {
-                            var form = $$("execute_raw_alp_form")
-                            if(form.validate()) {
-                                // TODO post?
-                                console.log(form.getValues())
-                                socket.emit('execute_raw_alp', form.getValues());
+            { view:"template", type:"header", template:"#header# - #status#", id:"header", data:{
+                header:"oss7 modem interface", status:"not connected"
+            }},
+            { view:"tabview", cells: [
+                {
+                    header: "Read local file",
+                    body: {
+                        view:"form", id:"read_local_file_form", elements:[
+                            { view:"text", label:'file ID', validate:webix.rules.isNumber, name:"file_id" },
+                            { view:"text", label:'offset', validate:webix.rules.isNumber, name:"offset", value: 0 },
+                            { view:"text", label:'length', validate:webix.rules.isNumber, name:"length", value: 0 },
+                            { view:"button", type:"form", value:"Read file",
+                                click:function () {
+                                    var form = $$("read_local_file_form")
+                                    if(form.validate()) {
+                                        // TODO post?
+                                        socket.emit('read_local_file', form.getValues())
+                                    }
+                                }
                             }
-                        }
+                        ]
                     }
-                ]
-            },
+                },
+                {
+                    header: "Read system file",
+                    body: {
+                        view:"form", id:"read_local_system_file_form", elements:[
+                            {view:"select", label:"System file", value: 0, name:"system_file_id", options:[
+                                {% for id, file in systemfiles.iteritems() %}
+                                    {id: "{{ id}}", value:  "{{ file.__class__.__name__ }}"},
+                                {% endfor %}
+                            ]},
+                            { view:"button", type:"form", value:"Read file",
+                                click:function () {
+                                    var form = $$("read_local_system_file_form")
+                                    if(form.validate()) {
+                                        // TODO post?
+                                        console.log(form.getValues())
+                                        socket.emit('read_local_system_file', form.getValues())
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    header: "Execute raw ALP command",
+                    body: {
+                        view:"form", id:"execute_raw_alp_form", elements:[
+                            { view:"text", "label":"Raw ALP command", "placeholder":"Raw ALP command", name:"raw_alp"},
+                            { view:"button", type:"form", value:"Execute",
+                                click:function () {
+                                    var form = $$("execute_raw_alp_form")
+                                    if(form.validate()) {
+                                        // TODO post?
+                                        console.log(form.getValues())
+                                        socket.emit('execute_raw_alp', form.getValues());
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]},
             {
                 view:"accordion",
                 rows:[
