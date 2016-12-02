@@ -43,9 +43,10 @@ class Action(Validatable):
   def __str__(self):
     # when reading a known system files we output the parsed data
     if isinstance(self.operation, ReturnFileData):
-      systemfile_type = SystemFiles().get_all_system_files()[self.operand.offset.id]
-      if systemfile_type is not None and systemfile_type.length == self.operand.length:
-        systemfile = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
-        return "op=ReturnFileData, systemfile={}: {}".format(systemfile_type.__class__.__name__, systemfile)
+      if SystemFiles().get_all_system_files().has_key(self.operand.offset.id):
+        systemfile_type = SystemFiles().get_all_system_files()[self.operand.offset.id]
+        if systemfile_type is not None and systemfile_type.length == self.operand.length:
+          systemfile = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
+          return "op=ReturnFileData, systemfile={}: {}".format(systemfile_type.__class__.__name__, systemfile)
 
     return "op={}, operand={}({})".format(type(self.operation).__name__, type(self.operand).__name__, self.operand)

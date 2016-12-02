@@ -61,6 +61,19 @@ class ThroughtPutTest:
 
     if self.transmitter_modem != None:
 
+      print("\n==> broadcast, with QoS, transmitter active access class = 0 ====")
+      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
+      interface_configuration = Configuration(
+        qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
+        addressee=Addressee(
+          access_class=2,
+          id_type=IdType.BCAST
+        )
+      )
+
+      self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
+      self.wait_for_receiver(payload)
+
       print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
       self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
       interface_configuration = Configuration(
@@ -141,9 +154,11 @@ class ThroughtPutTest:
       print("Running without receiver so we are not waiting for messages to be received ...")
     else:
       start = time.time()
-      while len(self.received_commands.values()) < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
+      total_recv = 0
+      while total_recv < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
+        total_recv = sum(len(v) for v in self.received_commands.values())
         time.sleep(2)
-        print("waiting for receiver to finish ...")
+        print("waiting for receiver to finish ... (current nr of recv msgs: {})".format(total_recv))
 
       print("finished receiving or timeout")
       self.receiver_modem.cancel_read()
@@ -154,7 +169,6 @@ class ThroughtPutTest:
             payload_has_errors = True
             print ("receiver: received unexpected command: {}".format(cmd))
 
-      total_recv = sum(len(v) for v in self.received_commands.values())
       if payload_has_errors == False and total_recv == self.config.msg_count:
         print("receiver: OK: received {} messages with correct payload:".format(total_recv))
         for sender, cmds in self.received_commands.items():
