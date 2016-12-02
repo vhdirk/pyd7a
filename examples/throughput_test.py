@@ -22,24 +22,24 @@ class ThroughtPutTest:
 
     self.argparser.add_argument("-n", "--msg-count", help="number of messages to transmit", type=int, default=10)
     self.argparser.add_argument("-p", "--payload-size", help="number of bytes of (appl level) payload to transmit", type=int, default=50)
-    self.argparser.add_argument("-sw", "--serial-writer", help="serial device /dev file writer node", default="/dev/ttyUSB0")
-    self.argparser.add_argument("-sr", "--serial-reader", help="serial device /dev file reader node", default=None)
+    self.argparser.add_argument("-sw", "--serial-transmitter", help="serial device /dev file transmitter node", default="/dev/ttyUSB0")
+    self.argparser.add_argument("-sr", "--serial-receiver", help="serial device /dev file receiver node", default=None)
     self.argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
-    self.writer_modem = Modem(self.config.serial_writer, self.config.rate, None, show_logging=self.config.verbose)
+    self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
 
-    if self.config.serial_reader == None:
-      self.reader_modem = None
+    if self.config.serial_receiver == None:
+      self.receiver_modem = None
     else:
-      self.reader_modem = Modem(self.config.serial_reader, self.config.rate, self.reader_received_cmd_callback, show_logging=self.config.verbose)
+      self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback, show_logging=self.config.verbose)
 
   def start(self):
     payload = range(self.config.payload_size)
 
-    print("\n==> broadcast, no QoS, writer active access class = 2 ====")
-    self.writer_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=2)))
+    print("\n==> broadcast, no QoS, transmitter active access class = 2 ====")
+    self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=2)))
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_NO),
       addressee=Addressee(
@@ -51,10 +51,10 @@ class ThroughtPutTest:
     self.test_throughput(interface_configuration=interface_configuration, payload=payload)
 
     addressee_id = 0
-    if self.reader_modem != None:
-      addressee_id = self.reader_modem.uid
+    if self.receiver_modem != None:
+      addressee_id = self.receiver_modem.uid
 
-    print("\n==> unicast, with QoS, writer active access class = 2")
+    print("\n==> unicast, with QoS, transmitter active access class = 2")
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
       addressee=Addressee(
@@ -66,7 +66,7 @@ class ThroughtPutTest:
 
     self.test_throughput(interface_configuration=interface_configuration, payload=payload)
 
-    print("\n==> unicast, no QoS, writer active access class = 2")
+    print("\n==> unicast, no QoS, transmitter active access class = 2")
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_NO),
       addressee=Addressee(
@@ -82,8 +82,8 @@ class ThroughtPutTest:
     print("Running throughput test with payload size {} and interface_configuration {}\n\nrunning ...\n".format(len(payload), interface_configuration))
     self.received_commands = []
 
-    if self.reader_modem != None:
-      self.reader_modem.start_reading()
+    if self.receiver_modem != None:
+      self.receiver_modem.start_reading()
 
     command = Command.create_with_return_file_data_action(
       file_id=0x40,
@@ -97,35 +97,35 @@ class ThroughtPutTest:
     for i in range(self.config.msg_count):
       sys.stdout.write("{}/{}\r".format(i + 1, self.config.msg_count))
       sys.stdout.flush()
-      self.writer_modem.d7asp_fifo_flush(command)
+      self.transmitter_modem.d7asp_fifo_flush(command)
 
     end = time.time()
-    print("writer: sending {} messages completed in: {} s".format(self.config.msg_count, end - start))
-    print("writer: throughput = {} bps with a payload size of {} bytes".format(
+    print("transmitter: sending {} messages completed in: {} s".format(self.config.msg_count, end - start))
+    print("transmitter: throughput = {} bps with a payload size of {} bytes".format(
       (self.config.msg_count * self.config.payload_size * 8) / (end - start), self.config.payload_size)
     )
 
-    if self.reader_modem == None:
+    if self.receiver_modem == None:
       print("Running without receiver so we are not waiting for messages to be received ...")
     else:
       while len(self.received_commands) < self.config.msg_count and time.time() - start < 5:
         time.sleep(0.5)
-        print("waiting for reader to finish ...")
+        print("waiting for receiver to finish ...")
 
-      print("finished reading or timeout")
-      self.reader_modem.cancel_read()
+      print("finished receiving or timeout")
+      self.receiver_modem.cancel_read()
       payload_has_errors = False
       for cmd in self.received_commands:
         if type(cmd.actions[0].op) != ReturnFileData and cmd.actions[0].operand.data != payload:
           payload_has_errors = True
-          print ("reader: received unexpected command: {}".format(cmd))
+          print ("receiver: received unexpected command: {}".format(cmd))
 
       if payload_has_errors == False and len(self.received_commands) == self.config.msg_count:
-        print("reader: OK: received {} messages with correct payload".format(len(self.received_commands)))
+        print("receiver: OK: received {} messages with correct payload".format(len(self.received_commands)))
       else:
-        print("reader: NOK: received {} messages".format(len(self.received_commands)))
+        print("receiver: NOK: received {} messages".format(len(self.received_commands)))
 
-  def reader_received_cmd_callback(self, cmd):
+  def receiver_cmd_callback(self, cmd):
     self.received_commands.append(cmd)
 
 

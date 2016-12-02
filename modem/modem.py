@@ -173,7 +173,7 @@ class Modem:
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(["0x{:02x}".format(ord(b)) for b in error["buffer"]])
-          self.log("Parser error: " + error)
+          self.log("Parser error: {}".format(error))
 
         for cmd in cmds:
           if self.receive_callback != None:
