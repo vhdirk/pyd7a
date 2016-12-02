@@ -2,6 +2,7 @@ import argparse
 import time
 
 import sys
+from collections import defaultdict
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -28,7 +29,7 @@ class ThroughtPutTest:
     self.argparser.add_argument("-uid", "--unicast-uid", help="UID to use for unicast transmission, "
                                                               "when not using receiver "
                                                               "(in hexstring, for example 0xb57000009151d)", default=None)
-    self.argparser.add_argument("-to", "--receiver-timeout", help="timeout for the receiver (in seconds)", type=int, default=30)
+    self.argparser.add_argument("-to", "--receiver-timeout", help="timeout for the receiver (in seconds)", type=int, default=10)
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
@@ -55,7 +56,7 @@ class ThroughtPutTest:
 
 
   def start(self):
-    self.received_commands = []
+    self.received_commands = defaultdict(list)
     payload = range(self.config.payload_size)
 
     if self.transmitter_modem != None:
@@ -112,7 +113,7 @@ class ThroughtPutTest:
     print("Running throughput test with payload size {} and interface_configuration {}\n\nrunning ...\n".format(len(payload), interface_configuration))
 
     if self.receiver_modem != None:
-      self.received_commands = []
+      self.received_commands = defaultdict(list)
       self.receiver_modem.start_reading()
 
     command = Command.create_with_return_file_data_action(
@@ -140,25 +141,32 @@ class ThroughtPutTest:
       print("Running without receiver so we are not waiting for messages to be received ...")
     else:
       start = time.time()
-      while len(self.received_commands) < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
+      while len(self.received_commands.values()) < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
         time.sleep(2)
         print("waiting for receiver to finish ...")
 
       print("finished receiving or timeout")
       self.receiver_modem.cancel_read()
       payload_has_errors = False
-      for cmd in self.received_commands:
-        if type(cmd.actions[0].op) != ReturnFileData and cmd.actions[0].operand.data != payload:
-          payload_has_errors = True
-          print ("receiver: received unexpected command: {}".format(cmd))
+      for sender_cmd in self.received_commands.values():
+        for cmd in sender_cmd:
+          if type(cmd.actions[0].op) != ReturnFileData and cmd.actions[0].operand.data != payload:
+            payload_has_errors = True
+            print ("receiver: received unexpected command: {}".format(cmd))
 
-      if payload_has_errors == False and len(self.received_commands) == self.config.msg_count:
-        print("receiver: OK: received {} messages with correct payload".format(len(self.received_commands)))
+      total_recv = sum(len(v) for v in self.received_commands.values())
+      if payload_has_errors == False and total_recv == self.config.msg_count:
+        print("receiver: OK: received {} messages with correct payload:".format(total_recv))
+        for sender, cmds in self.received_commands.items():
+          print("\t{}: {}".format(sender, len(cmds)))
       else:
-        print("receiver: NOK: received {} messages".format(len(self.received_commands)))
+        print("receiver: NOK: received messages {}:".format(total_recv))
+        for sender, cmds in self.received_commands.items():
+          print("\t{}: {}".format(sender, len(cmds)))
 
   def receiver_cmd_callback(self, cmd):
-    self.received_commands.append(cmd)
+    uid = cmd.interface_status.operand.interface_status.addressee.id
+    self.received_commands[uid].append(cmd)
 
 
 if __name__ == "__main__":
