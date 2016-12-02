@@ -22,67 +22,97 @@ class ThroughtPutTest:
 
     self.argparser.add_argument("-n", "--msg-count", help="number of messages to transmit", type=int, default=10)
     self.argparser.add_argument("-p", "--payload-size", help="number of bytes of (appl level) payload to transmit", type=int, default=50)
-    self.argparser.add_argument("-sw", "--serial-transmitter", help="serial device /dev file transmitter node", default="/dev/ttyUSB0")
+    self.argparser.add_argument("-sw", "--serial-transmitter", help="serial device /dev file transmitter node", default=None)
     self.argparser.add_argument("-sr", "--serial-receiver", help="serial device /dev file receiver node", default=None)
     self.argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
+    self.argparser.add_argument("-uid", "--unicast-uid", help="UID to use for unicast transmission, "
+                                                              "when not using receiver "
+                                                              "(in hexstring, for example 0xb57000009151d)", default=None)
+    self.argparser.add_argument("-to", "--receiver-timeout", help="timeout for the receiver (in seconds)", type=int, default=30)
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
-    self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
+    if self.config.serial_transmitter == None and self.config.serial_receiver ==  None:
+      self.argparser.error("At least a transmitter or receiver is required.")
+
+    if self.config.serial_receiver == None and self.config.unicast_uid == None:
+      self.argparser.error("When running without receiver a --unicast-uid parameter is required.")
+
+    if self.config.serial_transmitter == None:
+      self.transmitter_modem = None
+      print("Running without transmitter")
+    else:
+      self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
 
     if self.config.serial_receiver == None:
       self.receiver_modem = None
+      print("Running without receiver")
     else:
       self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback, show_logging=self.config.verbose)
+      self.receiver_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=2)))
+      print("Receiver scanning on Access Class = 2")
+
+
 
   def start(self):
+    self.received_commands = []
     payload = range(self.config.payload_size)
 
-    print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
-    self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
-    interface_configuration = Configuration(
-      qos=QoS(resp_mod=QoS.RESP_MODE_NO),
-      addressee=Addressee(
-        access_class=2,
-        id_type=IdType.BCAST
+    if self.transmitter_modem != None:
+
+      print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
+      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
+      interface_configuration = Configuration(
+        qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+        addressee=Addressee(
+          access_class=2,
+          id_type=IdType.BCAST
+        )
       )
-    )
 
-    self.test_throughput(interface_configuration=interface_configuration, payload=payload)
+      self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
+      self.wait_for_receiver(payload)
 
-    addressee_id = 0
-    if self.receiver_modem != None:
-      addressee_id = self.receiver_modem.uid
+      if self.receiver_modem != None:
+        addressee_id = self.receiver_modem.uid
+      else:
+        addressee_id = int(self.config.unicast_uid, 16)
 
-    print("\n==> unicast, with QoS, transmitter active access class = 0")
-    interface_configuration = Configuration(
-      qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
-      addressee=Addressee(
-        access_class=2,
-        id_type=IdType.UID,
-        id=addressee_id
+      print("\n==> unicast, with QoS, transmitter active access class = 0")
+      interface_configuration = Configuration(
+        qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
+        addressee=Addressee(
+          access_class=2,
+          id_type=IdType.UID,
+          id=addressee_id
+        )
       )
-    )
 
-    self.test_throughput(interface_configuration=interface_configuration, payload=payload)
+      self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
+      self.wait_for_receiver(payload)
 
-    print("\n==> unicast, no QoS, transmitter active access class = 0")
-    interface_configuration = Configuration(
-      qos=QoS(resp_mod=QoS.RESP_MODE_NO),
-      addressee=Addressee(
-        access_class=2,
-        id_type=IdType.UID,
-        id=addressee_id
+      print("\n==> unicast, no QoS, transmitter active access class = 0")
+      interface_configuration = Configuration(
+        qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+        addressee=Addressee(
+          access_class=2,
+          id_type=IdType.UID,
+          id=addressee_id
+        )
       )
-    )
 
-    self.test_throughput(interface_configuration=interface_configuration, payload=payload)
+      self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
+      self.wait_for_receiver(payload)
+    else:
+      # receive only
+      self.receiver_modem.start_reading()
+      self.wait_for_receiver(payload)
 
-  def test_throughput(self, interface_configuration, payload):
+  def start_transmitting(self, interface_configuration, payload):
     print("Running throughput test with payload size {} and interface_configuration {}\n\nrunning ...\n".format(len(payload), interface_configuration))
-    self.received_commands = []
 
     if self.receiver_modem != None:
+      self.received_commands = []
       self.receiver_modem.start_reading()
 
     command = Command.create_with_return_file_data_action(
@@ -105,11 +135,13 @@ class ThroughtPutTest:
       (self.config.msg_count * self.config.payload_size * 8) / (end - start), self.config.payload_size)
     )
 
+  def wait_for_receiver(self, payload):
     if self.receiver_modem == None:
       print("Running without receiver so we are not waiting for messages to be received ...")
     else:
-      while len(self.received_commands) < self.config.msg_count and time.time() - start < 5:
-        time.sleep(0.5)
+      start = time.time()
+      while len(self.received_commands) < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
+        time.sleep(2)
         print("waiting for receiver to finish ...")
 
       print("finished receiving or timeout")
