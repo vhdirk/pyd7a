@@ -38,8 +38,8 @@ class ThroughtPutTest:
   def start(self):
     payload = range(self.config.payload_size)
 
-    print("\n==> broadcast, no QoS, transmitter active access class = 2 ====")
-    self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=2)))
+    print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
+    self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_NO),
       addressee=Addressee(
@@ -54,7 +54,7 @@ class ThroughtPutTest:
     if self.receiver_modem != None:
       addressee_id = self.receiver_modem.uid
 
-    print("\n==> unicast, with QoS, transmitter active access class = 2")
+    print("\n==> unicast, with QoS, transmitter active access class = 0")
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
       addressee=Addressee(
@@ -66,7 +66,7 @@ class ThroughtPutTest:
 
     self.test_throughput(interface_configuration=interface_configuration, payload=payload)
 
-    print("\n==> unicast, no QoS, transmitter active access class = 2")
+    print("\n==> unicast, no QoS, transmitter active access class = 0")
     interface_configuration = Configuration(
       qos=QoS(resp_mod=QoS.RESP_MODE_NO),
       addressee=Addressee(
