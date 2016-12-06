@@ -71,7 +71,8 @@ class TestCommand(unittest.TestCase):
       200,                                            # fifo token
       0,                                              # seq
       20,                                             # response timeout
-      16,                                             # addressee ctrl (BCAST)
+      0x10,                                           # addressee ctrl (NOID)
+      0,                                              # access class
       0x20,                                           # action=32/ReturnFileData
       0x51,                                           # File ID
       0x00,                                           # offset
@@ -136,7 +137,8 @@ class TestCommand(unittest.TestCase):
       200,  # fifo token
       0,  # seq
       20,  # response timeout
-      16,  # addressee ctrl (BCAST)
+      0x10,  # addressee ctrl (NOID)
+      0,     # access class
       0x20,  # action=32/ReturnFileData
       0x51,  # File ID
       0x00,  # offset

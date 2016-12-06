@@ -22,14 +22,15 @@ class TestStatus(unittest.TestCase):
       100,                                              # fifo token
       0,                                              # seq
       20,                                              # response timeout
-      16                                              # addressee ctrl (BCAST)
+      16,                                              # addressee ctrl (NOID)
+      0                                                # access class
     ]
     bytes = bytearray(Status(
       channel_header=0, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
       nls=False, missed=False, retry=False, unicast=False, fifo_token=100,
       seq_nr=0, response_to=CT(0, 20), addressee=Addressee()
     ))
-    self.assertEqual(len(bytes), 11)
+    self.assertEqual(len(bytes), 12)
     for i in xrange(10):
       self.assertEqual(expected[i], bytes[i])
 
@@ -39,7 +40,7 @@ class TestStatus(unittest.TestCase):
       nls=True, missed=True, retry=True))
 
     expected[6] = int('11100000', 2) # nls, missed, retry, ucast
-    self.assertEqual(len(bytes), 11)
+    self.assertEqual(len(bytes), 12)
     for i in xrange(10):
       self.assertEqual(expected[i], bytes[i])
 

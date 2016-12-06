@@ -29,10 +29,11 @@ class TestConfiguration(unittest.TestCase):
   def test_byte_generation(self):
     # TODO: use mocking framework to mock sub-objects
     bytes = bytearray(Configuration())
-    self.assertEqual(len(bytes), 3)
+    self.assertEqual(len(bytes), 4)
     self.assertEquals(bytes[0], int( '00000000', 2)) # qos
     self.assertEquals(bytes[1], int( '00000000', 2)) # dorm_to (CT)
-    self.assertEquals(bytes[2], int( '00010000', 2)) # addressee control BCAST
+    self.assertEquals(bytes[2], int( '00010000', 2)) # addressee control NOID
+    self.assertEquals(bytes[3], 0)  # access class
 
 
 if __name__ == '__main__':

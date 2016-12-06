@@ -26,7 +26,8 @@ class TestParser(unittest.TestCase):
       0,                                              # fifo token
       0,                                              # seq
       0,                                              # response timeout
-      16                                              # addressee ctrl (BCAST)
+      1 << 4,                                         # addressee ctrl (NOID, nls_method=NONE)
+      0                                               # access class
     ]
 
   def test_basic_valid_message(self):
@@ -177,7 +178,8 @@ class TestParser(unittest.TestCase):
       0xa5,                                           # fifo token
       0x00,                                           # request ID
       20,                                             # response timeout
-      0x20,                                           # addr control
+      0b00100010,                                     # addr control
+      5,                                              # access class
       0x24, 0x8a, 0xb6, 0x01, 0x51, 0xc7, 0x96, 0x6d, # addr
     ]
 
