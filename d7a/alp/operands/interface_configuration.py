@@ -1,3 +1,4 @@
+from d7a.alp.interface import InterfaceType
 from d7a.sp.configuration import Configuration
 from d7a.support.schema import Validatable, Types
 
@@ -5,7 +6,7 @@ from d7a.support.schema import Validatable, Types
 class InterfaceConfiguration(Validatable):
 
   SCHEMA = [{
-    "interface_id"        : Types.BYTE(),
+    "interface_id"        : Types.ENUM(InterfaceType),
     "interface_configuration"    : Types.OBJECT(Configuration)
   }]
 
@@ -15,7 +16,7 @@ class InterfaceConfiguration(Validatable):
     super(InterfaceConfiguration, self).__init__()
 
   def __iter__(self):
-    yield self.interface_id
+    yield self.interface_id.value
     for byte in self.interface_configuration: yield byte
 
   def __str__(self):

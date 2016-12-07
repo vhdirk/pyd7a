@@ -57,7 +57,7 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0]), RegularAction)
     self.assertEqual(type(c.actions[0].operation), Forward)
     self.assertEqual(type(c.actions[0].operand), InterfaceConfiguration)
-    self.assertEqual(c.actions[0].operand.interface_id, 0xD7)
+    self.assertEqual(c.actions[0].operand.interface_id.value, 0xD7)
     self.assertEqual(type(c.actions[0].operand.interface_configuration), Configuration)
     # TODO configuration properties
     self.assertEqual(type(c.actions[1].operation), ReadFileData)
@@ -77,7 +77,7 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0]), RegularAction)
     self.assertEqual(type(c.actions[0].operation), Forward)
     self.assertEqual(type(c.actions[0].operand), InterfaceConfiguration)
-    self.assertEqual(c.actions[0].operand.interface_id, 0xD7)
+    self.assertEqual(c.actions[0].operand.interface_id.value, 0xD7)
     self.assertEqual(type(c.actions[0].operand.interface_configuration), Configuration)
     # TODO configuration properties
     self.assertEqual(type(c.actions[1].operation), WriteFileData)
@@ -95,7 +95,7 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0]), RegularAction)
     self.assertEqual(type(c.actions[0].operation), Forward)
     self.assertEqual(type(c.actions[0].operand), InterfaceConfiguration)
-    self.assertEqual(c.actions[0].operand.interface_id, 0xD7)
+    self.assertEqual(c.actions[0].operand.interface_id.value, 0xD7)
     self.assertEqual(type(c.actions[0].operand.interface_configuration), Configuration)
     self.assertEqual(type(c.actions[1]), RegularAction)
     self.assertEqual(type(c.actions[1].operation), ReturnFileData)
