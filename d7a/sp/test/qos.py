@@ -5,7 +5,8 @@
 
 import unittest
 
-from d7a.sp.qos import QoS
+from d7a.sp.qos import QoS, ResponseMode
+
 
 class TestQoS(unittest.TestCase):
   def test_default_constructor(self):
@@ -18,7 +19,7 @@ class TestQoS(unittest.TestCase):
 
     bytes = bytearray(QoS(
       nls= True,
-      resp_mod    = QoS.RESP_MODE_ANY,
+      resp_mod    = ResponseMode.RESP_MODE_ANY,
       record=True,
       stop_on_err=True,
     ))

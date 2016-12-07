@@ -5,21 +5,17 @@
 
 
 import struct
+from enum import Enum
+
 from d7a.support.schema import Validatable, Types
 from d7a.types.ct import CT
 
 
-class IdType(object):
+class IdType(Enum):
   NBID  = 0
   NOID  = 1
   UID   = 2
   VID   = 3
-  ALL   = [ NBID, NOID, UID, VID ]
-
-  @staticmethod
-  def SCHEMA():
-    return { "type": "integer", "allowed" : IdType.ALL }
-
 
 class NlsMethod(object):
   NONE = 0
@@ -48,28 +44,28 @@ class Addressee(Validatable):
   SCHEMA = [
     {
       # void identifier with reached devices estimation
-      "id_type"   : Types.INTEGER([IdType.NBID]),
+      "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.NBID]),
       "nls_method": Types.INTEGER(NlsMethod.ALL),
       "access_class": Types.BYTE(),
       "id"        : Types.OBJECT(CT)
     },
     {
       # void identifier without reached devices estimation
-      "id_type": Types.INTEGER([IdType.NOID]),
+      "id_type": Types.ENUM(IdType, allowedvalues=[IdType.NOID]),
       "nls_method": Types.INTEGER(NlsMethod.ALL),
       "access_class": Types.BYTE(),
       "id": Types.INTEGER([None])
     },
     {
        # virtual
-      "id_type"   : Types.INTEGER([IdType.VID]),
+      "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.VID]),
       "nls_method": Types.INTEGER(NlsMethod.ALL),
       "access_class": Types.BYTE(),
       "id"        : Types.INTEGER(min=0, max=0xFFFF)
     },
     {
       # unicast
-      "id_type"   : Types.INTEGER([IdType.UID]),
+      "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.UID]),
       "nls_method": Types.INTEGER(NlsMethod.ALL),
       "access_class": Types.BYTE(),
       "id"        : Types.INTEGER(min=0, max=0xFFFFFFFFFFFFFFFF)
@@ -107,7 +103,7 @@ class Addressee(Validatable):
   @staticmethod
   def parse(s):
     _     = s.read("pad:2")
-    id_type = s.read("uint:2")
+    id_type = IdType(s.read("uint:2"))
     nls_method = s.read("uint:4")
     cl    = s.read("uint:8")
     l     = Addressee.length_for(id_type)
@@ -117,7 +113,7 @@ class Addressee(Validatable):
   def __iter__(self):
     byte = 0
     # pad 2 << 7 << 6
-    byte |= self.id_type << 4
+    byte |= self.id_type.value << 4
     byte += self.nls_method
     yield byte
     yield self.access_class
