@@ -192,7 +192,7 @@ class Command(Validatable):
         yield byte
 
   def __str__(self):
-    output = "Command actions:\n"
+    output = "Command with tag {} actions:\n".format(self.tag_id)
     for action in self.actions:
       output = output + "\taction: {}\n".format(action)
 
