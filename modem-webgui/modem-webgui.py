@@ -6,7 +6,7 @@ import eventlet
 import sys
 
 from datetime import time, datetime
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 
 from d7a.alp.command import Command
@@ -17,7 +17,7 @@ from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.system_files import SystemFiles
 from modem.modem import Modem
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
 eventlet.monkey_patch()
 modem = None
@@ -30,6 +30,29 @@ def index():
                          qos_response_modes=ResponseMode.__members__,
                          id_types=IdType.__members__)
 
+@app.route('/systemfiles')
+def get_system_files():
+  options = []
+  for id, file in SystemFiles().get_all_system_files().iteritems():
+    options.append({"id": id, "value": file.__class__.__name__  })
+
+  return jsonify(options)
+
+@app.route('/idtypes')
+def get_id_types():
+  id_types = []
+  for name, member in IdType.__members__.items():
+    id_types.append({'id': member.value, 'value': name})
+
+  return jsonify(id_types)
+
+@app.route('/responsemodes')
+def get_response_modes():
+  response_modes = []
+  for name, member in ResponseMode.__members__.items():
+    response_modes.append({"id": member.value, "value": name})
+
+  return jsonify(response_modes)
 
 @socketio.on('execute_raw_alp')
 def on_execute_raw_alp(data):
