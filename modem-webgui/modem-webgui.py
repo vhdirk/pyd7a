@@ -85,8 +85,7 @@ def execute_command(data):
   )
 
   modem.send_command(cmd)
-
-  # TODO return command tag
+  return {'tag_id': cmd.tag_id}
 
 
 @socketio.on('connect')
