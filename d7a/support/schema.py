@@ -14,7 +14,16 @@ class ObjectValidator(Validator):
     """ {'nullable': True } """ # dummy validation schema to avoid warning ;-)
     if not isinstance(value, clazz):
       self._error(field, "Should be instance of " + clazz.__name__)
-  
+
+  def _validate_allowedmembers(self, allowed_members, field, value):
+    """ {'nullable': True } """ # dummy validation schema to avoid warning ;-)
+    for allowed_member in allowed_members:
+      if value == allowed_member:
+        return
+
+    self._error(field, "Only following enum values allowed: " + ", ".join([m.name for m in allowed_members]))
+
+
 class Validatable(object):
   def __init__(self):
     self.validate()
@@ -92,10 +101,14 @@ class Types(object):
     return i
 
   @staticmethod
-  def ENUM(values):
-    e = { "type": "integer", "allowed" : values}
-    if None in values: e["nullable"] = True
+  def ENUM(type, allowedvalues=None, nullable=False):
+    e = {"isinstance": type }
+    if allowedvalues is not None: e["allowedmembers"] = allowedvalues
     return e
+    #
+    # e = { "type": "integer", "allowed" : values}
+    # if None in values: e["nullable"] = True
+    # return e
 
   @staticmethod
   def BITS(length, min=0x0, max=None):

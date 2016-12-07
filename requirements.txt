@@ -7,3 +7,4 @@ PyCRC
 pyserial>=3.1.1
 unittest2
 coverage
+enum34
