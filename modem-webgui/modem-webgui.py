@@ -10,6 +10,10 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 from d7a.alp.command import Command
+from d7a.alp.interface import InterfaceType
+from d7a.d7anp.addressee import IdType, Addressee
+from d7a.sp.configuration import Configuration
+from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.system_files import SystemFiles
 from modem.modem import Modem
 
@@ -21,7 +25,10 @@ modem = None
 
 @app.route('/')
 def index():
-  return render_template('index.html', systemfiles=SystemFiles().get_all_system_files())
+  return render_template('index.html',
+                         systemfiles=SystemFiles().get_all_system_files(),
+                         qos_response_modes=ResponseMode.__members__,
+                         id_types=IdType.__members__)
 
 
 @socketio.on('execute_raw_alp')
@@ -46,6 +53,40 @@ def on_read_local_file(data):
   )
 
   modem.send_command(cmd)
+
+@socketio.on('execute_command')
+def execute_command(data):
+  print("execute_command")
+  print data
+
+  interface_configuration = None
+  interface_type = InterfaceType(int(data["interface"]))
+  if interface_type == InterfaceType.D7ASP:
+    id_type = IdType(int(data["id_type"]))
+    id = int(data["id"])
+    if id_type == IdType.NOID:
+      id = None
+
+    interface_configuration = Configuration(
+      qos=QoS(resp_mod=ResponseMode(int(data["qos_response_mode"]))),
+      addressee=Addressee(
+        access_class=int(data["access_class"]),
+        id_type=id_type,
+        id=id
+      )
+    )
+
+  cmd = Command.create_with_read_file_action(
+    interface_type=interface_type,
+    interface_configuration=interface_configuration,
+    file_id=int(data["file_id"]),
+    offset=int(data["offset"]),
+    length=int(data["length"])
+  )
+
+  modem.send_command(cmd)
+
+  # TODO return command tag
 
 
 @socketio.on('connect')
@@ -75,6 +116,9 @@ def command_received_callback(cmd):
     socketio.emit("received_alp_command", {'ts': datetime.now().isoformat(), 'cmd': str(cmd)}, broadcast=True)
     print("broadcasted recv command")
 
+@socketio.on_error_default
+def default_error_handler(e):
+  print("Error {} in {} with args".format(e, request.event["message"], request.event["args"]))
 
 if __name__ == '__main__':
   argparser = argparse.ArgumentParser()
