@@ -3,7 +3,7 @@ from d7a.support.schema import Validatable, Types
 
 
 class Subband(Validatable):
-  # TODO update to D7AP v1.1 
+  # TODO update to D7AP v1.1
 
   SCHEMA = [{
     "channel_header": Types.OBJECT(ChannelHeader),

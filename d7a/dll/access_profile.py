@@ -1,5 +1,6 @@
 from enum import Enum
 
+from d7a.phy.subband import Subband
 from d7a.support.schema           import Validatable, Types
 from d7a.types.ct import CT
 
@@ -10,10 +11,6 @@ class CsmaCaMode(Enum):
   RAIND = 2
   RIGD = 3
 
-class Subband(Validatable):
-  # TODO
-  SCHEMA = [{
-  }]
 
 class AccessProfile(Validatable):
 
@@ -28,7 +25,6 @@ class AccessProfile(Validatable):
   }]
 
   def __init__(self, scan_type_is_foreground, csma_ca_mode, subnet, scan_automation_period, subbands):
-    # TODO subbands + remove number
     self.scan_type_is_foreground = scan_type_is_foreground
     self.csma_ca_mode = csma_ca_mode
     self.subnet = subnet
