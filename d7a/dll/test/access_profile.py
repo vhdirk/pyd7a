@@ -76,11 +76,20 @@ class TestAccessProfile(unittest.TestCase):
     self.assertRaises(ValueError, bad)
 
   def test_byte_generation(self):
-    expected = []
+    expected = [
+      0b10000001, # AP control: FG scan, UNC, 1 subband
+      5, # subnet
+      0, # scan automation period
+      0, # RFU
+    ] + list(bytearray(self.valid_subband)) # TODO multiple subbands
     ap = AccessProfile(scan_type_is_foreground=True,
                        csma_ca_mode=CsmaCaMode.UNC,
-                       subnet=0,
+                       subnet=5,
                        scan_automation_period=CT(0),
                        subbands=[self.valid_subband])
 
-    self.assertEqual(expected, bytearray(ap))
+    bytes = bytearray(ap)
+    for i in xrange(len(bytes)):
+      self.assertEqual(expected[i], bytes[i])
+
+    self.assertEqual(len(expected), len(bytes))

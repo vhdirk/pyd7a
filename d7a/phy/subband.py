@@ -20,3 +20,10 @@ class Subband(Validatable):
     self.eirp = eirp
     self.ccao = ccao
     super(Subband, self).__init__()
+
+  def __iter__(self):
+    for byte in self.channel_header: yield byte
+    yield self.channel_index_start
+    yield self.channel_index_end
+    yield self.eirp
+    yield self.ccao

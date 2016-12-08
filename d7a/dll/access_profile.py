@@ -37,9 +37,14 @@ class AccessProfile(Validatable):
     return len(self.subbands)
 
   def __iter__(self):
-    yield self.length
+    control = self.scan_type_is_foreground << 7
+    control += self.csma_ca_mode.value << 6
+    control += self.number_of_subbands
+    yield control
     yield self.subnet
-    for byte in self.control: yield byte
-    for byte in self.target_address: yield byte
-    for byte in self.d7anp_frame: yield byte
-    yield self.crc16
+    for byte in self.scan_automation_period: yield byte
+    # skip Tc, this is already removed in oss7 as intermediate change towards v1.1
+    yield 0 # RFU
+    for subband in self.subbands:
+      for byte in subband:
+        yield byte

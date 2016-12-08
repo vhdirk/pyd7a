@@ -57,3 +57,21 @@ class TestSubband(unittest.TestCase):
                             eirp=10,
                             ccao=-10)
     self.assertRaises(ValueError, bad)
+
+  def test_byte_generation(self):
+    expected = list(bytearray(self.valid_channel_header)) + [
+      0, # channel index start
+      16, # channel index end
+      10, # eirp
+      86 # ccao
+    ]
+    sb = Subband(channel_header=self.valid_channel_header,
+                 channel_index_start=0,
+                 channel_index_end=16,
+                 eirp=10,
+                 ccao=86)
+    bytes = bytearray(sb)
+    for i in xrange(len(bytes)):
+      self.assertEqual(expected[i], bytes[i])
+
+    self.assertEqual(len(expected), len(bytes))
