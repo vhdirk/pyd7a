@@ -1,0 +1,21 @@
+from d7a.dll.access_profile import AccessProfile
+from d7a.support.schema import Validatable, Types
+from d7a.system_files.file import File
+from d7a.system_files.system_file_ids import SystemFileIds
+
+
+class AccessProfileFile(File, Validatable):
+  SCHEMA = [{
+    "access_specifier": Types.INTEGER(min=0, max=14),
+    "access_profile": Types.OBJECT(AccessProfile)
+  }]
+
+  def __init__(self, access_profile, access_specifier=0):
+    self.access_specifier = access_specifier
+    self.access_profile = access_profile
+    Validatable.__init__(self)
+    File.__init__(self, SystemFileIds.ACCESS_PROFILE_0 + access_specifier, 11)
+
+  def __iter__(self):
+    for byte in self.access_profile:
+      yield byte
