@@ -32,4 +32,8 @@ class ChannelHeader(Validatable):
     self.channel_band = channel_band
     super(ChannelHeader, self).__init__()
 
-  # TODO byte generation
+  def __iter__(self):
+    byte = self.channel_band.value << 4
+    byte += self.channel_class.value << 2
+    byte += self.channel_coding.value
+    yield byte

@@ -33,5 +33,16 @@ class TestChannelHeader(unittest.TestCase):
 
     self.assertRaises(ValueError, bad)
 
+  def test_byte_generation(self):
+    expected = [
+      0b00101000
+    ]
 
-  # TODO test byte generation
+    channel_header = ChannelHeader(channel_coding=ChannelCoding.PN9,
+                                   channel_class=ChannelClass.NORMAL_RATE,
+                                   channel_band=ChannelBand.BAND_433)
+    bytes = bytearray(channel_header)
+    for i in xrange(len(bytes)):
+      self.assertEqual(expected[i], bytes[i])
+
+    self.assertEqual(len(expected), len(bytes))
