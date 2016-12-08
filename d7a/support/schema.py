@@ -116,8 +116,8 @@ class Types(object):
     return { "type": "integer", "min": 0x0, "max": max }
 
   @staticmethod
-  def LIST(type=None):
-    l = { "type" : "list" }
+  def LIST(type=None, minlength=0):
+    l = { "type" : "list", "minlength": minlength }
     if type:
       l["schema"] = {
         "isinstance" : type
