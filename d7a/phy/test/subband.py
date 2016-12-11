@@ -60,8 +60,8 @@ class TestSubband(unittest.TestCase):
 
   def test_byte_generation(self):
     expected = list(bytearray(self.valid_channel_header)) + [
-      0, # channel index start
-      16, # channel index end
+      0, 0, # channel index start
+      16, 0, # channel index end
       10, # eirp
       86 # ccao
     ]

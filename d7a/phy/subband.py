@@ -1,3 +1,5 @@
+import struct
+
 from d7a.phy.channel_header import ChannelHeader
 from d7a.support.schema import Validatable, Types
 
@@ -23,7 +25,7 @@ class Subband(Validatable):
 
   def __iter__(self):
     for byte in self.channel_header: yield byte
-    yield self.channel_index_start
-    yield self.channel_index_end
+    for byte in bytearray(struct.pack("<h", self.channel_index_start)): yield byte
+    for byte in bytearray(struct.pack("<h", self.channel_index_end)): yield byte
     yield self.eirp
     yield self.ccao
