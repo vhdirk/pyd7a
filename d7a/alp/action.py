@@ -17,6 +17,7 @@ from d7a.support.schema           import Validatable, Types
 
 from d7a.alp.operations.operation import Operation
 from d7a.alp.operations.nop       import NoOperation
+from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.system_files import SystemFiles
 
 
@@ -43,10 +44,12 @@ class Action(Validatable):
   def __str__(self):
     # when reading a known system files we output the parsed data
     if isinstance(self.operation, ReturnFileData):
-      if SystemFiles().get_all_system_files().has_key(self.operand.offset.id):
-        systemfile_type = SystemFiles().get_all_system_files()[self.operand.offset.id]
+      try:
+        systemfile_type = SystemFiles().get_all_system_files()[SystemFileIds(self.operand.offset.id)]
         if systemfile_type is not None and systemfile_type.length == self.operand.length:
           systemfile = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
           return "op=ReturnFileData, systemfile={}: {}".format(systemfile_type.__class__.__name__, systemfile)
+      except:
+        pass # not a SystemFile, do nothing
 
     return "op={}, operand={}({})".format(type(self.operation).__name__, type(self.operand).__name__, self.operand)
