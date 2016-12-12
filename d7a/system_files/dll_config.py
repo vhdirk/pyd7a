@@ -16,7 +16,7 @@ class DllConfigFile(File, Validatable):
     self.active_access_class = active_access_class
     self.vid = vid
     Validatable.__init__(self)
-    File.__init__(self, SystemFileIds.DLL_CONFIG, 6)
+    File.__init__(self, SystemFileIds.DLL_CONFIG.value, 6)
 
   @staticmethod
   def parse(s):

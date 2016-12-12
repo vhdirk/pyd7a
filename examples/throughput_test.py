@@ -7,8 +7,13 @@ from collections import defaultdict
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import Addressee, IdType
+from d7a.dll.access_profile import AccessProfile, CsmaCaMode
+from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
+from d7a.phy.subband import Subband
 from d7a.sp.configuration import Configuration
-from d7a.sp.qos import QoS
+from d7a.sp.qos import QoS, ResponseMode
+from d7a.system_files.access_profile import AccessProfileFile
+from d7a.types.ct import CT
 from modem.modem import Modem
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.system_files.dll_config import DllConfigFile
@@ -44,6 +49,26 @@ class ThroughtPutTest:
       print("Running without transmitter")
     else:
       self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
+      access_profile = AccessProfile(
+        scan_type_is_foreground=True,
+        csma_ca_mode=CsmaCaMode.UNC,
+        subnet=03,
+        scan_automation_period=CT(0),
+        subbands=[Subband(
+          channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                                       channel_coding=ChannelCoding.PN9,
+                                       channel_class=ChannelClass.NORMAL_RATE),
+          channel_index_start=16,
+          channel_index_end=16,
+          eirp=10,
+          ccao=0 # TODO
+        )
+        ]
+      )
+
+      print("Write Access Profile")
+      write_ap_cmd = Command.create_with_write_file_action_system_file(file=AccessProfileFile(access_profile=access_profile, access_specifier=0))
+      self.transmitter_modem.send_command(write_ap_cmd)
 
     if self.config.serial_receiver == None:
       self.receiver_modem = None
@@ -56,18 +81,24 @@ class ThroughtPutTest:
 
 
   def start(self):
+    return # TODO
     self.received_commands = defaultdict(list)
     payload = range(self.config.payload_size)
+
+    if self.receiver_modem != None:
+      addressee_id = self.receiver_modem.uid
+    else:
+      addressee_id = int(self.config.unicast_uid, 16)
 
     if self.transmitter_modem != None:
 
       print("\n==> broadcast, with QoS, transmitter active access class = 0 ====")
       self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
       interface_configuration = Configuration(
-        qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
+        qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
           access_class=2,
-          id_type=IdType.BCAST
+          id_type=IdType.NOID
         )
       )
 
@@ -77,24 +108,19 @@ class ThroughtPutTest:
       print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
       self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
       interface_configuration = Configuration(
-        qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+        qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
         addressee=Addressee(
           access_class=2,
-          id_type=IdType.BCAST
+          id_type=IdType.NOID
         )
       )
 
       self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
       self.wait_for_receiver(payload)
 
-      if self.receiver_modem != None:
-        addressee_id = self.receiver_modem.uid
-      else:
-        addressee_id = int(self.config.unicast_uid, 16)
-
       print("\n==> unicast, with QoS, transmitter active access class = 0")
       interface_configuration = Configuration(
-        qos=QoS(resp_mod=QoS.RESP_MODE_ANY),
+        qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
           access_class=2,
           id_type=IdType.UID,
@@ -107,7 +133,7 @@ class ThroughtPutTest:
 
       print("\n==> unicast, no QoS, transmitter active access class = 0")
       interface_configuration = Configuration(
-        qos=QoS(resp_mod=QoS.RESP_MODE_NO),
+        qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
         addressee=Addressee(
           access_class=2,
           id_type=IdType.UID,

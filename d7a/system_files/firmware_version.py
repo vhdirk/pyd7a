@@ -21,7 +21,7 @@ class FirmwareVersionFile(File, Validatable):
     self.application_name = application_name
     self.git_sha1 = git_sha1
     Validatable.__init__(self)
-    File.__init__(self, SystemFileIds.FIRMWARE_VERSION, 15)
+    File.__init__(self, SystemFileIds.FIRMWARE_VERSION.value, 15)
 
   @property
   def d7ap_version(self):

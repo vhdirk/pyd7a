@@ -13,7 +13,7 @@ class UidFile(File, Validatable):
 
   def __init__(self, uid=0):
     self.uid = uid
-    File.__init__(self, SystemFileIds.UID, 8)
+    File.__init__(self, SystemFileIds.UID.value, 8)
     Validatable.__init__(self)
 
   @staticmethod

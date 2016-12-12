@@ -15,6 +15,7 @@ from d7a.d7anp.addressee import IdType, Addressee
 from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.system_files import SystemFiles
+from d7a.system_files.system_file_ids import SystemFileIds
 from modem.modem import Modem
 
 app = Flask(__name__, static_url_path='/static')
@@ -34,7 +35,7 @@ def index():
 def get_system_files():
   options = []
   for id, file in SystemFiles().get_all_system_files().iteritems():
-    options.append({"id": id, "value": file.__class__.__name__  })
+    options.append({"id": id.value, "value": id.name  })
 
   return jsonify(options)
 
@@ -63,7 +64,7 @@ def on_execute_raw_alp(data):
 def on_read_local_system_file(data):
   print("read local system file")
   modem.send_command(
-    Command.create_with_read_file_action_system_file(SystemFiles.files[int(data['system_file_id'])])
+    Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
   )
 
 @socketio.on('read_local_file')

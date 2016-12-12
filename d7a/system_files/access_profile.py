@@ -7,14 +7,14 @@ from d7a.system_files.system_file_ids import SystemFileIds
 class AccessProfileFile(File, Validatable):
   SCHEMA = [{
     "access_specifier": Types.INTEGER(min=0, max=14),
-    "access_profile": Types.OBJECT(AccessProfile)
+    "access_profile": Types.OBJECT(AccessProfile, nullable=True)
   }]
 
-  def __init__(self, access_profile, access_specifier=0):
+  def __init__(self, access_specifier=0, access_profile=None):
     self.access_specifier = access_specifier
     self.access_profile = access_profile
     Validatable.__init__(self)
-    File.__init__(self, SystemFileIds.ACCESS_PROFILE_0 + access_specifier, 11)
+    File.__init__(self, SystemFileIds.ACCESS_PROFILE_0.value + access_specifier, 11)
 
   def __iter__(self):
     for byte in self.access_profile:
