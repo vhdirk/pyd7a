@@ -37,3 +37,11 @@ class ChannelHeader(Validatable):
     byte += self.channel_class.value << 2
     byte += self.channel_coding.value
     yield byte
+
+  @staticmethod
+  def parse(s):
+    s.read("uint:1") # RFU
+    channel_band = ChannelBand(s.read("uint:3"))
+    channel_class = ChannelClass(s.read("uint:2"))
+    channel_coding = ChannelCoding(s.read("uint:2"))
+    return ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)

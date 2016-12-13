@@ -1,5 +1,7 @@
 import unittest
 
+from bitstring import ConstBitStream
+
 from d7a.phy.channel_header import ChannelHeader, ChannelCoding, ChannelClass, ChannelBand
 
 
@@ -46,3 +48,14 @@ class TestChannelHeader(unittest.TestCase):
       self.assertEqual(expected[i], bytes[i])
 
     self.assertEqual(len(expected), len(bytes))
+
+  def test_parse(self):
+    bytes = [
+      0b00101000
+    ]
+
+    ch = ChannelHeader.parse(ConstBitStream(bytes=bytes))
+
+    self.assertEqual(ch.channel_coding, ChannelCoding.PN9)
+    self.assertEqual(ch.channel_class, ChannelClass.NORMAL_RATE)
+    self.assertEqual(ch.channel_band, ChannelBand.BAND_433)

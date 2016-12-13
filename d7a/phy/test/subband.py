@@ -1,5 +1,7 @@
 import unittest
 
+from bitstring import ConstBitStream
+
 from d7a.phy.channel_header import ChannelHeader, ChannelCoding, ChannelClass, ChannelBand
 from d7a.phy.subband import Subband
 
@@ -75,3 +77,20 @@ class TestSubband(unittest.TestCase):
       self.assertEqual(expected[i], bytes[i])
 
     self.assertEqual(len(expected), len(bytes))
+
+  def test_parse(self):
+    bytes = list(bytearray(self.valid_channel_header)) + [
+      0, 0,  # channel index start
+      16, 0,  # channel index end
+      10,  # eirp
+      86  # ccao
+    ]
+
+    sb = Subband.parse(ConstBitStream(bytes=bytes))
+    self.assertEqual(sb.channel_header.channel_band, self.valid_channel_header.channel_band)
+    self.assertEqual(sb.channel_header.channel_coding, self.valid_channel_header.channel_coding)
+    self.assertEqual(sb.channel_header.channel_class, self.valid_channel_header.channel_class)
+    self.assertEqual(sb.channel_index_start, 0)
+    self.assertEqual(sb.channel_index_end, 16)
+    self.assertEqual(sb.eirp, 10)
+    self.assertEqual(sb.ccao, 86)

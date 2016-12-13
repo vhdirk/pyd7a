@@ -1,5 +1,7 @@
 import unittest
 
+from bitstring import ConstBitStream
+
 from d7a.dll.access_profile import AccessProfile, CsmaCaMode, Subband
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelCoding, ChannelClass
 from d7a.types.ct import CT
@@ -93,3 +95,19 @@ class TestAccessProfile(unittest.TestCase):
       self.assertEqual(expected[i], bytes[i])
 
     self.assertEqual(len(expected), len(bytes))
+
+  def test_parse(self):
+    bytes = [
+       0b10000001,  # AP control: FG scan, UNC, 1 subband
+       5,  # subnet
+       0,  # scan automation period
+       0,  # RFU
+     ] + list(bytearray(self.valid_subband))
+
+    ap = AccessProfile.parse(ConstBitStream(bytes=bytes))
+    self.assertEqual(ap.scan_type_is_foreground, True)
+    self.assertEqual(ap.csma_ca_mode, CsmaCaMode.UNC)
+    self.assertEqual(ap.subnet, 5)
+    self.assertEqual(ap.scan_automation_period.mant, CT(0).mant)
+    self.assertEqual(ap.scan_automation_period.exp, CT(0).exp)
+    self.assertEqual(len(ap.subbands), 1)

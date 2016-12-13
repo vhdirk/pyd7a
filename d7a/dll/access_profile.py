@@ -36,6 +36,24 @@ class AccessProfile(Validatable):
   def number_of_subbands(self):
     return len(self.subbands)
 
+  @staticmethod
+  def parse(s):
+    scan_type_is_foreground = s.read("bool")
+    csma_ca_mode = CsmaCaMode(s.read("uint:4"))
+    nr_of_subbands = s.read("uint:3")
+    subnet = s.read("int:8")
+    scan_automation_period = CT.parse(s)
+    s.read("uint:8") # RFU
+    subbands = []
+    for i in range(nr_of_subbands):
+      subbands.append(Subband.parse(s))
+
+    return AccessProfile(scan_type_is_foreground=scan_type_is_foreground,
+                         csma_ca_mode=csma_ca_mode,
+                         subnet=subnet,
+                         scan_automation_period=scan_automation_period,
+                         subbands=subbands)
+
   def __iter__(self):
     control = self.scan_type_is_foreground << 7
     control += self.csma_ca_mode.value << 6

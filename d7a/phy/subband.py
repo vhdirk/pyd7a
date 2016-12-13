@@ -29,3 +29,17 @@ class Subband(Validatable):
     for byte in bytearray(struct.pack("<h", self.channel_index_end)): yield byte
     yield self.eirp
     yield self.ccao
+
+  @staticmethod
+  def parse(s):
+    channel_header = ChannelHeader.parse(s)
+    channel_index_start = struct.unpack("<h", s.read("bytes:2"))[0]
+    channel_index_end = struct.unpack("<h", s.read("bytes:2"))[0]
+    eirp = s.read("uint:8")
+    ccao = s.read("uint:8")
+
+    return Subband(channel_header=channel_header,
+                   channel_index_start=channel_index_start,
+                   channel_index_end=channel_index_end,
+                   eirp=eirp,
+                   ccao=ccao)
