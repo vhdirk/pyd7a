@@ -5,6 +5,8 @@
 
 import unittest
 
+from bitstring import ConstBitStream
+
 from d7a.sp.qos import QoS, ResponseMode
 
 
@@ -25,6 +27,18 @@ class TestQoS(unittest.TestCase):
     ))
     self.assertEqual(len(bytes), 1)
     self.assertEqual(bytes[0], int('11100010', 2))
+
+  def test_parse(self):
+    bytes = [
+      0b11100010
+    ]
+
+    qos = QoS.parse(ConstBitStream(bytes=bytes))
+
+    self.assertEqual(qos.nls, True)
+    self.assertEqual(qos.resp_mod, ResponseMode.RESP_MODE_ANY)
+    self.assertEqual(qos.record, True)
+    self.assertEqual(qos.stop_on_err, True)
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestQoS)

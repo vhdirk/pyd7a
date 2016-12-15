@@ -33,3 +33,10 @@ class Configuration(Validatable):
 
   def __str__(self):
     return str(self.as_dict())
+
+  @staticmethod
+  def parse(s):
+    qos = QoS.parse(s)
+    dorm_to = CT.parse(s)
+    addressee = Addressee.parse(s)
+    return Configuration(qos=qos, dorm_to=dorm_to, addressee=addressee)

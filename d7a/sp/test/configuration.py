@@ -4,10 +4,14 @@
 # unit tests for the D7A SP (FIFO) Configuration
 
 import unittest
+
+from bitstring import ConstBitStream
+
+from d7a.d7anp.addressee import IdType, NlsMethod
 from d7a.sp.session import States
 
 from d7a.types.ct         import CT
-from d7a.sp.qos           import QoS
+from d7a.sp.qos           import QoS, ResponseMode
 from d7a.sp.configuration import Configuration
 
 class TestConfiguration(unittest.TestCase):
@@ -35,6 +39,23 @@ class TestConfiguration(unittest.TestCase):
     self.assertEquals(bytes[2], int( '00010000', 2)) # addressee control NOID
     self.assertEquals(bytes[3], 0)  # access class
 
+  def test_parse(self):
+    bytes = [
+      0b00000000,
+      0,
+      0b00010000,
+      0
+    ]
+
+    config = Configuration.parse(ConstBitStream(bytes=bytes))
+
+    self.assertEqual(config.qos.resp_mod, ResponseMode.RESP_MODE_NO)
+    self.assertEqual(config.qos.nls, False)
+    self.assertEqual(config.qos.stop_on_err, False)
+    self.assertEqual(config.qos.record, False)
+    self.assertEqual(config.addressee.id_type, IdType.NOID)
+    self.assertEqual(config.addressee.nls_method, NlsMethod.NONE)
+    self.assertEqual(config.addressee.access_class, 0)
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestConfiguration)

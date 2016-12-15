@@ -38,5 +38,14 @@ class QoS(Validatable):
     byte += self.resp_mod.value
     yield byte
 
+  @staticmethod
+  def parse(s):
+    nls = s.read("bool")
+    stop_on_error = s.read("bool")
+    record = s.read("bool")
+    _ = s.read("uint:2") # RFU
+    resp_mode = ResponseMode(int(s.read("uint:3")))
+    return QoS(nls=nls, stop_on_err=stop_on_error, record=record, resp_mod=resp_mode)
+
   def __str__(self):
     return str(self.as_dict())
