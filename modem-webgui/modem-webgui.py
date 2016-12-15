@@ -150,4 +150,4 @@ if __name__ == '__main__':
   argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
   config = argparser.parse_args()
   modem = None
-  socketio.run(app, debug=True)
+  socketio.run(app, debug=True, host="0.0.0.0")
