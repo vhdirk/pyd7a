@@ -20,4 +20,4 @@ class InterfaceConfiguration(Validatable):
     for byte in self.interface_configuration: yield byte
 
   def __str__(self):
-    return "interface-id={}, status={}".format(self.interface_id, self.interface_configuration)
+    return "interface-id={}, configuration={}".format(self.interface_id, self.interface_configuration)
