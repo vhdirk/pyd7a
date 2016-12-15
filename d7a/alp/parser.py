@@ -5,7 +5,11 @@
 import struct
 
 from d7a.alp.command              import Command
+from d7a.alp.forward_action import ForwardAction
+from d7a.alp.interface import InterfaceType
+from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
+from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.status import InterfaceStatus
 from d7a.alp.operations.tag_response import TagResponse
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
@@ -15,6 +19,7 @@ from d7a.alp.operations.requests  import ReadFileData
 from d7a.alp.operands.file        import Offset, Data, DataRequest
 from d7a.alp.tag_response_action import TagResponseAction
 from d7a.parse_error              import ParseError
+from d7a.sp.configuration import Configuration
 from d7a.sp.status import Status
 from d7a.d7anp.addressee import Addressee
 from d7a.types.ct import CT
@@ -49,6 +54,7 @@ class Parser(object):
         32 :  self.parse_alp_return_file_data_action,
         34 :  self.parse_alp_return_status_action,
         35 :  self.parse_tag_response_action,
+        50 :  self.parse_forward_action,
         52 :  self.parse_tag_request_action
       }[op](b7, b6, s)
     except KeyError:
@@ -109,6 +115,15 @@ class Parser(object):
     tag_id = s.read("uint:8")
     return TagResponseAction(error=b6, operation=TagResponse(operand=TagId(tag_id=tag_id)))
 
+  def parse_forward_action(self, b7, b6, s):
+    if b7:
+      raise ParseError("bit 7 is RFU")
+
+    interface_id = InterfaceType(int(s.read("uint:8")))
+    assert(interface_id == InterfaceType.D7ASP)
+    interface_config = Configuration.parse(s)
+    return ForwardAction(resp=b6, operation=Forward(operand=InterfaceConfiguration(interface_id=interface_id,
+                                                                                   interface_configuration=interface_config)))
 
   def parse_alp_interface_status_host(self, s):
     pass # no interface status defined for host interface

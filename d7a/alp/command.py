@@ -6,6 +6,7 @@
 # a D7A ALP Command consists of 1 or more ALP Actions
 import random
 
+from d7a.alp.action import Action
 from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.file import Offset, DataRequest, Data
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
@@ -28,7 +29,7 @@ from d7a.alp.tag_request_action import TagRequestAction
 class Command(Validatable):
   
   SCHEMA = [{
-    "actions": Types.LIST(RegularAction),
+    "actions": Types.LIST(Action),
     "interface_status": Types.OBJECT(StatusAction, nullable=True) # can be null for example when parsing DLL frames
   }]
 
@@ -52,7 +53,7 @@ class Command(Validatable):
         if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Response Action")
         self.tag_id = action.operand.tag_id
         self.completed_with_error = action.error # TODO distinguish between commands and responses?
-      if type(action) == RegularAction:
+      else:
         self.actions.append(action)
 
     if self.generate_tag_request_action and self.tag_id == None:
