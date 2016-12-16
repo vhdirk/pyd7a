@@ -44,3 +44,6 @@ class CT(Validatable):
     exp  = s.read("uint:3")
     mant = s.read("uint:5")
     return CT(exp=exp, mant=mant)
+
+  def __str__(self):
+    return "exp={} mant{}".format(self.exp, self.mant)
