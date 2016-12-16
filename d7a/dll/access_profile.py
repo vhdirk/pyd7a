@@ -68,10 +68,14 @@ class AccessProfile(Validatable):
         yield byte
 
   def __str__(self):
+    subbands_string = ""
+    for subband in self.subbands:
+      subbands_string = subbands_string + str(subband)
+
     return "scan_type_is_foregroud={}, csma_ca_mode={}, subnet={}, scan_automation_period={}, subbands={}".format(
       self.scan_type_is_foreground,
       self.csma_ca_mode,
       self.subnet,
       self.scan_automation_period,
-      self.subbands
+      subbands_string
     )

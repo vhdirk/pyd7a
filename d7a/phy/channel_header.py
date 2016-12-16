@@ -45,3 +45,10 @@ class ChannelHeader(Validatable):
     channel_class = ChannelClass(s.read("uint:2"))
     channel_coding = ChannelCoding(s.read("uint:2"))
     return ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)
+
+  def __str__(self):
+    return "coding={}, class={}, band={}".format(
+      self.channel_coding,
+      self.channel_class,
+      self.channel_band
+    )

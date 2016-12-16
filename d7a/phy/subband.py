@@ -43,3 +43,12 @@ class Subband(Validatable):
                    channel_index_end=channel_index_end,
                    eirp=eirp,
                    ccao=ccao)
+
+  def __str__(self):
+    return "channel_header={}, channel_index_start={}, channel_index_end={}, eirp={}, ccao={}".format(
+      self.channel_header,
+      self.channel_index_start,
+      self.channel_index_end,
+      self.eirp,
+      self.ccao
+    )
