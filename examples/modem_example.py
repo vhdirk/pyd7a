@@ -6,7 +6,7 @@ from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import Addressee, IdType
 from d7a.sp.configuration import Configuration
-from d7a.sp.qos import QoS
+from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
@@ -27,10 +27,10 @@ modem.d7asp_fifo_flush(
     file=UidFile(),
     interface_type=InterfaceType.D7ASP,
     interface_configuration=Configuration(
-      qos=QoS(resp_mod=QoS.RESP_MODE_ALL),
+      qos=QoS(resp_mod=ResponseMode.RESP_MODE_ALL),
       addressee=Addressee(
         access_class=0,
-        id_type=IdType.BCAST
+        id_type=IdType.NOID
       )
     )
   )
