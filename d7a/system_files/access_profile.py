@@ -19,3 +19,10 @@ class AccessProfileFile(File, Validatable):
   def __iter__(self):
     for byte in self.access_profile:
       yield byte
+
+  @staticmethod
+  def parse(s):
+    return AccessProfileFile(access_specifier=0, access_profile=AccessProfile.parse(s)) # TODO access_specifier?
+
+  def __str__(self):
+    return "active_specifier={}, access_profile={}".format(self.access_specifier, self.access_profile)
