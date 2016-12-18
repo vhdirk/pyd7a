@@ -58,7 +58,7 @@ Version: 3.1.1
 Minimal survival commands:
 
 ```bash
-$ git clone https://github.com/christophevg/pyd7a.git
+$ git clone https://github.com/MOSAIC-LoPoW/pyd7a.git
 $ cd pyd7a
 $ make
 *** running all tests
