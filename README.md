@@ -1,6 +1,5 @@
 # Dash7 Python Support
 A collection of Python modules, supporting Dash7.  
-Christophe VG (<contact@christophe.vg>)
 
 ## Introduction
 
