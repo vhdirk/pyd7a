@@ -148,6 +148,7 @@ if __name__ == '__main__':
   argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                          default="/dev/ttyUSB0")
   argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
+  argparser.add_argument("-p", "--port", help="TCP port used by webserver", type=int, default=5000)
   config = argparser.parse_args()
   modem = None
-  socketio.run(app, debug=True, host="0.0.0.0")
+  socketio.run(app, debug=True, host="0.0.0.0", port=config.port)
