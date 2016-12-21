@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
+from d7a.alp.operations.status import InterfaceStatus
 from d7a.d7anp.addressee import Addressee, IdType
 from d7a.dll.access_profile import AccessProfile, CsmaCaMode
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
@@ -81,7 +82,6 @@ class ThroughtPutTest:
 
 
   def start(self):
-    return # TODO
     self.received_commands = defaultdict(list)
     payload = range(self.config.payload_size)
 
@@ -205,8 +205,11 @@ class ThroughtPutTest:
           print("\t{}: {}".format(sender, len(cmds)))
 
   def receiver_cmd_callback(self, cmd):
-    uid = cmd.interface_status.operand.interface_status.addressee.id
-    self.received_commands[uid].append(cmd)
+    if cmd.interface_status != None:
+      uid = cmd.interface_status.operand.interface_status.addressee.id
+      self.received_commands[uid].append(cmd)
+    else:
+      print("Unexpected cmd received, reboot?\n\t{}".format(cmd))
 
 
 if __name__ == "__main__":
