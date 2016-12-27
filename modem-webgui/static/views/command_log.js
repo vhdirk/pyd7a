@@ -9,7 +9,7 @@ define([
                 body: {
                     view:"list",
                     id:"received_alp_commands_list",
-                    template: "#id# - #command# - #response#",
+                    template: "#tag_id# - #command# - #response#",
                     data:commands.data
                 }
             }
