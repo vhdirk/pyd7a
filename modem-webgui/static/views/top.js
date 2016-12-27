@@ -11,16 +11,17 @@ define([
 		width:180, layout:"y", select:true,
 		template:"<span class='webix_icon fa-#icon#'></span> #value# ",
 		data:[
-			{ value:"Modem", 			id:"modem",		href:"#!/top/modem", 		icon:"briefcase" }
+			{ value:"Modem", id:"modem", href:"#!/top/modem", icon:"signal" },
+			{ value: "Files", id: "files", href:"#!/top/files", icon: "folder-open-o" }
 		]
 	};
 
 	var ui = {
-		type:"line", cols:[
-			{ type:"clean", css:"app-left-panel",
+		type:"material", cols:[
+			{ type:"clean", css:"menu",
 				padding:10, margin:20, borderless:true, rows: [ header, menu ]},
 			{ rows:[ { height:10}, 
-				{ type:"clean", css:"app-right-panel", padding:4, rows:[
+				{ type:"clean", css:"", padding:4, rows:[
 					{ $subview:true } 
 				]}
 			]}
