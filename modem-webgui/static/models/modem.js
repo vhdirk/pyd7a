@@ -19,12 +19,12 @@ define(['models/commands'],function(commands){
             });
 
             socket.on('module_info', function(data) {
-               console.log('connected to module: ' + data.uid);
-                // TODO
-/*               $$('header').setValues({header:"oss7", status:
-                       'Connected to ' + data.uid + ' using D7AP v' + data.d7ap_version + ' running app \'' + data.application_name +
-                       '\' using git sha1 ' + data.git_sha1}
-               )*/
+                console.log('connected to module: ' + data.uid);
+                // TODO do not change mainToolbar directly, refactor
+                $$('header').setValues({header:"oss7", status:
+                    'Connected to ' + data.uid + ' using D7AP v' + data.d7ap_version + ' running app \'' + data.application_name +
+                    '\' using git sha1 ' + data.git_sha1}
+                );
             });
 
             socket.on('received_alp_command', function(resp) {
@@ -37,6 +37,10 @@ define(['models/commands'],function(commands){
             socket.emit('execute_command', command, function(response_data){
                 commands.add_request(response_data['tag_id'], command);
             });
+        },
+
+        info:function () {
+            return info_string;
         }
     }
 

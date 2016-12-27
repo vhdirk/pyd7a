@@ -6,9 +6,6 @@ define([
 
 	var ui = {
 		rows:[
-			{ view:"template", type:"header", template:"#header# - #status#", id:"header", data:{
-				header:"oss7 modem interface", status:"not connected"
-			}},
 			{ cols:[
 				{ view:"tabview", cells:
 					[{

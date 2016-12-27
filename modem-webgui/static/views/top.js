@@ -1,10 +1,18 @@
 define([
-	"app"
-],function(app){
+	"app",
+	"models/modem"
+],function(app, modem){
 
-	var header = {
-		type:"header", template:app.config.name
-	};
+	var mainToolbar = {
+		view: "toolbar",
+		elements:[
+			{
+				view: "template", type: "header", template: "#header# - #status#", id: "header", data: {
+				 	header: "oss7 modem interface", status: "not connected"
+				} // TODO bind to modem's info property
+			}
+		]
+}	;
 
 	var menu = {
 		view:"menu", id:"top:menu", 
@@ -17,14 +25,15 @@ define([
 	};
 
 	var ui = {
-		type:"material", cols:[
-			{ type:"clean", css:"menu",
-				padding:10, margin:20, borderless:true, rows: [ header, menu ]},
-			{ rows:[ { height:10}, 
-				{ type:"clean", css:"", padding:4, rows:[
-					{ $subview:true } 
-				]}
-			]}
+		type:"material",
+		rows:[
+			mainToolbar,
+			{
+				cols:[
+					{ type:"clean", css:"menu", padding:10, margin:20, borderless:true, rows: [ menu ]},
+					{ rows:[ { height:10}, { type:"clean", css:"", padding:4, rows:[{ $subview:true }]}	]}
+				]
+			}
 		]
 	};
 
