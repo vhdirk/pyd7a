@@ -19,6 +19,8 @@ from d7a.system_files.system_file_ids import SystemFileIds
 from modem.modem import Modem
 
 app = Flask(__name__, static_url_path='/static')
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # do not cache static assets for now
+
 socketio = SocketIO(app)
 eventlet.monkey_patch()
 modem = None
