@@ -27,13 +27,16 @@ define(['models/commands'],function(commands){
                )*/
             });
 
-            socket.on('received_alp_command', function(msg) {
-                commands.data.add(msg);
+            socket.on('received_alp_command', function(resp) {
+                console.log('received: ' + JSON.stringify(resp));
+                commands.add_response(resp['tag_id'], resp['cmd_string']);
             });
         },
 
-        execute_command:function(command, cb) {
-            socket.emit('execute_command', command, cb);
+        execute_command:function(command) {
+            socket.emit('execute_command', command, function(response_data){
+                commands.add_request(response_data['tag_id'], command);
+            });
         }
     }
 

@@ -138,7 +138,12 @@ def on_disconnect():
 def command_received_callback(cmd):
   print("cmd received: {}".format(cmd))
   with app.test_request_context('/'):
-    socketio.emit("received_alp_command", {'ts': datetime.now().isoformat(), 'cmd': str(cmd)}, broadcast=True)
+    socketio.emit("received_alp_command", {
+      'tag_id': cmd.tag_id,
+      'recv_ts': datetime.now().isoformat(),
+      'cmd_string': str(cmd)
+    }, broadcast=True)
+
     print("broadcasted recv command")
 
 @socketio.on_error_default
