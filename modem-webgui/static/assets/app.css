@@ -2,6 +2,12 @@ img{
 	border:none;
 }
 
+.webix_layout_toolbar.header {
+  background-color: #5F5F5F;
+  color: #FFF;
+  border: none;
+}
+
 .webix_layout_toolbar.header .webix_view {
   background-color: #5F5F5F;
   color: #FFF;
