@@ -5,9 +5,11 @@ define([
 
 	var mainToolbar = {
 		view: "toolbar",
+		css:"header",
+		height:40,
 		elements:[
 			{
-				view: "template", type: "header", template: "#header# - #status#", id: "header", data: {
+				view: "template", template: "#header# - #status#", id: "header", data: {
 				 	header: "oss7 modem interface", status: "not connected"
 				} // TODO bind to modem's info property
 			}

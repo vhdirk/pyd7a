@@ -12,6 +12,7 @@ define([
 						header: "Execute Command",
 						body: {
 							view:"form", id:"execute_command_form", elements:[
+                                { view: "toolbar", css: "highlighted_header header3", height:40, cols:[{template:"Execute command"}]},
 								{ template:"Read file", type:"section" }, // TODO other operations
 								{ view:"text", label:'file ID', validate:webix.rules.isNumber, name:"file_id", value: "0" },
 								{ view:"text", label:'offset', validate:webix.rules.isNumber, name:"offset", value: "0" },
