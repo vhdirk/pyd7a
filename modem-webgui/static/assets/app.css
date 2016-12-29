@@ -113,6 +113,18 @@ img{
 .highlighted_header .webix_el_icon .webix_icon{
 	font-size: 17px;
 }
+/*
+.webix_el_button .webixtype_base{
+	background-color: #eb6e1a;
+	border-color: #eb6e1a;
+	border-bottom-color:#c45c16;
+}*/
+.webix_el_button .webixtype_base{
+	background-color: #a693eb;
+	border-color: #fff;
+    color: #fff;
+    border-width: 1px;
+}
 
 .webix_list .marker {
 	float: left;

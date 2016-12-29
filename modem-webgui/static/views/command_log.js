@@ -4,7 +4,7 @@ define([
 ],function(app, commands){
     var ui = {
         rows:[
-            {view: "toolbar", css: "highlighted_header header3", height: 40, cols: [{template: "Response"}]},
+            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [{template: "Response"}]},
             {
                 view:"list",
                 id:"received_alp_commands_list",

@@ -1,7 +1,25 @@
 define(["models/modem"], function(modem){
     var ui = {
+        type: "clean",
         rows: [
-            {view: "toolbar", css: "highlighted_header header3", height: 40, cols: [{template: "Request"}]},
+            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [
+                {template: "Request"},
+                {
+                    view: "button",
+                    value: "Execute",
+                    width: 90,
+                    click: function () {
+                        var form = $$("execute_command_form");
+                        if (form.validate()) {
+                            // TODO post?
+                            console.log(form.getValues());
+                            modem.execute_command(form.getValues(), function (data) {
+                                console.log("server response: " + JSON.stringify(data));
+                            })
+                        }
+                    }
+                }
+            ]},
             {
                 view: "form", id: "execute_command_form", elements: [
                     {template: "Read file", type: "section"}, // TODO other operations
@@ -55,22 +73,7 @@ define(["models/modem"], function(modem){
                     // interface config
                     // operation
                     // file
-                    {
-                        view: "button", type: "form", value: "Execute",
-                        click: function () {
-                            var form = $$("execute_command_form");
-                            if (form.validate()) {
-                                // TODO post?
-                                console.log(form.getValues());
-                                modem.execute_command(form.getValues(), function (data) {
-                                    console.log("server response: " + JSON.stringify(data));
-                                })
-                                // socket.emit('execute_command', form.getValues(), function(data){
-                                // 	console.log("server response: " + JSON.stringify(data));
-                                // });
-                            }
-                        }
-                    }
+
                 ]
             }
         ]
