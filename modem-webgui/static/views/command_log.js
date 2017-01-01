@@ -4,11 +4,16 @@ define([
 ],function(app, commands){
     var ui = {
         rows:[
-            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [{template: "Response"}]},
+            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [{template: "Command Log"}]},
             {
-                view:"list",
+                view:"datatable",
                 id:"received_alp_commands_list",
-                template: "#tag_id# - #command# - #response#",
+                columns:[
+                    {id:"id", header:"Tag", sort:"int"},
+                    {id:"interface", header:"Interface"},
+                    {id:"command_description", header:"Request", fillspace:true},
+                    {id:"response_command_description", header:"Response", fillspace:true},
+                ],
                 data:commands.data,
                 on:{
                     'onItemClick':function(id){

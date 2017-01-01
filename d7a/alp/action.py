@@ -12,6 +12,7 @@
 # ALP Operand   N Bytes
 from bitstring import ConstBitStream
 
+from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.support.schema           import Validatable, Types
 
@@ -42,14 +43,19 @@ class Action(Validatable):
     return self.operation.operand
 
   def __str__(self):
-    # when reading a known system files we output the parsed data
     if isinstance(self.operation, ReturnFileData):
+      # when reading a known system files we output the parsed data
       try:
         systemfile_type = SystemFiles().get_all_system_files()[SystemFileIds(self.operand.offset.id)]
         if systemfile_type is not None and systemfile_type.length == self.operand.length:
-          systemfile = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
-          return "op=ReturnFileData, systemfile={}: {}".format(systemfile_type.__class__.__name__, systemfile)
+          systemfile_content = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
+          return "{} content: {}".format(systemfile_type.__class__.__name__, systemfile_content)
       except:
         pass # not a SystemFile, do nothing
+    elif isinstance(self.operation, ReadFileData):
+      return "Read file {}".format(self.operand.offset.id)
 
+    return "{}".format(type(self.operation).__name__)
+
+  def __repr__(self):
     return "op={}, operand={}({})".format(type(self.operation).__name__, type(self.operand).__name__, self.operand)

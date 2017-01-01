@@ -110,8 +110,13 @@ def execute_command(data):
     length=int(data["length"])
   )
 
+  print("executing cmd: {}".format(cmd))
   modem.send_command(cmd)
-  return {'tag_id': cmd.tag_id}
+  return {
+    'tag_id': cmd.tag_id,
+    'interface': interface_type.name,
+    'command_description': cmd.describe_actions()
+  }
 
 
 @socketio.on('connect')
@@ -141,7 +146,7 @@ def command_received_callback(cmd):
     socketio.emit("received_alp_command", {
       'tag_id': cmd.tag_id,
       'recv_ts': datetime.now().isoformat(),
-      'cmd_string': str(cmd)
+      'response_command_description': cmd.describe_actions()
     }, broadcast=True)
 
     print("broadcasted recv command")

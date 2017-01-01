@@ -8,19 +8,23 @@ define([],function(){
 		$oninit:function(){
 		},
 
-		add_request:function(tag_id, command){
+		add_request:function(tag_id, interface, command, command_description){
 			// TODO assert tag_id does not exist yet
-			commands.add({'id': tag_id, 'tag_id': tag_id, 'command': command, 'response': null});
-			// use tag_id for id field so we can use tag_id directly in for example exists() and getItem(),
-			// however use tag_id field for displaying, since a id cannot be null and this would result in bogus id in GUI
+			commands.add({
+				'id': tag_id,  // use tag_id for id field so we can use tag_id directly in for example exists() and getItem(),
+				'tag_id': tag_id, // however use tag_id field for displaying, since a id cannot be null and this would result in bogus id in GUI
+				'interface': interface,
+				'command': command,
+				'command_description': command_description,
+				'response_command_description': null});
 		},
 
-		add_response:function(tag_id, command_response){
+		add_response:function(tag_id, response_command_description){
 			if(commands.exists(tag_id)){
-				commands.getItem(tag_id).response = command_response;
+				commands.getItem(tag_id).response_command_description = response_command_description;
 				commands.updateItem(tag_id);
 			} else {
-				commands.add({'tag_id': tag_id, 'command': null, 'response': null}); // id will be generated
+				commands.add({'tag_id': tag_id, 'command': null, 'response_command_description': null}); // id will be generated
 			}
 		}
 	};

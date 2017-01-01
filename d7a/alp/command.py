@@ -192,6 +192,13 @@ class Command(Validatable):
       for byte in action:
         yield byte
 
+  def describe_actions(self):
+    description = ""
+    for action in self.actions:
+      description = description + "{}, ".format(action)
+
+    return description.strip(", ")
+
   def __str__(self):
     output = "Command with tag {} actions:\n".format(self.tag_id)
     for action in self.actions:

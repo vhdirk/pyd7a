@@ -21,7 +21,7 @@ define([
 	function loadCommand(command){
 		console.log("load: " + command.tag_id);
 		$$("title").parse({'tag_id': command.tag_id});
-		$$("cmd_response").parse({'cmd_string': command.response});
+		$$("cmd_response").parse({'cmd_string': command.response_command_description});
 	}
 
 	return {
