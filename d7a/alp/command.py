@@ -44,12 +44,12 @@ class Command(Validatable):
       if type(action) == StatusAction and action.status_operand_extension == StatusActionOperandExtensions.INTERFACE_STATUS:
         if self.interface_status != None: raise ParseError("An ALP command can contain one and only one Interface Status action")
         self.interface_status = action
-      if type(action) == TagRequestAction:
+      elif type(action) == TagRequestAction:
         if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Request Action")
         self.tag_id = action.operand.tag_id
         self.send_tag_response_when_completed = action.respond_when_completed
         # we don't add this to self.actions but prepend it on serializing
-      if type(action) == TagResponseAction:
+      elif type(action) == TagResponseAction:
         if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Response Action")
         self.tag_id = action.operand.tag_id
         self.completed_with_error = action.error # TODO distinguish between commands and responses?
