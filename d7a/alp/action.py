@@ -49,9 +49,14 @@ class Action(Validatable):
         systemfile_type = SystemFiles().get_all_system_files()[SystemFileIds(self.operand.offset.id)]
         if systemfile_type is not None and systemfile_type.length == self.operand.length:
           systemfile_content = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
-          return "{} content: {}".format(systemfile_type.__class__.__name__, systemfile_content)
+          return "Received {} content: {}".format(systemfile_type.__class__.__name__, systemfile_content)
+
+        return "Received {} partial ({} of {} bytes)".format(systemfile_type.__class__.__name__, self.operand.length,
+                                                               systemfile_type.length)
       except:
-        pass # not a SystemFile, do nothing
+        # not a SystemFile
+        return "Received file {} content: {}".format(self.operand.offset.id, self.operand.data)
+
     elif isinstance(self.operation, ReadFileData):
       return "Read file {}".format(self.operand.offset.id)
 

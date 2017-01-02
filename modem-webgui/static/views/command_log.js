@@ -11,6 +11,7 @@ define([
                 columns:[
                     {id:"id", header:"Tag", sort:"int"},
                     {id:"interface", header:"Interface"},
+                    {id:"status", header:"Status"},
                     {id:"command_description", header:"Request", fillspace:true},
                     {id:"response_command_description", header:"Response", fillspace:true},
                 ],
