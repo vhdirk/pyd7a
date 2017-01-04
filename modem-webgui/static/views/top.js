@@ -21,7 +21,7 @@ define([
 		width:180, layout:"y", select:true,
 		template:"<span class='webix_icon fa-#icon#'></span> #value# ",
 		data:[
-			{ value:"Modem", id:"modem", href:"#!/top/modem", icon:"signal" },
+			{ value:"ALP Commands", id:"commands", href:"#!/top/commands", icon:"signal" },
 			{ value: "Files", id: "files", href:"#!/top/files", icon: "folder-open-o" }
 		]
 	};

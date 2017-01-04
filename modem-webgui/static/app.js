@@ -7,7 +7,7 @@ define([
 		name:		"OSS-7 Modem webgui",
 		version:	"0.0.1",
 		debug:		true,
-		start:		"/top/modem"
+		start:		"/top/commands"
 	});
 
 	app.use(menu);
