@@ -33,7 +33,7 @@ define(['models/commands'],function(commands){
             });
         },
 
-        execute_command:function(command) {
+        execute_command:function(command, cb) {
             socket.emit('execute_command', command, function(response_data){
                 commands.add_request(
                     response_data['tag_id'],
@@ -41,6 +41,8 @@ define(['models/commands'],function(commands){
                     command,
                     response_data['command_description']
                 );
+
+                cb(response_data['tag_id']);
             });
         },
 

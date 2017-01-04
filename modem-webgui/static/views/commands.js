@@ -3,6 +3,8 @@ define([
     "models/commands",
     "models/modem",
 ],function(app, commands, modem){
+    var selected_tag_id = null;
+
     var command_request_view = {
         type: "clean",
         rows: [
@@ -14,11 +16,16 @@ define([
                     width: 90,
                     click: function () {
                         var form = $$("execute_command_form");
+                        selected_tag_id = null;
                         if (form.validate()) {
                             // TODO post?
                             console.log(form.getValues());
-                            modem.execute_command(form.getValues(), function (data) {
-                                console.log("server response: " + JSON.stringify(data));
+                            modem.execute_command(form.getValues(), function (new_tag_id) {
+                                console.log("executed command, generated tag_id: " + new_tag_id);
+                                if(selected_tag_id == null) {
+                                    selected_tag_id = new_tag_id;
+                                    showCommandDetail(commands.data.getItem(new_tag_id));
+                                }
                             })
                         }
                     }
@@ -112,7 +119,12 @@ define([
                     command_response_view
                 ]
             }
-        ]}
+        ]},
+        on:{
+            'onHide':function(){
+                selected_tag_id = null;
+            }
+        }
     };
 
     var ui = {
@@ -124,7 +136,7 @@ define([
                     value: "New Query",
                     width: 120,
                     click: function () {
-                        $$("query_window").show();
+                        showNewQueryWindow();
                     }
                 }
             ]},
@@ -148,16 +160,38 @@ define([
         ]
     };
 
+    function showNewQueryWindow() {
+        $$("title").parse({'tag_id': ''});
+		$$("cmd_response").parse({'cmd_string': ''});
+        $$("query_window").show();
+    }
+
     function showCommandDetail(command){
 		console.log("show detail: " + command.tag_id);
 		$$("title").parse({'tag_id': command.tag_id});
 		$$("cmd_response").parse({'cmd_string': command.response_command_description});
         $$("query_window").show();
-	}
+    }
+
+    function onInit() {
+        // make sure changes to the command are updated in the querywindow, for example
+        // the response is received async after execution. Update the UI after response has been received.
+        // TODO check if we can get this through databinding, like it used for the datatable.
+        commands.data.attachEvent("onDataUpdate", function(id, obj){
+            console.log("onDataUpdated");
+            // we only update the view when we are currently displaying this command
+            if($$("query_window").isVisible && id == selected_tag_id) {
+                showCommandDetail(commands.data.getItem(id));
+            }
+            return true;
+        });
+
+    }
 
 	return {
 		$ui: ui,
 		$menu: "top:menu",
-        $windows: [query_window]
+        $windows: [query_window],
+        $oninit: onInit()
 	};
 });
