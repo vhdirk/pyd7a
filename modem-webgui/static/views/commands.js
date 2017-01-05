@@ -8,28 +8,8 @@ define([
     var command_request_view = {
         type: "clean",
         rows: [
-            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [
-                {template: "Request"},
-                {
-                    view: "button",
-                    value: "Execute",
-                    width: 90,
-                    click: function () {
-                        var form = $$("execute_command_form");
-                        selected_tag_id = null;
-                        if (form.validate()) {
-                            // TODO post?
-                            console.log(form.getValues());
-                            modem.execute_command(form.getValues(), function (new_tag_id) {
-                                console.log("executed command, generated tag_id: " + new_tag_id);
-                                if(selected_tag_id == null) {
-                                    selected_tag_id = new_tag_id;
-                                    showCommandDetail(commands.data.getItem(new_tag_id));
-                                }
-                            })
-                        }
-                    }
-                }
+            {view: "toolbar", css: "highlighted_header header2", height: 40, cols: [
+                {template: "Request"}
             ]},
             {
                 view: "form", id: "execute_command_form", elements: [
@@ -92,7 +72,7 @@ define([
 
     var command_response_view = {
         rows: [
-            {view: "toolbar", css: "highlighted_header header1", height: 40, cols: [{template: "Responses"}]},
+            {view: "toolbar", css: "highlighted_header header2", height: 40, cols: [{template: "Response(s)"}]},
             {id:"cmd_response", template:"#cmd_string#"}
         ]
     };
@@ -102,16 +82,36 @@ define([
         id:"query_window",
         position:"center",
         width: 1000,
-        head:{
-            view:"toolbar", elements:[
-              {height: 49, id: "title", css: "title", template: "Command #tag_id#", data: {tag_id: ""}},
-              { view:"button", value:"Close", width:150, click:function(){
-                this.getTopParentView().hide();
-              }}
-            ]
-        },
+        head: false,
         body:{ rows:[
-            /*{height: 49, id: "title", css: "title", template: "Command #tag_id#", data: {tag_id: ""}},*/
+            {
+                view:"toolbar", css: "highlighted_header header1", height: 40, cols:[
+                    { id: "title", template: "Command #tag_id#", data: {tag_id: ""}},
+                    {
+                        view: "button",
+                        value: "Execute",
+                        width: 90,
+                        click: function () {
+                            var form = $$("execute_command_form");
+                            selected_tag_id = null;
+                            if (form.validate()) {
+                                // TODO post?
+                                console.log(form.getValues());
+                                modem.execute_command(form.getValues(), function (new_tag_id) {
+                                    console.log("executed command, generated tag_id: " + new_tag_id);
+                                    if(selected_tag_id == null) {
+                                        selected_tag_id = new_tag_id;
+                                        showCommandDetail(commands.data.getItem(new_tag_id));
+                                    }
+                                })
+                            }
+                        }
+                    },
+                    { view:"button", value:"Close", width:90, click:function(){
+                        this.getTopParentView().hide();
+                    }}
+                ]
+            },
             {
                 type: "space",
                 cols: [
