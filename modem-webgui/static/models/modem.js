@@ -1,5 +1,16 @@
-define(['models/commands'],function(commands){
+define([
+    'models/commands',
+    'models/files'
+],function(commands, files){
 	var instance = null;
+
+    var destination_model = {
+        COMMANDS: 0,
+        FILES: 1
+    };
+
+    var tag_to_destination_model = {};
+    var tag_to_file_id = {}
 
     function Modem(){
         if(instance !== null){
@@ -29,12 +40,17 @@ define(['models/commands'],function(commands){
 
             socket.on('received_alp_command', function(resp) {
                 console.log('received: ' + JSON.stringify(resp));
-                commands.add_response(resp['tag_id'], resp['response_command_description']);
+                dest_view = tag_to_destination_model[resp['tag_id']];
+                if(dest_view == destination_model.COMMANDS)
+                    commands.add_response(resp['tag_id'], resp['response_command_description']);
+                else if(dest_view == destination_model.FILES)
+                    files.update_file(tag_to_file_id[resp['tag_id']], resp['response_command_description']);
             });
         },
 
         execute_command:function(command, cb) {
             socket.emit('execute_command', command, function(response_data){
+                tag_to_destination_model[response_data['tag_id']] = destination_model.COMMANDS;
                 commands.add_request(
                     response_data['tag_id'],
                     response_data['interface'],
@@ -43,6 +59,13 @@ define(['models/commands'],function(commands){
                 );
 
                 cb(response_data['tag_id']);
+            });
+        },
+
+        read_file:function(file_id) {
+            socket.emit('read_local_system_file', {'system_file_id': file_id}, function(response_data){
+                tag_to_destination_model[response_data['tag_id']] = destination_model.FILES;
+                tag_to_file_id[response_data['tag_id']] = file_id;
             });
         },
 

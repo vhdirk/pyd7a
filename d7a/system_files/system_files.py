@@ -29,4 +29,4 @@ class SystemFiles:
   }
 
   def get_all_system_files(self):
-    return self.files
+    return sorted(self.files, key=lambda t: t.value)

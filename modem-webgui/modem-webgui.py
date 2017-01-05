@@ -36,8 +36,8 @@ def index():
 @app.route('/systemfiles')
 def get_system_files():
   options = []
-  for id, file in SystemFiles().get_all_system_files().iteritems():
-    options.append({"id": id.value, "value": id.name  })
+  for file in SystemFiles().get_all_system_files():
+    options.append({"file_id": file.value, "file_name": file.name, "data": ""})
 
   return jsonify(options)
 
@@ -64,10 +64,10 @@ def on_execute_raw_alp(data):
 
 @socketio.on('read_local_system_file')
 def on_read_local_system_file(data):
-  print("read local system file")
-  modem.send_command(
-    Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
-  )
+  cmd = Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
+  modem.send_command(cmd)
+
+  return {'tag_id': cmd.tag_id}
 
 @socketio.on('read_local_file')
 def on_read_local_file(data):
