@@ -5,7 +5,8 @@ define([
 ],function(app, modem, files){
     function showFileDetail(file){
 		console.log("show detail: " + file.file_id);
-		$$("file_data").parse({'file_data': file.data});
+		$$("file_details_title").parse({'file_name': file.file_name, 'file_id': file.file_id});
+        $$("file_data").parse({'file_data': file.data});
     }
 
     var ui = {
@@ -30,7 +31,18 @@ define([
                             }
                         }
                     },
-                    {template:"#file_data#", id:"file_data", data:{"file_data":""}}
+                    {
+                        rows: [
+                            {
+                                view: "toolbar" ,css: "highlighted_header header1", height: 40, cols: [
+                                    {id: "file_details_title", template: "File details - #file_name# (#file_id#)",
+                                        data: {"file_name": "", "file_id": ""}}
+                                ]
+                            },
+                            {template:"#file_data#", id:"file_data", data:{"file_data":""}}
+                        ]
+                    }
+
                 ]
             }
 
