@@ -6,7 +6,7 @@ define([
     function showFileDetail(file){
 		console.log("show detail: " + file.file_id);
 		$$("file_details_title").parse({'file_name': file.file_name, 'file_id': file.file_id});
-        $$("file_data").parse({'file_data': file.data});
+        $$("file_data").parse({'file_data': JSON.stringify(file.data)});
     }
 
     var ui = {

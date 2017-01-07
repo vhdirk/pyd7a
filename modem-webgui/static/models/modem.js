@@ -44,7 +44,7 @@ define([
                 if(dest_view == destination_model.COMMANDS)
                     commands.add_response(resp['tag_id'], resp['response_command_description']);
                 else if(dest_view == destination_model.FILES)
-                    files.update_file(tag_to_file_id[resp['tag_id']], resp['response_command_description']);
+                    files.update_file(tag_to_file_id[resp['tag_id']], resp['response_command']['actions'][0]['operation']['file_data_parsed']);
             });
         },
 

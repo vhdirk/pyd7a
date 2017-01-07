@@ -6,6 +6,8 @@ import eventlet
 import sys
 
 from datetime import time, datetime
+
+import jsonpickle
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 
@@ -146,7 +148,8 @@ def command_received_callback(cmd):
     socketio.emit("received_alp_command", {
       'tag_id': cmd.tag_id,
       'recv_ts': datetime.now().isoformat(),
-      'response_command_description': cmd.describe_actions()
+      'response_command_description': cmd.describe_actions(),
+      'response_command': json.loads(jsonpickle.encode(cmd, unpicklable=False)) # we use jsonpickle here as an easy way to serialize the whole object structure
     }, broadcast=True)
 
     print("broadcasted recv command")
