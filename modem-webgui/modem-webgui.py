@@ -67,6 +67,7 @@ def on_execute_raw_alp(data):
 @socketio.on('read_local_system_file')
 def on_read_local_system_file(data):
   cmd = Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
+  print("executing cmd: {}".format(cmd))
   modem.send_command(cmd)
 
   return {'tag_id': cmd.tag_id}

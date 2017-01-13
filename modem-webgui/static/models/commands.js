@@ -17,16 +17,23 @@ define([],function(){
 				'status':'Running',
 				'command': command,
 				'command_description': command_description,
-				'response_command_description': null});
+				'response_command_descriptions': []});
 		},
 
-		add_response:function(tag_id, response_command_description){
+		add_response:function(tag_id, response_command_description, completed_with_error){
 			if(commands.exists(tag_id)){
-				commands.getItem(tag_id).response_command_description = response_command_description;
-				commands.getItem(tag_id).status = 'Completed'; // TODO include error flag in status
+				commands.getItem(tag_id).response_command_descriptions.push(response_command_description);
+				var status = "Completed";
+				if(completed_with_error) {
+					status += " (NOK)";
+				} else {
+					status += " (OK)";
+				}
+
+				commands.getItem(tag_id).status = status;
 				commands.updateItem(tag_id);
 			} else {
-				commands.add({'id': tag_id, 'tag_id': tag_id, 'command': null, 'response_command_description': response_command_description});
+				commands.add({'id': tag_id, 'tag_id': tag_id, 'command': null, 'response_command_descriptions': [response_command_description]});
 			}
 		}
 	};

@@ -146,9 +146,9 @@ define([
                 columns:[
                     {id:"id", header:"Tag", sort:"int"},
                     {id:"interface", header:"Interface"},
-                    {id:"status", header:"Status"},
+                    {id:"status", header:"Status", fillspace:true},
                     {id:"command_description", header:"Request", fillspace:true},
-                    {id:"response_command_description", header:"Response", fillspace:true},
+                    {id:"response_command_descriptions", header:"Response", fillspace:true},
                 ],
                 data:commands.data,
                 on:{
@@ -169,7 +169,7 @@ define([
     function showCommandDetail(command){
 		console.log("show detail: " + command.tag_id);
 		$$("title").parse({'tag_id': command.tag_id});
-		$$("cmd_response").parse({'cmd_string': command.response_command_description});
+		$$("cmd_response").parse({'cmd_string': command.response_command_descriptions.join()});
         $$("query_window").show();
     }
 
