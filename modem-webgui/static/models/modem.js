@@ -40,8 +40,8 @@ define([
 
             socket.on('received_alp_command', function(resp) {
                 console.log('received: ' + JSON.stringify(resp));
-                dest_view = tag_to_destination_model[resp['tag_id']];
-                if(dest_view == destination_model.COMMANDS)
+                var dest_view = tag_to_destination_model[resp['tag_id']];
+                if(dest_view == destination_model.COMMANDS || !dest_view) // dest_view can be undefined in case of unsolicited resp
                     commands.add_response(resp['tag_id'], resp['response_command_description']);
                 else if(dest_view == destination_model.FILES)
                     files.update_file(tag_to_file_id[resp['tag_id']], resp['response_command']['actions'][0]['operation']['file_data_parsed']);
