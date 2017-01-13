@@ -214,7 +214,7 @@ class TestParser(unittest.TestCase):
 
     cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(len(cmd.actions), 1)
-    self.assertEqual(cmd.tag_id, None)
+    self.assertNotEqual(cmd.tag_id, None) # a random ID will be generated
 
   def test_with_tag_request(self):
     cmd_data = [

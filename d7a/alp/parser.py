@@ -40,7 +40,7 @@ class Parser(object):
         actions.append(action)
         alp_bytes_parsed = alp_bytes_parsed + (s.bytepos - startpos)
 
-    cmd = Command(actions = actions, generate_tag_request_action=False)
+    cmd = Command(actions = actions, generate_tag_request_action=True)
     return cmd
 
   def parse_alp_action(self, s):
