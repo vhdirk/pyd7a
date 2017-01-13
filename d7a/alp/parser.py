@@ -33,9 +33,9 @@ class Parser(object):
   def parse(self, s, cmd_length):
     actions = []
     if cmd_length != 0:
-      startpos = s.bytepos
       alp_bytes_parsed = 0
       while alp_bytes_parsed < cmd_length:
+        startpos = s.bytepos
         action = self.parse_alp_action(s)
         actions.append(action)
         alp_bytes_parsed = alp_bytes_parsed + (s.bytepos - startpos)
