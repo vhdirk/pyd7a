@@ -13,6 +13,8 @@ from d7a.system_files.system_files import SystemFiles
 
 class ReturnFileData(Operation):
   def __init__(self, *args, **kwargs):
+    self.systemfile_type = None
+    self.file_data_parsed = None
     self.op     = 32
     self.operand_class = Data
     super(ReturnFileData, self).__init__(*args, **kwargs)
