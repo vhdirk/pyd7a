@@ -116,10 +116,13 @@ class Types(object):
     return { "type": "integer", "min": 0x0, "max": max }
 
   @staticmethod
-  def LIST(type=None, minlength=0):
+  def LIST(type=None, minlength=0, maxlength=None):
     l = { "type" : "list", "minlength": minlength }
     if type:
       l["schema"] = {
         "isinstance" : type
       }
+    if maxlength:
+      l["maxlength"] = maxlength
+
     return l

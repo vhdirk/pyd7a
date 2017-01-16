@@ -2,93 +2,92 @@ import unittest
 
 from bitstring import ConstBitStream
 
-from d7a.dll.access_profile import AccessProfile, CsmaCaMode, Subband
+from d7a.dll.access_profile import AccessProfile, CsmaCaMode, SubBand
+from d7a.dll.sub_profile import SubProfile
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelCoding, ChannelClass
 from d7a.types.ct import CT
 
 
 class TestAccessProfile(unittest.TestCase):
-  valid_subband = Subband(
-    channel_header=ChannelHeader(
-      channel_class=ChannelClass.NORMAL_RATE,
-      channel_coding=ChannelCoding.PN9,
-      channel_band=ChannelBand.BAND_433
-    ),
-    channel_index_start=0,
-    channel_index_end=0,
-    ccao=86,
-    eirp=10
+  valid_channel_header = ChannelHeader(
+    channel_class=ChannelClass.NORMAL_RATE,
+    channel_coding=ChannelCoding.PN9,
+    channel_band=ChannelBand.BAND_433
   )
 
+  valid_sub_bands = [
+    SubBand(),
+    SubBand(),
+    SubBand(),
+    SubBand(),
+    SubBand(),
+    SubBand(),
+    SubBand(),
+    SubBand()
+  ]
+
+  valid_sub_profiles = [
+    SubProfile(),
+    SubProfile(),
+    SubProfile(),
+    SubProfile()
+  ]
+
   def test_validation_ok(self):
-    ap = AccessProfile(scan_type_is_foreground=True,
-                       csma_ca_mode=CsmaCaMode.UNC,
-                       subnet=0,
-                       scan_automation_period=CT(0),
-                       subbands=[self.valid_subband])
+    ap = AccessProfile(channel_header=self.valid_channel_header,
+                       sub_profiles=self.valid_sub_profiles,
+                       sub_bands=self.valid_sub_bands)
 
-  def test_validation_scan_type_is_foreground(self):
+
+  def test_validation_sub_profiles(self):
     def bad():
-      ap = AccessProfile(scan_type_is_foreground="wrong",
-                       csma_ca_mode=CsmaCaMode.UNC,
-                       subnet=0,
-                       scan_automation_period=CT(0),
-                       subbands=[self.valid_subband])
+      ap = AccessProfile(channel_header=self.valid_channel_header,
+                         sub_profiles=[],
+                         sub_bands=self.valid_sub_bands)
 
     self.assertRaises(ValueError, bad)
 
-  def test_validation_csma_ca_mode(self):
+  def test_validation_sub_profiles_count(self):
     def bad():
-      ap = AccessProfile(scan_type_is_foreground=True,
-                         csma_ca_mode="wrong",
-                         subnet=0,
-                         scan_automation_period=CT(0),
-                         subbands=[self.valid_subband])
+      sub_profiles = [SubProfile() for _ in range(10)] # too many ...
+
+      ap = AccessProfile(channel_header=self.valid_channel_header,
+                         sub_profiles=sub_profiles,
+                         sub_bands=self.valid_sub_bands)
 
     self.assertRaises(ValueError, bad)
 
-  def test_validation_subnet(self):
+  def test_validation_sub_bands_type(self):
     def bad():
-      ap = AccessProfile(scan_type_is_foreground=True,
-                         csma_ca_mode=CsmaCaMode.UNC,
-                         subnet="wrong",
-                         scan_automation_period=CT(0),
-                         subbands=[self.valid_subband])
+      ap = AccessProfile(channel_header=self.valid_channel_header,
+                         sub_profiles=self.valid_sub_profiles,
+                         sub_bands=[None])
 
-    self.assertRaises(ValueError, bad)
+    self.assertRaises(TypeError, bad)
 
-  def test_validation_scan_automation_period(self):
+  def test_validation_sub_bands_count(self):
     def bad():
-      ap = AccessProfile(scan_type_is_foreground=True,
-                         csma_ca_mode=CsmaCaMode.UNC,
-                         subnet=0,
-                         scan_automation_period="wrong",
-                         subbands=[self.valid_subband])
+      sub_bands = [SubBand() for _ in range(10)] # too many ...
 
-    self.assertRaises(ValueError, bad)
-
-  def test_validation_no_subband(self):
-    def bad():
-      ap = AccessProfile(scan_type_is_foreground=True,
-                         csma_ca_mode=CsmaCaMode.UNC,
-                         subnet=0,
-                         scan_automation_period=CT(0),
-                         subbands=[])
+      ap = AccessProfile(channel_header=self.valid_channel_header,
+                         sub_profiles=self.valid_sub_profiles,
+                         sub_bands=sub_bands)
 
     self.assertRaises(ValueError, bad)
 
   def test_byte_generation(self):
     expected = [
-      0b10000001, # AP control: FG scan, UNC, 1 subband
-      5, # subnet
-      0, # scan automation period
-      0, # RFU
-    ] + list(bytearray(self.valid_subband)) # TODO multiple subbands
-    ap = AccessProfile(scan_type_is_foreground=True,
-                       csma_ca_mode=CsmaCaMode.UNC,
-                       subnet=5,
-                       scan_automation_period=CT(0),
-                       subbands=[self.valid_subband])
+      0b00101000,  # channel header
+    ]
+
+    for _ in xrange(AccessProfile.NUMBER_OF_SUB_PROFILES):
+      expected.extend(list(bytearray(SubProfile())))
+
+    expected.extend(list(bytearray(SubBand()))) # only one sub_band
+
+    ap = AccessProfile(channel_header=self.valid_channel_header,
+                       sub_bands=[SubBand()],
+                       sub_profiles=self.valid_sub_profiles)
 
     bytes = bytearray(ap)
     for i in xrange(len(bytes)):
@@ -97,17 +96,30 @@ class TestAccessProfile(unittest.TestCase):
     self.assertEqual(len(expected), len(bytes))
 
   def test_parse(self):
-    bytes = [
-       0b10000001,  # AP control: FG scan, UNC, 1 subband
-       5,  # subnet
-       0,  # scan automation period
-       0,  # RFU
-     ] + list(bytearray(self.valid_subband))
+    bytes = list(bytearray(self.valid_channel_header))
+
+    for _ in xrange(AccessProfile.NUMBER_OF_SUB_PROFILES):
+      bytes.extend(list(bytearray(SubProfile())))
+
+    for _ in range(AccessProfile.MAX_NUMBER_OF_SUB_BANDS):
+      bytes.extend(list(bytearray(SubBand())))
 
     ap = AccessProfile.parse(ConstBitStream(bytes=bytes))
-    self.assertEqual(ap.scan_type_is_foreground, True)
-    self.assertEqual(ap.csma_ca_mode, CsmaCaMode.UNC)
-    self.assertEqual(ap.subnet, 5)
-    self.assertEqual(ap.scan_automation_period.mant, CT(0).mant)
-    self.assertEqual(ap.scan_automation_period.exp, CT(0).exp)
-    self.assertEqual(len(ap.subbands), 1)
+    self.assertEqual(ap.channel_header.channel_band, self.valid_channel_header.channel_band)
+    self.assertEqual(ap.channel_header.channel_coding, self.valid_channel_header.channel_coding)
+    self.assertEqual(ap.channel_header.channel_class, self.valid_channel_header.channel_class)
+    self.assertEqual(len(ap.sub_bands), AccessProfile.MAX_NUMBER_OF_SUB_BANDS)
+    for sb in ap.sub_bands:
+      self.assertEqual(sb.channel_index_start, SubBand().channel_index_start)
+      self.assertEqual(sb.channel_index_end, SubBand().channel_index_end)
+      self.assertEqual(sb.cca, SubBand().cca)
+      self.assertEqual(sb.duty, SubBand().duty)
+      self.assertEqual(sb.eirp, SubBand().eirp)
+
+    for sp in ap.sub_profiles:
+      self.assertEqual(sp.subband_bitmap, SubProfile().subband_bitmap)
+      self.assertEqual(sp.scan_automation_period.exp, SubProfile().scan_automation_period.exp)
+      self.assertEqual(sp.scan_automation_period.mant, SubProfile().scan_automation_period.mant)
+
+    self.assertEqual(len(ap.sub_profiles), AccessProfile.NUMBER_OF_SUB_PROFILES)
+

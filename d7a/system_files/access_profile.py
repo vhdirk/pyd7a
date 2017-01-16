@@ -14,7 +14,7 @@ class AccessProfileFile(File, Validatable):
     self.access_specifier = access_specifier
     self.access_profile = access_profile
     Validatable.__init__(self)
-    File.__init__(self, SystemFileIds.ACCESS_PROFILE_0.value + access_specifier, 11)
+    File.__init__(self, SystemFileIds.ACCESS_PROFILE_0.value + access_specifier, 65)
 
   def __iter__(self):
     for byte in self.access_profile:

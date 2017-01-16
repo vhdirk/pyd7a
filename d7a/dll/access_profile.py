@@ -1,6 +1,8 @@
 from enum import Enum
 
-from d7a.phy.subband import Subband
+from d7a.dll.sub_profile import SubProfile
+from d7a.phy.channel_header import ChannelHeader
+from d7a.phy.subband import SubBand
 from d7a.support.schema           import Validatable, Types
 from d7a.types.ct import CT
 
@@ -13,69 +15,57 @@ class CsmaCaMode(Enum):
 
 
 class AccessProfile(Validatable):
+  NUMBER_OF_SUB_PROFILES = 4
+  MAX_NUMBER_OF_SUB_BANDS = 8
 
   # TODO update to D7AP v1.1
   SCHEMA = [{
-    "scan_type_is_foreground": Types.BOOLEAN(),
-    "csma_ca_mode": Types.ENUM(CsmaCaMode),
-    "number_of_subbands": Types.INTEGER(min=0, max=8),
-    "subnet": Types.BYTE(),
-    "scan_automation_period": Types.OBJECT(CT),
-    "subbands": Types.LIST(Subband, minlength=1)
+    "channel_header": Types.OBJECT(ChannelHeader),
+    "sub_profiles": Types.LIST(SubProfile, minlength=4, maxlength=4),
+    "sub_bands": Types.LIST(SubBand, minlength=0, maxlength=8)
   }]
 
-  def __init__(self, scan_type_is_foreground, csma_ca_mode, subnet, scan_automation_period, subbands):
-    self.scan_type_is_foreground = scan_type_is_foreground
-    self.csma_ca_mode = csma_ca_mode
-    self.subnet = subnet
-    self.scan_automation_period = scan_automation_period
-    self.subbands = subbands
+  def __init__(self, channel_header, sub_profiles, sub_bands):
+    self.channel_header = channel_header
+    self.sub_profiles = sub_profiles
+    self.sub_bands = sub_bands
     super(AccessProfile, self).__init__()
-
-  @property
-  def number_of_subbands(self):
-    return len(self.subbands)
 
   @staticmethod
   def parse(s):
-    scan_type_is_foreground = s.read("bool")
-    csma_ca_mode = CsmaCaMode(s.read("uint:4"))
-    nr_of_subbands = s.read("uint:3")
-    subnet = s.read("int:8")
-    scan_automation_period = CT.parse(s)
-    s.read("uint:8") # RFU
-    subbands = []
-    for i in range(nr_of_subbands):
-      subbands.append(Subband.parse(s))
+    channel_header = ChannelHeader.parse(s)
+    sub_profiles = []
+    for _ in range(AccessProfile.NUMBER_OF_SUB_PROFILES):
+      sub_profiles.append(SubProfile.parse(s))
 
-    return AccessProfile(scan_type_is_foreground=scan_type_is_foreground,
-                         csma_ca_mode=csma_ca_mode,
-                         subnet=subnet,
-                         scan_automation_period=scan_automation_period,
-                         subbands=subbands)
+    sub_bands = []
+    for _ in range(AccessProfile.MAX_NUMBER_OF_SUB_BANDS):
+      sub_bands.append(SubBand.parse(s))
+
+    return AccessProfile(channel_header=channel_header,
+                         sub_bands=sub_bands,
+                         sub_profiles=sub_profiles
+                         )
 
   def __iter__(self):
-    control = self.scan_type_is_foreground << 7
-    control += self.csma_ca_mode.value << 6
-    control += self.number_of_subbands
-    yield control
-    yield self.subnet
-    for byte in self.scan_automation_period: yield byte
-    # skip Tc, this is already removed in oss7 as intermediate change towards v1.1
-    yield 0 # RFU
-    for subband in self.subbands:
-      for byte in subband:
-        yield byte
+    for byte in self.channel_header: yield byte
+    for sp in self.sub_profiles:
+      for byte in sp: yield byte
+
+    for sb in self.sub_bands:
+      for byte in sb: yield byte
 
   def __str__(self):
+    subprofiles_string = ""
+    for subprofile in self.sub_profiles:
+      subprofiles_string = subprofiles_string + str(subprofile)
+
     subbands_string = ""
-    for subband in self.subbands:
+    for subband in self.sub_bands:
       subbands_string = subbands_string + str(subband)
 
-    return "scan_type_is_foregroud={}, csma_ca_mode={}, subnet={}, scan_automation_period={}, subbands={}".format(
-      self.scan_type_is_foreground,
-      self.csma_ca_mode,
-      self.subnet,
-      self.scan_automation_period,
+    return "channel_header={}, sub_profiles={}, sub_bands={}".format(
+      self.channel_header,
+      subprofiles_string,
       subbands_string
     )

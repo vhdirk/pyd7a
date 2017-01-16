@@ -24,9 +24,10 @@ class ReturnFileData(Operation):
     # when reading a known system files we store the parsed data and filename
     try:
       systemfile_type = SystemFiles().files[SystemFileIds(self.operand.offset.id)]
-      if systemfile_type is not None and systemfile_type.length == self.operand.length:
-        self.systemfile_type = systemfile_type
-        self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
-
     except:
-      pass # not a SystemFile
+      return
+
+    if systemfile_type is not None and systemfile_type.length == self.operand.length:
+      self.systemfile_type = systemfile_type
+      self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
+
