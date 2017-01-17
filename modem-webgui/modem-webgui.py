@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 import argparse
 import json
-
 import eventlet
-import sys
-
 from datetime import time, datetime
-
 import jsonpickle
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
