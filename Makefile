@@ -1,4 +1,4 @@
-COVERAGE=PYTHONPATH=. $(shell which coverage)
+COVERAGE=PYTHONPATH=. $(shell which coverage2)
 
 TESTFILES=$(shell grep -lr TestCase d7a | grep '\.py$$')
 
