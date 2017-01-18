@@ -1,43 +1,121 @@
-Version 2.4.7
+Version 4.1 (November 2016)
+================
+
+### Major features
+
+- Gage widget
+- RichText widget
+- Exra modes for charts
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_4_1.html)
+
+
+Version 4.0 (September 2016)
+================
+
+### Major features
+
+- ARIA compatibility
+- Keyboard navigation for all widgets
+- High-contrast theme
+- DateRange control
+- FlexLayout control
+- Google Map control
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_4_0.html)
+
+
+Version 3.4 (July 2016)
+================
+
+### Major features
+
+- "Frozen" rows in datatable
+- Patterns for text inputs
+- Area, Spline, Pie and Bar sparklines
+- "Month" and "year" time pickers
+- Webix Remote
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_3_3.html)
+
+
+Version 3.3 (April 2016)
+================
+
+### Major features
+
+- AbsLayout widget
+- DataLayout widget
+- sparklines for DataTable and TreeTable
+- ability to use JSON payload in Ajax calls
+- drag-n-drop on touch devices
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_3_3.html)
+
+
+Version 3.2 (February 2016)
+================
+
+### Major features
+
+- Spreadsheet widget
+- Rangechart widget
+- undo functionality
+- export to PDF
+- area selection
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_3_2.html)
+
+
+Version 3.1
 ==============
 
-### Fixes
+### Major features
 
-- workaround for rendering regressions in Google Chrome
-- aminations in datatable	
-- avoiding errors when refresh() is called before render()
-- bottomPadding and invalid message; textarea sizing
-- incorrect checkbox state after double-click
-- deleting items in filtered state in tree or treetable
-- display native context menu on a page with webix context menu
-- flash upload and compiled webix.js
-- regression in restoring of scroll state in datatable
-- repainting changes in the hidden view
-- styling of disabled buttons
-- text selection during using a custom scrolls
+- SideMenu widget
+- SideBar widget
+- TreeMap widget
+- autowidth for menu and buttons
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_3_1.html)  
 
 
-Version 2.4.4
+Version 3.0
 ==============
 
-### Fixes
+### New tools
 
-- workaround for rendering regressions in Google Chrome
-- aminations in datatable	
-- avoiding errors when refresh() is called before render()
-- bottomPadding and invalid message; textarea sizing
-- incorrect checkbox state after double-click
-- deleting items in filtered state in tree or treetable
-- display native context menu on a page with webix context menu
-- flash upload and compiled webix.js
-- regression in restoring of scroll state in datatable
-- repainting changes in the hidden view
-- styling of disabled buttons
-- text selection during using a custom scrolls
+- Visual editor
+- Webix Jet frameworks
+
+### Major features
+
+- Excel viewer
+- PDF viewer
+- export to Excel
+- export to PNG
+- SubViews and SubGrids
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_3_0.html)
 
 
-Version 2.4.0
+Version 2.5
 ==============
+
+### Major features
+
+- Support of Microsoft Edge
+- Handling of complex data in Form widget
+- Swimlanes in Kanban widget
+- Total calculations in Pivot widget
+
+[Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2_5.html)
+
+
+Version 2.4
+==============
+
+### Major features
 
 - Portlet widget
 - MultiCombo widget
@@ -47,85 +125,19 @@ Version 2.4.0
 [Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2_4.html)
 
 
-
-Version 2.3.14
-==============
-- fix date serialization for ajax calls
-- fix closing of nested popups can affect windows
-- fix for multiple instances of FileManager on the same page
-- fix for uploader in IE8
-- fix colspans and split mode
-- fix clipbuffer styling in IE8
-- fix metaKey support (mac OS) for multiselection
-- fix validation in dataprocessor breaks insert operations
-- fix for CSV parser, not it ignores the trailing new-lines
-- fix for richselect, setting an empty value clears list selection
-
-
-Version 2.3.8
-=============
-- combo accepts full data object as a value
-- fix for scheduler: bottom toolbar height
-- fix for value binding and dataFeed
-- fix for regression in data saving handling
-
-
-Version 2.3.6
-=============
-
-- better position for sort-row marker
-- fix for missed onAfterFilter event for server side filtering
-- fix for server side filtering with active editor
-- fix for close all sub-windows on master popup closing
-- fix for validation in hidden form
-- fix for richselect filter in IE8
-- fix for unnecessary scroll blocking by datatable
-- fix for regression in treetable filtering
-- fix for combo behavior in dyn. loading mode
-- fix for onChange event in combo
-- fix for ActiveContent doesn't survive component repainting in IE
-- fix for regression in tooltip for icon
-
-
 Version 2.3
 ============
 
 ### Major features
 
-- new material skin
-- barcode widget
-- organogram (organization chart) widget
-- badges and icons for list, buttons and menus (and views based on them)
+- New material skin
+- Barcode widget
+- Organogram (organization chart) widget
+- Badges and icons for list, buttons and menus (and views based on them)
 - "Today" and "Clear" buttons are added to the date editor.
-- better default styling, ability to customize layout configuration
+- Better default styling, ability to customize layout configuration
 
 [Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2_3.html)
-
-
-Version 2.2.3
-================
-
-### Fixes
-
-- autoheight in templates
-- blockselecting and dbl-click events
-- blockselection and custom scroll
-- blockselection in scrolled state
-- blockselection in the empty datatable
-- calendar with no buttons, timepicker position
-- default hotkeys for windows
-- getValue on "editable" datepicker
-- moving items in tree and tree table while in the filtered state
-- processing setState with empty filter value
-- regression in click handling inside of multi-level popup
-- resetting text filter value after reloading data from the server side
-- select filter in FF
-- setValue and getValue of datepicker uses parseDateFormat
-- tabbar "more" icon styling
-- treestore serialization in filtered state
-- calendar icons hidden by default
-- scrollable "Month" view in Scheduler
-
 
 
 Version 2.2
@@ -139,34 +151,21 @@ Version 2.2
 - Optional hover for rows in datatable
 - Improved scrolling on touch devices
 
+
 [Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2_2.html)
-
-
-
-Version 2.1.1
-================
-- regression in addView fixed
-- issue with input focus in IE fixed
-
 
 
 Version 2.1
 ================
 
 ### Major features
-
-- better compatibility with Bootstrap and jQuery
+- Better compatibility with Bootstrap and jQuery
 - Icon font contains 479 icons now ( Font Awesome updated to 4.2 )
 - "strict" mode for Webix
 - Datatable and treetable math can be extended with custom functions
-- Uploader can work in Internet Explorer 8-9
-- ability to send extra data with file upload
-- addView() and removeView() methods can be used to add and remove tabs in tabview
-- find API for datatable and treetable
-- addDropZone() method for uploader to allow file upload by drag-n-drop on html area
+- Uploader can work in Internet Explorer 8
 
 [Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2_1.html)
-
 
 
 Version 2.0
@@ -191,7 +190,6 @@ Version 2.0
 
 
 [Full list of changes and fixes](http://docs.webix.com/desktop__whats_new_2.html)
-
 
 
 Version 1.10
@@ -254,7 +252,7 @@ Default skin changed to flat ( you still can use the old skin by using skins/air
 Compact skin changed to flat theme as well ( old one renamed to skins/aircompact.css )  
 
 
-### Improvments in API
+### Improvements in API
 - text sorting mode for datatable
 - autoheight property for "property" view
 - ability to edit math formulas in the datatable
@@ -279,7 +277,7 @@ onError event replaced with two new events - onBeforeSaveError and onAfterSaveEr
 - drag-n-drop on touch devices
 
 
-### Improvments in Server side integrations
+### Improvements in Server side integrations
 - full support of REST API
 - data in components can be updated from server side
 - client side code can't be broken by server side errors anymore
@@ -301,13 +299,13 @@ Version 1.5
 - new skin for mobile UI
 - functionality of desktop UI adapted to touch events and gestures
 
-### Improvments in DataTable
+### Improvements in DataTable
 - adjustRowHeight method added to datatable
 - fillspace can be used for multiple columsn
 - richselect can be used as editor in the datatable
 - checkboxes can have checkValue and uncheckValue options
  
-### Improvments in Angular and Backbone 
+### Improvements in Angular and Backbone 
 
 - [angular] webix-ui is compatible with ng-repeat
 - [angular] webix-data works for options in combo and select
