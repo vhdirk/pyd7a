@@ -6,11 +6,13 @@ define([
     function showFileDetail(file){
 		console.log("show detail: " + file.file_id);
 		$$("file_details_title").parse({'file_name': file.file_name, 'file_id': file.file_id});
+
+        // dynamically load form based on filename
         var filename = file.file_name;
         if(filename.startsWith("ACCESS_PROFILE"))
             filename = "access_profile"; // remove access specifier
 
-        app.show("/top/files/" + filename);
+        app.show("/top/files/file_" + filename.toLowerCase());
         $$('file_contents_form').setValues(file); // TODO forms for all files now have the same id, find a better way
     }
 
