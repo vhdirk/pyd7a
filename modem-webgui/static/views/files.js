@@ -6,7 +6,12 @@ define([
     function showFileDetail(file){
 		console.log("show detail: " + file.file_id);
 		$$("file_details_title").parse({'file_name': file.file_name, 'file_id': file.file_id});
-        $$("file_data").parse({'file_data': JSON.stringify(file.data)});
+        var filename = file.file_name;
+        if(filename.startsWith("ACCESS_PROFILE"))
+            filename = "access_profile"; // remove access specifier
+
+        app.show("/top/files/" + filename);
+        $$('file_contents_form').setValues(file); // TODO forms for all files now have the same id, find a better way
     }
 
     var ui = {
@@ -19,6 +24,7 @@ define([
                     {
                         view:"datatable",
                         id:"file_list",
+                        select: true,
                         columns:[
                             {id:"file_id", header:"ID", sort:"int"},
                             {id:"file_name", header:"Filename", fillspace:true}
@@ -26,7 +32,7 @@ define([
                         data:files.data,
                         on:{
                             'onItemClick':function(id){
-                               modem.read_file(this.getItem(id).file_id);
+                                modem.read_file(this.getItem(id).file_id);
                                 showFileDetail(this.getItem(id));
                             }
                         }
@@ -39,7 +45,7 @@ define([
                                         data: {"file_name": "", "file_id": ""}}
                                 ]
                             },
-                            {template:"#file_data#", id:"file_data", data:{"file_data":""}}
+                            { $subview: true }
                         ]
                     }
 
@@ -62,6 +68,6 @@ define([
 	return {
 		$ui: ui,
 		$menu: "top:menu",
-        $oninit: onInit()
+        $oninit:onInit()
 	};
 });

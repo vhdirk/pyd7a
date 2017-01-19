@@ -9,6 +9,8 @@ define([
 		debug:		true,
 		start:		"/top/commands"
 	});
+	
+	webix.debug_bind = true;
 
 	app.use(menu);
 

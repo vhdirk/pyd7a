@@ -10,6 +10,7 @@ from flask_socketio import SocketIO, emit
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import IdType, Addressee
+from d7a.phy.channel_header import ChannelBand, ChannelCoding, ChannelClass
 from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.system_files import SystemFiles
@@ -54,6 +55,31 @@ def get_response_modes():
     response_modes.append({"id": member.value, "value": name})
 
   return jsonify(response_modes)
+
+@app.route('/channel_bands')
+def get_channel_bands():
+  channel_bands = []
+  for name, member in ChannelBand.__members__.items():
+    channel_bands.append({"id": member.value, "value": name})
+
+  return jsonify(channel_bands)
+
+@app.route('/channel_codings')
+def get_channel_codings():
+  channel_codings = []
+  for name, member in ChannelCoding.__members__.items():
+    channel_codings.append({"id": member.value, "value": name})
+
+  return jsonify(channel_codings)
+
+@app.route('/channel_classes')
+def get_channel_classes():
+  channel_classes = []
+  for name, member in ChannelClass.__members__.items():
+    channel_classes.append({"id": member.value, "value": name})
+
+  return jsonify(channel_classes)
+
 
 @socketio.on('execute_raw_alp')
 def on_execute_raw_alp(data):
