@@ -109,11 +109,8 @@ class Parser(object):
     return TagRequestAction(respond_when_completed=b7, operation=TagRequest(operand=TagId(tag_id=tag_id)))
 
   def parse_tag_response_action(self, b7, b6, s):
-    if b7:
-      raise ParseError("bit 7 is RFU")
-
     tag_id = s.read("uint:8")
-    return TagResponseAction(error=b6, operation=TagResponse(operand=TagId(tag_id=tag_id)))
+    return TagResponseAction(eop=b7, error=b6, operation=TagResponse(operand=TagId(tag_id=tag_id)))
 
   def parse_forward_action(self, b7, b6, s):
     if b7:

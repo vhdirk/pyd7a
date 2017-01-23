@@ -39,6 +39,7 @@ class Command(Validatable):
     self.generate_tag_request_action = generate_tag_request_action
     self.tag_id = tag_id
     self.send_tag_response_when_completed = send_tag_response_when_completed
+    self.execution_completed = False
 
     for action in actions:
       if type(action) == StatusAction and action.status_operand_extension == StatusActionOperandExtensions.INTERFACE_STATUS:
@@ -53,6 +54,7 @@ class Command(Validatable):
         if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Response Action")
         self.tag_id = action.operand.tag_id
         self.completed_with_error = action.error # TODO distinguish between commands and responses?
+        self.execution_completed = action.eop
       else:
         self.actions.append(action)
 
@@ -200,10 +202,19 @@ class Command(Validatable):
     return description.strip(", ")
 
   def __str__(self):
-    output = "Command with tag {} actions:\n".format(self.tag_id)
-    for action in self.actions:
-      output = output + "\taction: {}\n".format(action)
+    output = "Command with tag {} ".format(self.tag_id)
+    if(self.execution_completed):
+      status = "completed"
+    else:
+      status = "executing"
+
+    output += "({})".format(status)
+
+    if(len(self.actions) > 0):
+      output += "\n\tactions:\n"
+      for action in self.actions:
+        output += "\t\taction: {}\n".format(action)
 
     if self.interface_status is not None:
-      output = output + "interface status: {}\n".format(self.interface_status)
+      output += "\tinterface status: {}\n".format(self.interface_status)
     return output
