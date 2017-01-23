@@ -11,7 +11,7 @@ from d7a.d7anp.addressee import IdType, NlsMethod
 from d7a.sp.session import States
 
 from d7a.types.ct         import CT
-from d7a.sp.qos           import QoS, ResponseMode
+from d7a.sp.qos           import QoS, ResponseMode, RetryMode
 from d7a.sp.configuration import Configuration
 
 class TestConfiguration(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestConfiguration(unittest.TestCase):
     config = Configuration.parse(ConstBitStream(bytes=bytes))
 
     self.assertEqual(config.qos.resp_mod, ResponseMode.RESP_MODE_NO)
-    self.assertEqual(config.qos.nls, False)
+    self.assertEqual(config.qos.retry_mod, RetryMode.RETRY_MODE_NO)
     self.assertEqual(config.qos.stop_on_err, False)
     self.assertEqual(config.qos.record, False)
     self.assertEqual(config.addressee.id_type, IdType.NOID)
