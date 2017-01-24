@@ -9,6 +9,7 @@ from d7a.alp.interface import InterfaceType
 from d7a.alp.operations.status import InterfaceStatus
 from d7a.d7anp.addressee import Addressee, IdType
 from d7a.dll.access_profile import AccessProfile, CsmaCaMode
+from d7a.dll.sub_profile import SubProfile
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
 from d7a.phy.subband import SubBand
 from d7a.sp.configuration import Configuration
@@ -51,20 +52,16 @@ class ThroughtPutTest:
     else:
       self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
       access_profile = AccessProfile(
-        scan_type_is_foreground=True,
-        csma_ca_mode=CsmaCaMode.UNC,
-        subnet=03,
-        scan_automation_period=CT(0),
-        subbands=[SubBand(
-          channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
-                                       channel_coding=ChannelCoding.PN9,
-                                       channel_class=ChannelClass.NORMAL_RATE),
+        channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                                     channel_coding=ChannelCoding.PN9,
+                                     channel_class=ChannelClass.NORMAL_RATE),
+        sub_profiles=[SubProfile(subband_bitmap=0x01), SubProfile(), SubProfile(), SubProfile()],
+        sub_bands=[SubBand(
           channel_index_start=16,
           channel_index_end=16,
           eirp=10,
-          ccao=0 # TODO
-        )
-        ]
+          cca=86 # TODO
+        )]
       )
 
       print("Write Access Profile")
@@ -98,7 +95,8 @@ class ThroughtPutTest:
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
           access_class=2,
-          id_type=IdType.NOID
+          id_type=IdType.NBID,
+          id=CT(exp=0, mant=1) # we expect one responder
         )
       )
 
