@@ -121,7 +121,8 @@ class Modem:
         (cmds, info) = self.parser.parse(data_received)
 
         for cmd in cmds:
-          if cmd.tag_id == alp_command.tag_id:
+          self.log(cmd)
+          if cmd.tag_id == alp_command.tag_id and cmd.execution_completed:
             flush_done = True
             if cmd.completed_with_error:
               self.log("Flushing cmd with tag {} done, with error".format(cmd.tag_id))
@@ -133,7 +134,7 @@ class Modem:
           error["buffer"] = " ".join(["0x{:02x}".format(ord(b)) for b in error["buffer"]])
           print error
 
-      if (datetime.now() - start_time).total_seconds() > 2:
+      if (datetime.now() - start_time).total_seconds() > 10:
         timeout = True
         self.log("Flush timed out, skipping")
 
