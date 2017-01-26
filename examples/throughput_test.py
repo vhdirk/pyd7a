@@ -40,7 +40,7 @@ class ThroughtPutTest:
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
-    if self.config.serial_transmitter == None and self.config.serial_receiver ==  None:
+    if self.config.serial_transmitter == None and self.config.serial_receiver == None:
       self.argparser.error("At least a transmitter or receiver is required.")
 
     if self.config.serial_receiver == None and self.config.unicast_uid == None:
@@ -52,13 +52,13 @@ class ThroughtPutTest:
     else:
       self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
       access_profile = AccessProfile(
-        channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+        channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
                                      channel_coding=ChannelCoding.PN9,
                                      channel_class=ChannelClass.NORMAL_RATE),
-        sub_profiles=[SubProfile(subband_bitmap=0x01), SubProfile(), SubProfile(), SubProfile()],
+        sub_profiles=[SubProfile(subband_bitmap=0x01, scan_automation_period=CT(exp=0, mant=0)), SubProfile(), SubProfile(), SubProfile()],
         sub_bands=[SubBand(
-          channel_index_start=16,
-          channel_index_end=16,
+          channel_index_start=0,
+          channel_index_end=0,
           eirp=10,
           cca=86 # TODO
         )]
@@ -73,8 +73,8 @@ class ThroughtPutTest:
       print("Running without receiver")
     else:
       self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback, show_logging=self.config.verbose)
-      self.receiver_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=2)))
-      print("Receiver scanning on Access Class = 2")
+      self.receiver_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
+      print("Receiver scanning on Access Class = 0x01")
 
 
 
@@ -89,12 +89,12 @@ class ThroughtPutTest:
 
     if self.transmitter_modem != None:
 
-      print("\n==> broadcast, with QoS, transmitter active access class = 0 ====")
-      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
+      print("\n==> broadcast, with QoS, transmitter active access class = 0x01 ====")
+      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
-          access_class=2,
+          access_class=0x01,
           id_type=IdType.NBID,
           id=CT(exp=0, mant=1) # we expect one responder
         )
@@ -103,12 +103,12 @@ class ThroughtPutTest:
       self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
       self.wait_for_receiver(payload)
 
-      print("\n==> broadcast, no QoS, transmitter active access class = 0 ====")
-      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0)))
+      print("\n==> broadcast, no QoS, transmitter active access class = 0x01 ====")
+      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
         addressee=Addressee(
-          access_class=2,
+          access_class=0x01,
           id_type=IdType.NOID
         )
       )
@@ -116,11 +116,11 @@ class ThroughtPutTest:
       self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
       self.wait_for_receiver(payload)
 
-      print("\n==> unicast, with QoS, transmitter active access class = 0")
+      print("\n==> unicast, with QoS, transmitter active access class = 0x01")
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
-          access_class=2,
+          access_class=0x01,
           id_type=IdType.UID,
           id=addressee_id
         )
@@ -129,11 +129,11 @@ class ThroughtPutTest:
       self.start_transmitting(interface_configuration=interface_configuration, payload=payload)
       self.wait_for_receiver(payload)
 
-      print("\n==> unicast, no QoS, transmitter active access class = 0")
+      print("\n==> unicast, no QoS, transmitter active access class = 0x01")
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
         addressee=Addressee(
-          access_class=2,
+          access_class=0x01,
           id_type=IdType.UID,
           id=addressee_id
         )
@@ -203,6 +203,7 @@ class ThroughtPutTest:
           print("\t{}: {}".format(sender, len(cmds)))
 
   def receiver_cmd_callback(self, cmd):
+    print("recv cmd: ".format(cmd))
     if cmd.interface_status != None:
       uid = cmd.interface_status.operand.interface_status.addressee.id
       self.received_commands[uid].append(cmd)
