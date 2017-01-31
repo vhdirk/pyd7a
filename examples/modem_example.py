@@ -29,7 +29,7 @@ modem.d7asp_fifo_flush(
     interface_configuration=Configuration(
       qos=QoS(resp_mod=ResponseMode.RESP_MODE_ALL),
       addressee=Addressee(
-        access_class=0,
+        access_class=0x01,
         id_type=IdType.NOID
       )
     )
