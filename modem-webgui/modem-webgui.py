@@ -153,7 +153,7 @@ def on_connect():
 
   print("modem: " + str(modem.uid))
   emit('module_info', {
-    'uid': hex(modem.uid),
+    'uid': modem.uid,
     'application_name': modem.firmware_version.application_name,
     'git_sha1': modem.firmware_version.git_sha1,
     'd7ap_version': modem.firmware_version.d7ap_version
