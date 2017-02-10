@@ -39,7 +39,7 @@ class Modem2Mqtt():
   def connect_to_mqtt(self):
     self.connected_to_mqtt = False
 
-    self.mq = mqtt.Client()
+    self.mq = mqtt.Client("", True, None, mqtt.MQTTv31)
     self.mq.on_connect = self.on_mqtt_connect
     self.mq.on_message = self.on_mqtt_message
     self.mqtt_topic_incoming = "/DASH7/{}/incoming".format(self.modem_uid)
