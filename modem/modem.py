@@ -36,7 +36,7 @@ class Modem:
     connected = self._connect_serial_modem()
     if connected:
       print("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
-        self.config["device"], hex(self.uid), self.firmware_version.d7ap_version,
+        self.config["device"], self.uid, self.firmware_version.d7ap_version,
         self.firmware_version.application_name, self.firmware_version.git_sha1)
       )
     else:
@@ -75,7 +75,7 @@ class Modem:
         for action in command.actions:
           if type(action) is RegularAction and type(action.operation) is ReturnFileData:
               if action.operand.offset.id == SystemFileIds.UID.value:
-                self.uid = struct.unpack(">Q", bytearray(action.operand.data))[0]
+                self.uid = '{:x}'.format(struct.unpack(">Q", bytearray(action.operand.data))[0])
               if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
                 self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
 
