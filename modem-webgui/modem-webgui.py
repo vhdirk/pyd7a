@@ -44,7 +44,7 @@ def get_system_files():
 def get_id_types():
   id_types = []
   for name, member in IdType.__members__.items():
-    id_types.append({'id': member.value, 'value': name})
+    id_types.append({'id': name, 'value': name})
 
   return jsonify(id_types)
 
@@ -52,7 +52,7 @@ def get_id_types():
 def get_response_modes():
   response_modes = []
   for name, member in ResponseMode.__members__.items():
-    response_modes.append({"id": member.value, "value": name})
+    response_modes.append({"id": name, "value": name})
 
   return jsonify(response_modes)
 
@@ -60,7 +60,7 @@ def get_response_modes():
 def get_channel_bands():
   channel_bands = []
   for name, member in ChannelBand.__members__.items():
-    channel_bands.append({"id": member.value, "value": name})
+    channel_bands.append({"id": name, "value": name})
 
   return jsonify(channel_bands)
 
@@ -68,7 +68,7 @@ def get_channel_bands():
 def get_channel_codings():
   channel_codings = []
   for name, member in ChannelCoding.__members__.items():
-    channel_codings.append({"id": member.value, "value": name})
+    channel_codings.append({"id": name, "value": name})
 
   return jsonify(channel_codings)
 
@@ -76,7 +76,7 @@ def get_channel_codings():
 def get_channel_classes():
   channel_classes = []
   for name, member in ChannelClass.__members__.items():
-    channel_classes.append({"id": member.value, "value": name})
+    channel_classes.append({"id": name, "value": name})
 
   return jsonify(channel_classes)
 
@@ -92,6 +92,14 @@ def on_read_local_system_file(data):
   print("executing cmd: {}".format(cmd))
   modem.send_command(cmd)
 
+  return {'tag_id': cmd.tag_id}
+
+@socketio.on('write_local_system_file')
+def on_write_local_system_file(data):
+  file = jsonpickle.decode(json.dumps(data))
+  cmd = Command.create_with_write_file_action_system_file(file)
+  print("executing cmd: {}".format(cmd))
+  modem.send_command(cmd)
   return {'tag_id': cmd.tag_id}
 
 @socketio.on('read_local_file')
@@ -172,7 +180,7 @@ def command_received_callback(cmd):
       'tag_id': cmd.tag_id,
       'recv_ts': datetime.now().isoformat(),
       'response_command_description': cmd.describe_actions(),
-      'response_command': json.loads(jsonpickle.encode(cmd, unpicklable=False)) # we use jsonpickle here as an easy way to serialize the whole object structure
+      'response_command': json.loads(jsonpickle.encode(cmd)) # we use jsonpickle here as an easy way to serialize the whole object structure
     }, broadcast=True)
 
     print("broadcasted recv command")

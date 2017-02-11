@@ -9,21 +9,21 @@ define([],function(){
                         view: "select",
                         label: "Band",
                         value: 0,
-                        name: "data.access_profile.channel_header.channel_band",
+                        name: "data.access_profile.channel_header.channel_band.value",
                         options: "/channel_bands"
                     },
                     {
                         view: "select",
                         label: "Coding",
                         value: 0,
-                        name: "data.access_profile.channel_header.channel_coding",
+                        name: "data.access_profile.channel_header.channel_coding.value",
                         options: "/channel_codings"
                     },
                     {
                         view: "select",
                         label: "Class",
                         value: 0,
-                        name: "data.access_profile.channel_header.channel_class",
+                        name: "data.access_profile.channel_header.channel_class.value",
                         options: "/channel_classes"
                     },
                 ]

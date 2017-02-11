@@ -69,6 +69,14 @@ define([
             });
         },
 
+        save_file:function(file_data) {
+            socket.emit('write_local_system_file', file_data.data,
+                function(response_data){
+                    console.log("file saved: " + response_data);
+                }
+            );
+        },
+
         info:function () {
             return info_string;
         }
