@@ -55,7 +55,7 @@ define([
                                             if (form.validate()) {
                                                 // TODO post?
                                                 file_data = form.getValues();
-                                                console.log(file_data);
+                                                console.log('file_data: ' + file_data);
                                                 modem.save_file(file_data);
                                             }
                                         }
