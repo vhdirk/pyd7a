@@ -1,29 +1,35 @@
+from d7a.d7anp.addressee import IdType, NlsMethod
 from d7a.support.schema import Validatable, Types
 
 class Control(Validatable):
 
   SCHEMA = [{
-    "has_network_layer_security": Types.BOOLEAN(),
-    "has_multi_hop": Types.BOOLEAN(),
-    "has_origin_access_id": Types.BOOLEAN(),
-    "is_origin_access_id_vid": Types.BOOLEAN(),
-    "origin_access_class": Types.INTEGER(min=0, max=15)
+    "has_no_origin_access_id": Types.BOOLEAN(),
+    "has_hopping": Types.BOOLEAN(),
+    "origin_id_type": Types.ENUM(IdType, allowedvalues=[IdType.UID, IdType.VID]),
+    "nls_method": Types.ENUM(NlsMethod),
   }]
 
-  def __init__(self, has_network_layer_security, has_multi_hop,
-               has_origin_access_id, is_origin_access_id_vid, origin_access_class):
-    self.has_network_layer_security = has_network_layer_security
-    self.has_multi_hop = has_multi_hop
-    self.has_origin_access_id = has_origin_access_id
-    self.is_origin_access_id_vid = is_origin_access_id_vid
-    self.origin_access_class = origin_access_class
+  def __init__(self, has_no_origin_access_id, has_hopping, nls_method, origin_id_type):
+    self.has_no_origin_access_id = has_no_origin_access_id
+    self.nls_method = nls_method
+    self.has_hopping = has_hopping
+    self.origin_id_type = origin_id_type
     super(Control, self).__init__()
+
+  @staticmethod
+  def parse(bitstream):
+    return Control(
+      has_no_origin_access_id=bitstream.read("bool"),
+      has_hopping=bitstream.read("bool"),
+      origin_id_type=IdType(bitstream.read("uint:2")),
+      nls_method=NlsMethod(bitstream.read("uint:4")),
+    )
 
   def __iter__(self):
     byte = 0
-    if self.has_network_layer_security: byte |= 1 << 7
+    if self.has_no_origin_access_id: byte |= 1 << 7
     if self.has_multi_hop:  byte |= 1 << 6
-    if self.has_origin_access_id:  byte |= 1 << 5
-    if self.is_origin_access_id_vid:  byte |= 1 << 4
-    byte += self.origin_access_class
+    if self.origin_id_type:  byte |= 1 << 4
+    byte += self.nls_method
     yield byte

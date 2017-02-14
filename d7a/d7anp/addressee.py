@@ -17,7 +17,7 @@ class IdType(Enum):
   UID   = 2
   VID   = 3
 
-class NlsMethod(object):
+class NlsMethod(Enum):
   NONE = 0
   AES_CTR = 1
   AES_CBC_MAC_128 = 2
@@ -26,12 +26,6 @@ class NlsMethod(object):
   AES_CCM_128 = 5
   AES_CCM_64 = 6
   AES_CCM_32 = 7
-
-  ALL = [ NONE, AES_CTR, AES_CBC_MAC_128, AES_CBC_MAC_64, AES_CBC_MAC_32, AES_CCM_128, AES_CCM_64, AES_CCM_32 ]
-
-  @staticmethod
-  def SCHEMA():
-    return { "type": "integer", "allowed" : NlsMethod.ALL }
 
 class Addressee(Validatable):
   
@@ -45,28 +39,28 @@ class Addressee(Validatable):
     {
       # void identifier with reached devices estimation
       "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.NBID]),
-      "nls_method": Types.INTEGER(NlsMethod.ALL),
+      "nls_method": Types.ENUM(NlsMethod),
       "access_class": Types.BYTE(),
       "id"        : Types.OBJECT(CT)
     },
     {
       # void identifier without reached devices estimation
       "id_type": Types.ENUM(IdType, allowedvalues=[IdType.NOID]),
-      "nls_method": Types.INTEGER(NlsMethod.ALL),
+      "nls_method": Types.ENUM(NlsMethod),
       "access_class": Types.BYTE(),
       "id": Types.INTEGER([None])
     },
     {
        # virtual
       "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.VID]),
-      "nls_method": Types.INTEGER(NlsMethod.ALL),
+      "nls_method": Types.ENUM(NlsMethod),
       "access_class": Types.BYTE(),
       "id"        : Types.INTEGER(min=0, max=0xFFFF)
     },
     {
       # unicast
       "id_type"   : Types.ENUM(IdType, allowedvalues=[IdType.UID]),
-      "nls_method": Types.INTEGER(NlsMethod.ALL),
+      "nls_method": Types.ENUM(NlsMethod),
       "access_class": Types.BYTE(),
       "id"        : Types.INTEGER(min=0, max=0xFFFFFFFFFFFFFFFF)
      }
@@ -104,7 +98,7 @@ class Addressee(Validatable):
   def parse(s):
     _     = s.read("pad:2")
     id_type = IdType(s.read("uint:2"))
-    nls_method = s.read("uint:4")
+    nls_method = NlsMethod(s.read("uint:4"))
     cl    = s.read("uint:8")
     l     = Addressee.length_for(id_type)
     id    = s.read("uint:"+str(l*8)) if l > 0 else None
@@ -114,7 +108,7 @@ class Addressee(Validatable):
     byte = 0
     # pad 2 << 7 << 6
     byte |= self.id_type.value << 4
-    byte += self.nls_method
+    byte += self.nls_method.value
     yield byte
     yield self.access_class
     if self.id_length > 0:

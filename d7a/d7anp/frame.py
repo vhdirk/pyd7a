@@ -7,21 +7,21 @@ from d7a.types.ct import CT
 class Frame(Validatable):
 
   SCHEMA = [{
-    "timeout": Types.OBJECT(CT),
     "control": Types.OBJECT(Control),
+    "origin_access_class": Types.BYTE(),
     "origin_access_id": Types.BYTES(), # TODO refactor to use OriginAddressee (subclass of addressee containing control and access_id)
     "d7atp_frame": Types.OBJECT(D7atpFrame)
   }]
 
-  def __init__(self, timeout, control, origin_access_id, d7atp_frame):
-    self.timeout = timeout
+  def __init__(self, control, origin_access_class, origin_access_id, d7atp_frame):
     self.control = control
+    self.origin_access_class = origin_access_class
     self.origin_access_id = origin_access_id
     self.d7atp_frame = d7atp_frame # TODO
     super(Frame, self).__init__()
 
   def __iter__(self):
-    for byte in self.timeout: yield byte
     for byte in self.control: yield byte
+    yield self.origin_access_class
     for byte in self.origin_access_id: yield byte
     for byte in self.d7atp_frame: yield byte

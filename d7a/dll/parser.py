@@ -1,5 +1,7 @@
 
 from bitstring import ConstBitStream, ReadError
+
+from d7a.d7anp.addressee import IdType
 from d7a.dll.frame import Frame
 from d7a.dll.control import Control
 from d7a.d7anp.parser import Parser as D7anpParser
@@ -71,11 +73,10 @@ class Parser(object):
     subnet = self.s.read("int:8")
     control = self.parse_control()
     payload_length = length - 4 # substract subnet, control, crc
-    if control.is_target_address_set:
-      if control.is_target_address_vid:
-        target_address = map(ord, self.s.read("bytes:2"))
-        payload_length = payload_length - 2
-      else:
+    if control.id_type == IdType.VID:
+      target_address = map(ord, self.s.read("bytes:2"))
+      payload_length = payload_length - 2
+    elif control.id_type == IdType.UID:
         target_address = map(ord, self.s.read("bytes:8"))
         payload_length = payload_length - 8
     else:
@@ -91,11 +92,9 @@ class Parser(object):
     )
 
   def parse_control(self):
-    is_target_address_set = self.s.read("bool")
-    is_target_address_vid = self.s.read("bool")
+    id_type = IdType(self.s.read("uint:2"))
     eirp_index = self.s.read("uint:6")
     return Control(
-      is_target_address_set=is_target_address_set,
-      is_target_address_vid=is_target_address_vid,
+      id_type=id_type,
       eirp_index=eirp_index
     )
