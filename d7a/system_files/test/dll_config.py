@@ -13,7 +13,7 @@ class TestDllConfigFile(unittest.TestCase):
     self.assertEqual(c.vid, 0xFFFF)
 
   def test_invalid_access_class(self):
-    def bad(): DllConfigFile(active_access_class=21) # can be max 20
+    def bad(): DllConfigFile(active_access_class=0xFF01) # can be max 0xFF
     self.assertRaises(ValueError, bad)
 
   def test_parsing(self):

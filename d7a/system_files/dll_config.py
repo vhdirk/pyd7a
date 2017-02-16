@@ -7,7 +7,7 @@ from d7a.system_files.system_file_ids import SystemFileIds
 
 class DllConfigFile(File, Validatable):
   SCHEMA = [{
-    "active_access_class": Types.INTEGER(min=0, max=20),
+    "active_access_class": Types.INTEGER(min=0, max=0xFF),
     "vid": Types.INTEGER(min=0, max=0xFFFF)
     # TODO others
   }]
