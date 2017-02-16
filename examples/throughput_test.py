@@ -83,7 +83,7 @@ class ThroughtPutTest:
     payload = range(self.config.payload_size)
 
     if self.receiver_modem != None:
-      addressee_id = self.receiver_modem.uid
+      addressee_id = int(self.receiver_modem.uid, 16)
     else:
       addressee_id = int(self.config.unicast_uid, 16)
 
