@@ -8,6 +8,7 @@ from d7a.d7anp.addressee import IdType, NlsMethod
 
 from d7a.dll.parser import Parser
 from d7a.support.Crc import calculate_crc
+from d7a.types.ct import CT
 
 
 class TestParser(unittest.TestCase):
@@ -25,9 +26,10 @@ class TestParser(unittest.TestCase):
       0xa8, # D7ATP control
       0xe9, # dialog ID
       0x00, # transaction ID
+      0x05, # Tl
       0x01, # ALP control (read file data operation)
       0x00, 0x00, 0x08, # file data request operand (file ID 0x00)
-      0xC0, 0xC9 # CRC
+      0xE7, 0x5F # CRC
     ]
 
     (frames, info) = self.parser.parse(read_id_command)
@@ -53,6 +55,8 @@ class TestParser(unittest.TestCase):
     self.assertFalse(frame.d7anp_frame.d7atp_frame.control.has_agc)
     self.assertEqual(frame.d7anp_frame.d7atp_frame.dialog_id, 0xe9)
     self.assertEqual(frame.d7anp_frame.d7atp_frame.transaction_id, 0)
+    self.assertEqual(frame.d7anp_frame.d7atp_frame.tl.exp, CT(exp=0, mant=5).exp)
+    self.assertEqual(frame.d7anp_frame.d7atp_frame.tl.mant, CT(exp=0, mant=5).mant)
     self.assertEqual(len(frame.d7anp_frame.d7atp_frame.alp_command.actions), 1)
     alp_action = frame.d7anp_frame.d7atp_frame.alp_command.actions[0]
     self.assertEqual(type(alp_action.operation), ReadFileData)
@@ -76,6 +80,7 @@ class TestParser(unittest.TestCase):
                    0xa8,  # D7ATP control
                    0xe9,  # dialog ID
                    0x00,  # transaction ID
+                   0x05,  # Tl
                    0x20,  # ALP control (return file data operation)
                    0x00, 0x00, 0x08, # file data operand
                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, # UID
@@ -107,6 +112,8 @@ class TestParser(unittest.TestCase):
     self.assertFalse(frame.d7anp_frame.d7atp_frame.control.has_agc)
     self.assertEqual(frame.d7anp_frame.d7atp_frame.dialog_id, 0xe9)
     self.assertEqual(frame.d7anp_frame.d7atp_frame.transaction_id, 0)
+    self.assertEqual(frame.d7anp_frame.d7atp_frame.tl.exp, CT(exp=0, mant=5).exp)
+    self.assertEqual(frame.d7anp_frame.d7atp_frame.tl.mant, CT(exp=0, mant=5).mant)
     self.assertEqual(len(frame.d7anp_frame.d7atp_frame.alp_command.actions), 1)
     alp_action = frame.d7anp_frame.d7atp_frame.alp_command.actions[0]
     self.assertEqual(type(alp_action.operation), ReturnFileData)
