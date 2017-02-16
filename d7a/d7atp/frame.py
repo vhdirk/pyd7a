@@ -14,11 +14,12 @@ class Frame(Validatable):
     "agc_rx_level_i": Types.INTEGER(min=0, max=31),
     "tl": Types.OBJECT(CT, nullable=True),
     "te": Types.OBJECT(CT, nullable=True),
+    "tc": Types.OBJECT(CT, nullable=True),
     "ack_template": Types.OBJECT(nullable=True), # TODO
     "alp_command": Types.OBJECT(Command)
   }]
 
-  def __init__(self, control, dialog_id, transaction_id, alp_command, agc_rx_level_i=10, tl=None, te=None, ack_template=None):
+  def __init__(self, control, dialog_id, transaction_id, alp_command, agc_rx_level_i=10, tl=None, te=None, tc=None, ack_template=None):
     if agc_rx_level_i == None:
       agc_rx_level_i = 10
 
@@ -28,6 +29,7 @@ class Frame(Validatable):
     self.agc_rx_level_i = agc_rx_level_i
     self.tl = tl
     self.te = te
+    self.tc = tc
     self.ack_template = ack_template
     self.alp_command = alp_command
     super(Frame, self).__init__()
@@ -58,6 +60,16 @@ class Frame(Validatable):
       te = CT.parse(bitstream)
       payload_length -= 1
 
+    tc = None
+    # TODO currently we have no way to know if Tc is present or not
+    # Tc is present when control.is_ack_requested AND when we are requester,
+    # while responders copy this flag but do NOT provide a Tc.
+    # When parsing single frames without knowledge of dialogs we cannot determine this.
+    # We use control.is_dialog_start for now but this will break when we start supporting multiple transactions per dialog
+    if control.is_ack_requested and control.is_dialog_start:
+      tc = CT.parse(bitstream)
+      payload_length -= 1
+
     ack_template = None
     if control.is_ack_not_void:
       transaction_id_start = bitstream.read("uint:8")
@@ -81,6 +93,7 @@ class Frame(Validatable):
       agc_rx_level_i=target_rx_level_i,
       tl=tl,
       te=te,
+      tc=tc,
       ack_template=ack_template,
       alp_command=alp_command
     )
