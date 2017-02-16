@@ -15,6 +15,7 @@ from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.system_files import SystemFiles
 from d7a.system_files.system_file_ids import SystemFileIds
+from d7a.types.ct import CT
 from modem.modem import Modem
 
 app = Flask(__name__, static_url_path='/static')
@@ -121,13 +122,15 @@ def execute_command(data):
   interface_configuration = None
   interface_type = InterfaceType(int(data["interface"]))
   if interface_type == InterfaceType.D7ASP:
-    id_type = IdType(int(data["id_type"]))
+    id_type = IdType[data["id_type"]]
     id = int(data["id"])
     if id_type == IdType.NOID:
       id = None
+    if id_type == IdType.NBID:
+      id = CT() # TODO convert
 
     interface_configuration = Configuration(
-      qos=QoS(resp_mod=ResponseMode(int(data["qos_response_mode"]))),
+      qos=QoS(resp_mod=ResponseMode[data["qos_response_mode"]]),
       addressee=Addressee(
         access_class=int(data["access_class"]),
         id_type=id_type,
