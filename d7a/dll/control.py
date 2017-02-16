@@ -13,6 +13,15 @@ class Control(Validatable):
     self.eirp_index = eirp_index
     super(Control, self).__init__()
 
+  @staticmethod
+  def parse(s):
+    id_type = IdType(s.read("uint:2"))
+    eirp_index = s.read("uint:6")
+    return Control(
+      id_type=id_type,
+      eirp_index=eirp_index
+    )
+
   def __iter__(self):
     byte = 0
     byte |= self.id_type.value << 6

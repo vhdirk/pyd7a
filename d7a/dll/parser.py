@@ -4,7 +4,7 @@ from bitstring import ConstBitStream, ReadError
 from d7a.d7anp.addressee import IdType
 from d7a.dll.frame import Frame
 from d7a.dll.control import Control
-from d7a.d7anp.parser import Parser as D7anpParser
+from d7a.d7anp.frame import Frame as D7anpFrame
 
 class ParseError(Exception): pass
 
@@ -46,7 +46,7 @@ class Parser(object):
     while retry and len(self.buffer) > 0:
       try:
         self.s      = ConstBitStream(bytes=self.buffer)
-        frame         = self.parse_frame()
+        frame         = Frame.parse(self.s)
         bits_parsed = self.s.pos
         self.shift_buffer(bits_parsed/8)
         retry = False         # got one, carry on
@@ -68,33 +68,5 @@ class Parser(object):
     return (frame, info)
 
 
-  def parse_frame(self):
-    length = self.s.read("int:8")
-    subnet = self.s.read("int:8")
-    control = self.parse_control()
-    payload_length = length - 4 # substract subnet, control, crc
-    if control.id_type == IdType.VID:
-      target_address = map(ord, self.s.read("bytes:2"))
-      payload_length = payload_length - 2
-    elif control.id_type == IdType.UID:
-        target_address = map(ord, self.s.read("bytes:8"))
-        payload_length = payload_length - 8
-    else:
-      target_address = []
 
-    return Frame(
-      length=length,
-      subnet=subnet,
-      control=control,
-      target_address=target_address,
-      d7anp_frame=D7anpParser().parse(self.s, payload_length),
-      crc16=self.s.read("uint:16")
-    )
 
-  def parse_control(self):
-    id_type = IdType(self.s.read("uint:2"))
-    eirp_index = self.s.read("uint:6")
-    return Control(
-      id_type=id_type,
-      eirp_index=eirp_index
-    )

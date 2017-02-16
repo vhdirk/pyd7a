@@ -1,3 +1,4 @@
+from d7a.d7anp.addressee import IdType
 from d7a.support.schema           import Validatable, Types
 from d7a.dll.control import Control
 from d7a.d7anp.frame import Frame as D7anpFrame
@@ -34,6 +35,32 @@ class Frame(Validatable):
   #   raw_data.append(self.target_address)
   #   raw_data.append(self.payload)
   #   crc = CRCCCITT().calculate(raw_data)
+
+
+  @staticmethod
+  def parse(s):
+    length = s.read("int:8")
+    subnet = s.read("int:8")
+    control = Control.parse(s)
+    payload_length = length - 4 # substract subnet, control, crc
+    if control.id_type == IdType.VID:
+      target_address = map(ord, s.read("bytes:2"))
+      payload_length = payload_length - 2
+    elif control.id_type == IdType.UID:
+        target_address = map(ord, s.read("bytes:8"))
+        payload_length = payload_length - 8
+    else:
+      target_address = []
+
+    return Frame(
+      length=length,
+      subnet=subnet,
+      control=control,
+      target_address=target_address,
+      d7anp_frame=D7anpFrame.parse(s, payload_length),
+      crc16=s.read("uint:16")
+    )
+
 
   def __iter__(self):
     yield self.length
