@@ -63,7 +63,7 @@ class TestAccessProfile(unittest.TestCase):
                          sub_profiles=self.valid_sub_profiles,
                          sub_bands=[None])
 
-    self.assertRaises(TypeError, bad)
+    self.assertRaises(ValueError, bad)
 
   def test_validation_sub_bands_count(self):
     def bad():

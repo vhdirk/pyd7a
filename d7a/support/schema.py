@@ -56,7 +56,12 @@ class Validatable(object):
     obj_dict = {}
     for attr in dir(self): obj_dict[attr] = getattr(self, attr)
     if not validator.validate({ "item" : obj_dict }):
-      raise ValueError(validator.errors)
+      try:
+        errors = validator.errors # cerberus returns NotImplementedError in some cases (for now) ...
+      except NotImplementedError:
+        errors = None
+
+      raise ValueError(errors)
 
 class Types(object):
   @staticmethod
