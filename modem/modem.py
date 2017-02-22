@@ -143,7 +143,7 @@ class Modem:
 
   def read(self):
     try:
-      data = self.dev.read_all()
+      data = self.dev.read(self.dev.inWaiting())
       if len(data) > 0:
         self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
     except serial.SerialException:
