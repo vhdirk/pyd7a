@@ -12,6 +12,7 @@ from d7a.alp.operands.interface_status import InterfaceStatusOperand
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.status import InterfaceStatus
 from d7a.alp.operations.tag_response import TagResponse
+from d7a.alp.operations.write_operations import WriteFileData
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.alp.regular_action import RegularAction
 from d7a.alp.operations.responses import ReturnFileData
@@ -51,6 +52,7 @@ class Parser(object):
     try:
       return{
         1  :  self.parse_alp_read_file_data_action,
+        4  :  self.parse_alp_write_file_data_action,
         32 :  self.parse_alp_return_file_data_action,
         34 :  self.parse_alp_return_status_action,
         35 :  self.parse_tag_response_action,
@@ -66,6 +68,12 @@ class Parser(object):
                   resp=b6,
                   operation=ReadFileData(operand=operand))
 
+  def parse_alp_write_file_data_action(self, b7, b6, s):
+    operand = self.parse_alp_return_file_data_operand(s)
+    return RegularAction(group=b7,
+                  resp=b6,
+                  operation=WriteFileData(operand=operand))
+
   def parse_alp_file_data_request_operand(self, s):
     offset = self.parse_offset(s)
     length = s.read("uint:8")
@@ -79,7 +87,7 @@ class Parser(object):
 
   def parse_alp_return_file_data_operand(self, s):
     offset = self.parse_offset(s)
-    length = s.read("uint:8")
+    length = s.read("uint:8") # TODO assuming 1 bute for now but can be 4 bytes
     data   = s.read("bytes:" + str(length))
     return Data(offset=offset, data=map(ord,data))
 
