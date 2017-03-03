@@ -26,11 +26,12 @@ import struct
 from d7a.support.schema   import Validatable, Types
 from d7a.types.ct         import CT
 from d7a.d7anp.addressee import Addressee
+from d7a.phy.channel_header import ChannelHeader
 
 class Status(Validatable):
 
   SCHEMA = [{
-    "channel_header"    : Types.BYTE(), # TODO parse
+    "channel_header"    : Types.OBJECT(ChannelHeader),
     "channel_index" : Types.INTEGER(),
     "rx_level"      : Types.BYTE(),
     "link_budget": Types.BYTE(),

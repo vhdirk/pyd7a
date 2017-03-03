@@ -27,6 +27,7 @@ from d7a.types.ct import CT
 from d7a.alp.operands.tag_id import TagId
 from d7a.alp.operations.tag_request import TagRequest
 from d7a.alp.tag_request_action import TagRequestAction
+from d7a.phy.channel_header import ChannelHeader
 
 
 class Parser(object):
@@ -134,7 +135,7 @@ class Parser(object):
     pass # no interface status defined for host interface
 
   def parse_alp_interface_status_d7asp(self, s):
-    channel_header  = s.read("uint:8") # TODO parse
+    channel_header  = ChannelHeader.parse(s)
     channel_index   = struct.unpack(">h", s.read("bytes:2"))[0]
     rx_level        = s.read("int:8")
     link_budget     = s.read("uint:8")
