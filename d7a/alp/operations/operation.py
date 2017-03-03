@@ -26,3 +26,8 @@ class Operation(Validatable):
   def __iter__(self):
     if self.operand:
       for byte in self.operand: yield byte
+
+  def __str__(self):
+    s = self.__class__.__name__
+    s += ": " + str(self.operand)
+    return s

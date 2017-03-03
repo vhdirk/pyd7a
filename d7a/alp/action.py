@@ -6,6 +6,7 @@
 # D7A ALP Action 
 from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
+from d7a.alp.operations.write_operations import WriteFileData
 from d7a.support.schema           import Validatable, Types
 
 from d7a.alp.operations.operation import Operation
@@ -37,10 +38,5 @@ class Action(Validatable):
       if self.operation.systemfile_type != None and self.operation.file_data_parsed != None:
         return "Received {} content: {}".format(self.operation.systemfile_type.__class__.__name__,
                                                 self.operation.file_data_parsed)
-      else:
-        return "Received file {} content: {}".format(self.operand.offset.id, self.operand.data)
 
-    elif isinstance(self.operation, ReadFileData):
-      return "Read file {}".format(self.operand.offset.id)
-
-    return "{}".format(type(self.operation).__name__)
+    return str(self.operation)
