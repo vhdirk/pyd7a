@@ -13,6 +13,7 @@ from d7a.alp.operands.file                import Data, Offset
 from d7a.alp.regular_action import RegularAction
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.d7anp.addressee import Addressee
+from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
 from d7a.sp.status                        import Status as D7ASpStatus
 from d7a.alp.operands.interface_status    import InterfaceStatusOperand
 from d7a.types.ct import CT
@@ -40,7 +41,9 @@ class TestCommand(unittest.TestCase):
               operand=InterfaceStatusOperand(
                 interface_id=0xD7,
                 interface_status=D7ASpStatus(
-                  channel_header=0,
+                  channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                                               channel_class=ChannelClass.LO_RATE,
+                                               channel_coding=ChannelCoding.PN9),
                   channel_index=16,
                   rx_level=70,
                   link_budget=80,
@@ -62,7 +65,7 @@ class TestCommand(unittest.TestCase):
     expected = [
       0x62,                                           # Interface Status action
       0xD7,                                           # D7ASP interface
-      0,                                              # channel header
+      32,                                              # channel header
       16, 0,                                          # channel_id
       70,                                             # rxlevel (- dBm)
       80,                                             # link budget
@@ -104,7 +107,9 @@ class TestCommand(unittest.TestCase):
             operand=InterfaceStatusOperand(
               interface_id=0xD7,
               interface_status=D7ASpStatus(
-                channel_header=0,
+                channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                                             channel_class=ChannelClass.LO_RATE,
+                                             channel_coding=ChannelCoding.PN9),
                 channel_index=16,
                 rx_level=70,
                 link_budget=80,
@@ -128,7 +133,7 @@ class TestCommand(unittest.TestCase):
       25,     # tag ID
       0x62,  # Interface Status action
       0xD7,  # D7ASP interface
-      0,  # channel header
+      32,  # channel header
       16, 0,  # channel_id
       70,  # rxlevel (- dBm)
       80,  # link budget

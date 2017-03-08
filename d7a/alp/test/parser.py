@@ -10,6 +10,7 @@ from d7a.alp.operands.interface_status import InterfaceStatusOperand
 
 from d7a.alp.parser import Parser
 from d7a.parse_error import ParseError
+from d7a.phy.channel_header import ChannelBand, ChannelCoding, ChannelClass
 
 
 class TestParser(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestParser(unittest.TestCase):
     self.interface_status_action = [
       0x62,                                           # Interface Status action
       0xD7,                                           # D7ASP interface
-      0,                                              # channel_header
+      32,                                              # channel_header
       0, 0,                                           # channel_id
       0,                                              # rxlevel (- dBm)
       0,                                              # link budget
@@ -169,7 +170,7 @@ class TestParser(unittest.TestCase):
     alp_action_bytes = [
       34 + 0b01000000,                                 # action=34 + inf status
       0xd7,                                           # interface ID
-      0x00,                                           # channel_header
+      32,                                           # channel_header
       0, 16,                                          # channel_index
       70,                                             # rx level
       80,                                             # link budget
@@ -188,7 +189,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(cmd.interface_status.op, 34)
     self.assertEqual(type(cmd.interface_status.operand), InterfaceStatusOperand)
     self.assertEqual(cmd.interface_status.operand.interface_id, 0xD7)
-    self.assertEqual(cmd.interface_status.operand.interface_status.channel_header, 0)
+    self.assertEqual(cmd.interface_status.operand.interface_status.channel_header.channel_band, ChannelBand.BAND_433)
+    self.assertEqual(cmd.interface_status.operand.interface_status.channel_header.channel_coding, ChannelCoding.PN9)
+    self.assertEqual(cmd.interface_status.operand.interface_status.channel_header.channel_class, ChannelClass.LO_RATE)
     self.assertEqual(cmd.interface_status.operand.interface_status.channel_index, 16)
     self.assertEqual(cmd.interface_status.operand.interface_status.rx_level, 70)
     self.assertEqual(cmd.interface_status.operand.interface_status.link_budget, 80)

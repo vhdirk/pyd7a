@@ -64,7 +64,7 @@ class Status(Validatable):
     super(Status, self).__init__()
 
   def __iter__(self):
-    yield self.channel_header
+    for byte in self.channel_header: yield byte
     for byte in bytearray(struct.pack("<h", self.channel_index)): yield byte
     yield self.rx_level
     yield self.link_budget

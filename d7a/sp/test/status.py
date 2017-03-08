@@ -5,15 +5,22 @@
 
 import unittest
 
+from d7a.phy.channel_header import ChannelHeader, ChannelClass, ChannelCoding, ChannelBand
 from d7a.types.ct     import CT
 from d7a.d7anp.addressee import Addressee
 from d7a.sp.session   import States
 from d7a.sp.status    import Status
 
 class TestStatus(unittest.TestCase):
+  valid_channel_header = ChannelHeader(
+    channel_class=ChannelClass.NORMAL_RATE,
+    channel_coding=ChannelCoding.PN9,
+    channel_band=ChannelBand.BAND_433
+  )
+
   def test_byte_generation(self):
     expected = [
-      0,                                              # channel_header
+      40,                                              # channel_header
       16, 0,                                           # channel_id
       70,                                              # rxlevel (- dBm)
       80,                                              # link budget
@@ -26,7 +33,7 @@ class TestStatus(unittest.TestCase):
       0                                                # access class
     ]
     bytes = bytearray(Status(
-      channel_header=0, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
+      channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
       nls=False, missed=False, retry=False, unicast=False, fifo_token=100,
       seq_nr=0, response_to=CT(0, 20), addressee=Addressee()
     ))
@@ -35,7 +42,7 @@ class TestStatus(unittest.TestCase):
       self.assertEqual(expected[i], bytes[i])
 
     bytes = bytearray(Status(
-      channel_header=0, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
+      channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
       unicast=False, fifo_token=100, seq_nr=0, response_to=CT(0, 20), addressee=Addressee(),
       nls=True, missed=True, retry=True))
 
