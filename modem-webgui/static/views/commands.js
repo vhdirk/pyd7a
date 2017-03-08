@@ -43,7 +43,7 @@ define([
                                 {
                                     view: "select",
                                     label: "Response mode",
-                                    value: 1,
+                                    value: "RESP_MODE_ALL",
                                     name: "qos_response_mode",
                                     options: "/responsemodes"
                                 },
@@ -51,11 +51,11 @@ define([
                                 {
                                     view: "text",
                                     label: "Access Class",
-                                    value: "0",
+                                    value: "1",
                                     validate: webix.rules.isNumber,
                                     name: "access_class"
                                 },
-                                {view: "select", label: "IdType", value: 1, name: "id_type", options: "/idtypes"},
+                                {view: "select", label: "IdType", value: "NOID", name: "id_type", options: "/idtypes"},
                                 {view: "text", label: "ID", validate: webix.rules.isNumber, name: "id", value: "0"},
 
                             ]
