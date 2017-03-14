@@ -205,6 +205,10 @@ class Command(Validatable):
     output = "Command with tag {} ".format(self.tag_id)
     if(self.execution_completed):
       status = "completed"
+      if(self.completed_with_error):
+        status += ", with error"
+      else:
+        status += ", without error"
     else:
       status = "executing"
 
