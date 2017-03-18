@@ -11,7 +11,7 @@ from d7a.parse_error              import ParseError
 class Parser(object):
 
   def __init__(self):
-    self.buffer = []
+    self.buffer = bytearray()
 
   def shift_buffer(self, start):
     self.buffer = self.buffer[start:]
@@ -32,14 +32,17 @@ class Parser(object):
   def parse_buffer(self):
     parsed = 0
     cmds   = []
+    errors = []
 
     while True:
       (cmd, info) = self.parse_one_command_from_buffer()
+      errors.extend(info["errors"])
       if cmd is None: break
       parsed += info["parsed"]
       cmds.append(cmd)
 
     info["parsed"] = parsed
+    info["errors"] = errors
     return (cmds, info)
 
   def parse_one_command_from_buffer(self):
@@ -76,7 +79,7 @@ class Parser(object):
     # skip until we find 0xc0, which might be a valid starting point
     try:
       self.buffer.pop(0)                      # first might be 0xc0
-      pos = self.buffer.index(0xc0)
+      pos = self.buffer.index(b'\xc0')
       self.buffer = self.buffer[pos:]
       return pos + 1
     except IndexError:                        # empty buffer

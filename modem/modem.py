@@ -52,6 +52,7 @@ class Modem:
       timeout  = 0.5,
     )
 
+    self.dev.flush() # ignore possible buffered data
     read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
     read_modem_info_action.add_action(
       RegularAction(
@@ -71,6 +72,9 @@ class Modem:
     timeout = False
     while not timeout:
       commands, info = self.read()
+      for error in info["errors"]:
+        print error
+
       for command in commands:
         for action in command.actions:
           if type(action) is RegularAction and type(action.operation) is ReturnFileData:
@@ -82,7 +86,7 @@ class Modem:
         if self.uid and self.firmware_version:
           return True
 
-      if (datetime.now() - start_time).total_seconds() > 2:
+      if (datetime.now() - start_time).total_seconds() > 10:
         timeout = True
         self.log("Timed out reading node information")
 
@@ -103,6 +107,8 @@ class Modem:
     self.send_command(alp_command)
     flush_done = False
     should_restart_async_read = False
+    success = False
+    responses = []
     if self.read_async_active:
       self.log("stopping read thread")
       should_restart_async_read = True
@@ -119,7 +125,7 @@ class Modem:
       self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
       if len(data_received) > 0:
         (cmds, info) = self.parser.parse(data_received)
-
+        responses.extend(cmds)
         for cmd in cmds:
           self.log(cmd)
           if cmd.tag_id == alp_command.tag_id and cmd.execution_completed:
@@ -128,18 +134,21 @@ class Modem:
               self.log("Flushing cmd with tag {} done, with error".format(cmd.tag_id))
             else:
               self.log("Flushing cmd with tag {} done, without error".format(cmd.tag_id))
+              success = True
             break
 
         for error in info["errors"]:
-          error["buffer"] = " ".join(["0x{:02x}".format(ord(b)) for b in error["buffer"]])
+          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), self.buffer))
           print error
 
-      if (datetime.now() - start_time).total_seconds() > 10:
+      if (datetime.now() - start_time).total_seconds() > 60:
         timeout = True
         self.log("Flush timed out, skipping")
 
     if should_restart_async_read:
       self.start_reading()
+
+    return success, responses
 
   def read(self):
     try:
@@ -147,6 +156,7 @@ class Modem:
       if len(data) > 0:
         self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
     except serial.SerialException:
+      print "got serial exception, restarting ..."
       time.sleep(5)
       self.setup_serial_device()
       data = ""
@@ -173,7 +183,7 @@ class Modem:
         self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
-          error["buffer"] = " ".join(["0x{:02x}".format(ord(b)) for b in error["buffer"]])
+          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), self.buffer))
           self.log("Parser error: {}".format(error))
 
         for cmd in cmds:

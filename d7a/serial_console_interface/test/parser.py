@@ -45,10 +45,10 @@ class TestParser(unittest.TestCase):
     self.assertEquals(len(info["errors"]), 1)
 
   def test_buffer_skipping(self):
-    self.parser.buffer = [ 0x10, 0x20, 0x30, 0xc0, 0x10, 0x20, 0x30 ]
+    self.parser.buffer = bytearray([ 0x10, 0x20, 0x30, 0xc0, 0x10, 0x20, 0x30 ])
     skipped = self.parser.skip_bad_buffer_content()
     self.assertEquals(skipped, 3)
-    self.assertEquals(self.parser.buffer, [ 0xc0, 0x10, 0x20, 0x30 ])
+    self.assertEquals(self.parser.buffer, bytearray([ 0xc0, 0x10, 0x20, 0x30 ]))
 
   def test_entire_buffer_skipping(self):
     self.parser.buffer = [ 0x10, 0x20, 0x30, 0x10, 0x20, 0x30 ]
@@ -69,13 +69,13 @@ class TestParser(unittest.TestCase):
     self.assertEquals(self.parser.buffer, [])
 
   def test_buffer_skipping_with_first_and_second_item_the_id(self):
-    self.parser.buffer = [ 0xc0, 0xc0, 0x10, 0x20, 0x30 ]
+    self.parser.buffer = bytearray([ 0xc0, 0xc0, 0x10, 0x20, 0x30 ])
     skipped = self.parser.skip_bad_buffer_content()
     self.assertEquals(skipped, 1)
-    self.assertEquals(self.parser.buffer, [ 0xc0, 0x10, 0x20, 0x30 ])
+    self.assertEquals(self.parser.buffer, bytearray([ 0xc0, 0x10, 0x20, 0x30 ]))
 
   def test_bad_identifier_with_identifier_in_body(self):
-    (cmds, info) = self.parser.parse([
+    (cmds, info) = self.parser.parse(bytearray([
       0x0c, # that's 0c not c0 ! ;-)
       0x04, 0x00, 0x00, 0x00,
       0x20,
@@ -84,38 +84,38 @@ class TestParser(unittest.TestCase):
       0x40,
       0x00,
       0x00
-    ])
+    ]))
     self.assertEquals(len(cmds), 0)
     self.assertEquals(len(info["errors"]), 2)
     self.assertEquals(info["errors"][0]["skipped"], 8)
 
   def test_partial_command(self):
-    alp_action_bytes = [
+    alp_action_bytes = bytearray([
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
       0x00,                                           # offset
       0x04,                                           # length
       0x00, 0xf3, 0x00, 0x00                          # data
-    ]
+    ])
 
-    (cmds, info) = self.parser.parse([
+    (cmds, info) = self.parser.parse(bytearray([
       0xc0,                                           # interface start
       0,
-      2 * len(alp_action_bytes),                         # expect 2 ALP actions but only one in buffer
-    ] + alp_action_bytes)
+      2 * len(alp_action_bytes)                        # expect 2 ALP actions but only one in buffer
+    ]) + alp_action_bytes)
     self.assertEquals(len(cmds), 0)
     self.assertEquals(len(info["errors"]), 0)
     self.assertEquals(info["parsed"], 0)
 
   def test_continue_partial_command(self):
     self.test_partial_command() # incomplete command, add second ALP action to complete it ...
-    (cmds, info) = self.parser.parse([
+    (cmds, info) = self.parser.parse(bytearray([
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
       0x00,                                           # offset
       0x04,                                           # length
       0x00, 0xf3, 0x00, 0x00                          # data
-    ])
+    ]))
     self.assertEquals(len(info["errors"]), 0)
     self.assertEqual(len(cmds[0].actions), 2)
 
@@ -123,6 +123,7 @@ class TestParser(unittest.TestCase):
   def test_continue_from_bad_buffer(self):
     self.test_bad_identifier_with_identifier_in_body() # buffer is bad now
     self.test_basic_valid_message()                    # cont. with valid msg
+
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestParser)
