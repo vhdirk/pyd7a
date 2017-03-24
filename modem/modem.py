@@ -138,7 +138,6 @@ class Modem:
             break
 
         for error in info["errors"]:
-          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), self.buffer))
           print error
 
       if (datetime.now() - start_time).total_seconds() > 60:
@@ -155,7 +154,8 @@ class Modem:
       data = self.dev.read(self.dev.inWaiting())
       if len(data) > 0:
         self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
-    except serial.SerialException:
+    except serial.SerialException as e:
+      print e
       print "got serial exception, restarting ..."
       time.sleep(5)
       self.setup_serial_device()

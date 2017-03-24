@@ -63,7 +63,7 @@ class Parser(object):
       except ParseError as e: # actual problem with current buffer, need to skip
         errors.append({
           "error"   : e.args[0],
-          "buffer"  : list(self.buffer),
+          "buffer"  : " ".join(map(lambda b: format(b, "02x"), self.buffer)),
           "pos"     : s.pos,
           "skipped" : self.skip_bad_buffer_content()
         })
