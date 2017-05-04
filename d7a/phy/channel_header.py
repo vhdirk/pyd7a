@@ -10,6 +10,7 @@ class ChannelCoding(Enum):
 
 class ChannelClass(Enum):
   LO_RATE = 0x00
+  LORA = 0x01 # TODO not part of spec
   NORMAL_RATE = 0x02
   HI_RATE = 0x03
 
