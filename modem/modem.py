@@ -176,9 +176,16 @@ class Modem:
 
   def read_async(self):
     self.log("starting read thread")
-
+    data_received = bytearray()
     while self.read_async_active:
-      data_received = self.dev.read()
+      try:
+        data_received = self.dev.read()
+      except serial.SerialException:
+        self.log("SerialException received, trying to reconnect")
+        self.dev.close()
+        time.sleep(5)
+        self._connect_serial_modem()
+
       if len(data_received) > 0:
         self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
