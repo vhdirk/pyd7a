@@ -6,6 +6,7 @@ from datetime import time, datetime
 import jsonpickle
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS, cross_origin
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -20,6 +21,7 @@ from modem.modem import Modem
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # do not cache static assets for now
+CORS(app) # TODO can be removed after integrating the ng project (and serving ng through flask)
 
 socketio = SocketIO(app)
 eventlet.monkey_patch()
