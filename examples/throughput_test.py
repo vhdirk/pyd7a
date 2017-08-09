@@ -66,14 +66,14 @@ class ThroughtPutTest:
 
       print("Write Access Profile")
       write_ap_cmd = Command.create_with_write_file_action_system_file(file=AccessProfileFile(access_profile=access_profile, access_specifier=0))
-      self.transmitter_modem.send_command(write_ap_cmd)
+      self.transmitter_modem.execute_command(write_ap_cmd, timeout_seconds=1)
 
     if self.config.serial_receiver == None:
       self.receiver_modem = None
       print("Running without receiver")
     else:
       self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback, show_logging=self.config.verbose)
-      self.receiver_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
+      self.receiver_modem.execute_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)), timeout_seconds=1)
       print("Receiver scanning on Access Class = 0x01")
 
 
@@ -90,7 +90,7 @@ class ThroughtPutTest:
     if self.transmitter_modem != None:
 
       print("\n==> broadcast, with QoS, transmitter active access class = 0x01 ====")
-      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
+      self.transmitter_modem.execute_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)), timeout_seconds=1)
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
         addressee=Addressee(
@@ -104,7 +104,7 @@ class ThroughtPutTest:
       self.wait_for_receiver(payload)
 
       print("\n==> broadcast, no QoS, transmitter active access class = 0x01 ====")
-      self.transmitter_modem.send_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)))
+      self.transmitter_modem.execute_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)), timeout_seconds=1)
       interface_configuration = Configuration(
         qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
         addressee=Addressee(
@@ -143,7 +143,6 @@ class ThroughtPutTest:
       self.wait_for_receiver(payload)
     else:
       # receive only
-      self.receiver_modem.start_reading()
       self.wait_for_receiver(payload)
 
   def start_transmitting(self, interface_configuration, payload):
@@ -151,7 +150,6 @@ class ThroughtPutTest:
 
     if self.receiver_modem != None:
       self.received_commands = defaultdict(list)
-      self.receiver_modem.start_reading()
 
     command = Command.create_with_return_file_data_action(
       file_id=0x40,
@@ -165,7 +163,7 @@ class ThroughtPutTest:
     for i in range(self.config.msg_count):
       sys.stdout.write("{}/{}\r".format(i + 1, self.config.msg_count))
       sys.stdout.flush()
-      self.transmitter_modem.d7asp_fifo_flush(command)
+      self.transmitter_modem.execute_command(command, timeout_seconds=100)
 
     end = time.time()
     print("transmitter: sending {} messages completed in: {} s".format(self.config.msg_count, end - start))
@@ -185,7 +183,6 @@ class ThroughtPutTest:
         print("waiting for receiver to finish ... (current nr of recv msgs: {})".format(total_recv))
 
       print("finished receiving or timeout")
-      self.receiver_modem.cancel_read()
       payload_has_errors = False
       for sender_cmd in self.received_commands.values():
         for cmd in sender_cmd:

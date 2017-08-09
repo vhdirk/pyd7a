@@ -33,6 +33,10 @@ class Modem:
 
     self.uid = None
     self.firmware_version = None
+    self._sync_execution_response_cmds = []
+    self._sync_execution_tag_id = None
+    self._sync_execution_completed = False
+
     connected = self._connect_serial_modem()
     if connected:
       print("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
@@ -42,8 +46,8 @@ class Modem:
     else:
       raise ModemConnectionError
 
-    self.read_async_active = False
     self.receive_callback = receive_callback
+
 
   def _connect_serial_modem(self):
     self.dev = serial.Serial(
@@ -53,6 +57,7 @@ class Modem:
     )
 
     self.dev.flush() # ignore possible buffered data
+    self._start_reading()
     read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
     read_modem_info_action.add_action(
       RegularAction(
@@ -65,139 +70,99 @@ class Modem:
       )
     )
 
-    self.send_command(read_modem_info_action)
+    resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=10)
 
-    # read thread not yet running here, read sync
-    start_time = datetime.now()
-    timeout = False
-    while not timeout:
-      commands, info = self.read()
-      for error in info["errors"]:
-        print error
+    if len(resp_cmd) == 0:
+      self._log("Timed out reading node information")
+      return False
 
-      for command in commands:
-        for action in command.actions:
-          if type(action) is RegularAction and type(action.operation) is ReturnFileData:
-              if action.operand.offset.id == SystemFileIds.UID.value:
-                self.uid = '{:x}'.format(struct.unpack(">Q", bytearray(action.operand.data))[0])
-              if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
-                self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
+    for action in resp_cmd[0].actions:
+      if type(action) is RegularAction and type(action.operation) is ReturnFileData:
+          if action.operand.offset.id == SystemFileIds.UID.value:
+            self.uid = '{:x}'.format(struct.unpack(">Q", bytearray(action.operand.data))[0])
+          if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
+            self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
 
-        if self.uid and self.firmware_version:
-          return True
-
-      if (datetime.now() - start_time).total_seconds() > 10:
-        timeout = True
-        self.log("Timed out reading node information")
+    if self.uid and self.firmware_version:
+      return True
 
     return False
 
 
-  def log(self, *msg):
+  def _log(self, *msg):
     if self.show_logging: print " ".join(map(str, msg))
 
-  def send_command(self, alp_command):
+  def execute_command_async(self, alp_command):
+    self.execute_command(alp_command, timeout_seconds=0)
+
+  def execute_command(self, alp_command, timeout_seconds):
     data = self.parser.build_serial_frame(alp_command)
+    self._sync_execution_response_cmds = []
+    self._sync_execution_tag_id = None
+    self._sync_execution_completed = False
+    if(timeout_seconds > 0):
+      assert self._sync_execution_tag_id is None
+      self._sync_execution_tag_id = alp_command.tag_id
+
     self.dev.write(data)
     self.dev.flush()
-    self.log("Sending command of size ", len(data))
-    self.log("> " + " ".join(map(lambda b: format(b, "02x"), data)))
+    self._log("Sending command of size ", len(data))
+    self._log("> " + " ".join(map(lambda b: format(b, "02x"), data)))
+    if timeout_seconds == 0:
+      return None
 
-  def d7asp_fifo_flush(self, alp_command):
-    self.send_command(alp_command)
-    flush_done = False
-    should_restart_async_read = False
-    success = False
-    responses = []
-    if self.read_async_active:
-      self.log("stopping read thread")
-      should_restart_async_read = True
-      self.read_async_active = False
-      self.read_thread.shutdown = True
-      self.read_thread.join()
-      self.log("read thread stopped")
-
+    self._log("Waiting for response (max {} s)".format(timeout_seconds))
     start_time = datetime.now()
-    timeout = False
-    self.log("flush start of command with tag {}".format(alp_command.tag_id))
-    while not flush_done and not timeout:
-      data_received = self.dev.read()
-      self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
-      if len(data_received) > 0:
-        (cmds, info) = self.parser.parse(data_received)
-        responses.extend(cmds)
-        for cmd in cmds:
-          self.log(cmd)
-          if cmd.tag_id == alp_command.tag_id and cmd.execution_completed:
-            flush_done = True
-            if cmd.completed_with_error:
-              self.log("Flushing cmd with tag {} done, with error".format(cmd.tag_id))
-            else:
-              self.log("Flushing cmd with tag {} done, without error".format(cmd.tag_id))
-              success = True
-            break
+    while not self._sync_execution_completed and (datetime.now() - start_time).total_seconds() < timeout_seconds:
+      time.sleep(0.05)
 
-        for error in info["errors"]:
-          print error
+    if not self._sync_execution_completed:
+      self._log("Command timeout (tag {})".format(alp_command.tag_id))
 
-      if (datetime.now() - start_time).total_seconds() > 60:
-        timeout = True
-        self.log("Flush timed out, skipping")
+    return self._sync_execution_response_cmds
 
-    if should_restart_async_read:
-      self.start_reading()
 
-    return success, responses
-
-  def read(self):
-    try:
-      data = self.dev.read(self.dev.inWaiting())
-      if len(data) > 0:
-        self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data))))
-    except serial.SerialException as e:
-      print e
-      print "got serial exception, restarting ..."
-      time.sleep(5)
-      self.setup_serial_device()
-      data = ""
-    return self.parser.parse(data)
-
-  def cancel_read(self):
-    if self.read_async_active:
-      self.read_async_active = False
-      self.read_thread.shutdown = True
-      self.read_thread.join()
-
-  def start_reading(self):
+  def _start_reading(self):
     self.read_async_active = True
-    self.read_thread = Thread(target=self.read_async)
+    self.read_thread = Thread(target=self._read_async)
     self.read_thread.daemon = True
     self.read_thread.start()
 
-  def read_async(self):
-    self.log("starting read thread")
+  def _read_async(self):
+    self._log("starting read thread")
     data_received = bytearray()
     while self.read_async_active:
       try:
         data_received = self.dev.read()
       except serial.SerialException:
-        self.log("SerialException received, trying to reconnect")
+        self._log("SerialException received, trying to reconnect")
         self.dev.close()
         time.sleep(5)
         self._connect_serial_modem()
 
       if len(data_received) > 0:
-        self.log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
+        self._log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(map(lambda b: format(b, "02x"), self.buffer))
-          self.log("Parser error: {}".format(error))
+          self._log("Parser error: {}".format(error))
 
         for cmd in cmds:
-          if self.receive_callback != None:
-            self.receive_callback(cmd)
+          if self._sync_execution_tag_id == cmd.tag_id:
+            self._log("Received response for sync execution")
+            self._sync_execution_response_cmds.append(cmd)
+            if cmd.execution_completed:
+              self._log("cmd with tag {} done".format(cmd.tag_id))
+              self._sync_execution_completed = True
+            else:
+              self._log("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
-    self.log("end read thread")
+          elif self.receive_callback != None:
+            self.receive_callback(cmd)
+          else:
+            self._log("Received a response which was not requested synchronously or no async callback provided")
+
+    self._log("end read thread")
 
 
 class ModemConnectionError(Exception):

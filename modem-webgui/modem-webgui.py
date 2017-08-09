@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import json
+
 import eventlet
 from datetime import time, datetime
 import jsonpickle
@@ -87,13 +88,13 @@ def get_channel_classes():
 @socketio.on('execute_raw_alp')
 def on_execute_raw_alp(data):
   alp_hex_string = data['raw_alp'].replace(" ", "").strip()
-  modem.send_command(bytearray(alp_hex_string.decode("hex")))
+  modem.execute_command_async(bytearray(alp_hex_string.decode("hex")))
 
 @socketio.on('read_local_system_file')
 def on_read_local_system_file(data):
   cmd = Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
   print("executing cmd: {}".format(cmd))
-  modem.send_command(cmd)
+  modem.execute_command(cmd, timeout_seconds=1)
 
   return {'tag_id': cmd.tag_id}
 
@@ -102,7 +103,7 @@ def on_write_local_system_file(data):
   file = jsonpickle.decode(json.dumps(data))
   cmd = Command.create_with_write_file_action_system_file(file)
   print("executing cmd: {}".format(cmd))
-  modem.send_command(cmd)
+  modem.execute_command(cmd, timeout_seconds=1)
   return {'tag_id': cmd.tag_id}
 
 @socketio.on('read_local_file')
@@ -114,7 +115,7 @@ def on_read_local_file(data):
     length=int(data['length'])
   )
 
-  modem.send_command(cmd)
+  modem.execute_command(cmd, timeout_seconds=1)
 
 @socketio.on('execute_command')
 def execute_command(data):
@@ -149,7 +150,7 @@ def execute_command(data):
   )
 
   print("executing cmd: {}".format(cmd))
-  modem.send_command(cmd)
+  modem.execute_command_async(cmd)
   return {
     'tag_id': cmd.tag_id,
     'interface': interface_type.name,
@@ -162,7 +163,6 @@ def on_connect():
   global modem
   if modem == None:
     modem = Modem(config.device, config.rate, command_received_callback)
-    modem.start_reading()
 
   print("modem: " + str(modem.uid))
   emit('module_info', {

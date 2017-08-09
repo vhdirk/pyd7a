@@ -22,7 +22,7 @@ argparser.add_argument("-v", "--verbose", help="verbose", default=False, action=
 config = argparser.parse_args()
 
 modem = Modem(config.device, config.rate, receive_callback=received_command_callback, show_logging=config.verbose)
-modem.d7asp_fifo_flush(
+modem.execute_command_async(
   alp_command=Command.create_with_read_file_action_system_file(
     file=UidFile(),
     interface_type=InterfaceType.D7ASP,
@@ -36,6 +36,5 @@ modem.d7asp_fifo_flush(
   )
 )
 
-modem.start_reading()
 while True:
   pass
