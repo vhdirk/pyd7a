@@ -94,7 +94,7 @@ def on_execute_raw_alp(data):
 def on_read_local_system_file(data):
   cmd = Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
   print("executing cmd: {}".format(cmd))
-  modem.execute_command(cmd, timeout_seconds=1)
+  modem.execute_command_async(cmd)
 
   return {'tag_id': cmd.tag_id}
 
@@ -103,7 +103,7 @@ def on_write_local_system_file(data):
   file = jsonpickle.decode(json.dumps(data))
   cmd = Command.create_with_write_file_action_system_file(file)
   print("executing cmd: {}".format(cmd))
-  modem.execute_command(cmd, timeout_seconds=1)
+  modem.execute_command_async(cmd)
   return {'tag_id': cmd.tag_id}
 
 @socketio.on('read_local_file')
@@ -115,7 +115,7 @@ def on_read_local_file(data):
     length=int(data['length'])
   )
 
-  modem.execute_command(cmd, timeout_seconds=1)
+  modem.execute_command(cmd)
 
 @socketio.on('execute_command')
 def execute_command(data):
