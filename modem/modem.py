@@ -96,7 +96,7 @@ class Modem:
   def execute_command_async(self, alp_command):
     self.execute_command(alp_command, timeout_seconds=0)
 
-  def execute_command(self, alp_command, timeout_seconds):
+  def execute_command(self, alp_command, timeout_seconds=10):
     data = self.parser.build_serial_frame(alp_command)
     self._sync_execution_response_cmds = []
     self._sync_execution_tag_id = None
