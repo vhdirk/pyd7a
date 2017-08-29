@@ -86,7 +86,7 @@ class Parser(object):
       return 0
     except ValueError:                        # empty buffer, reported by .index
       skipped = len(self.buffer) + 1          # popped first item already
-      self.buffer = []
+      self.buffer = bytearray()
       return skipped
 
   def parse_serial_interface_header(self, s):
