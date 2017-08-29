@@ -21,7 +21,7 @@ argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=i
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
 config = argparser.parse_args()
 
-modem = Modem(config.device, config.rate, receive_callback=received_command_callback, show_logging=config.verbose)
+modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, show_logging=config.verbose)
 modem.execute_command_async(
   alp_command=Command.create_with_read_file_action_system_file(
     file=UidFile(),
