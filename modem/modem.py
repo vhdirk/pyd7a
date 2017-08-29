@@ -23,7 +23,7 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.system_file_ids import SystemFileIds
 
 class Modem:
-  def __init__(self, device, baudrate, receive_callback, show_logging=True):
+  def __init__(self, device, baudrate, unsolicited_response_received_callback, show_logging=True):
     self.show_logging = show_logging
     self.parser = Parser()
     self.config = {
@@ -36,6 +36,7 @@ class Modem:
     self._sync_execution_response_cmds = []
     self._sync_execution_tag_id = None
     self._sync_execution_completed = False
+    self._unsolicited_responses_received = []
 
     connected = self._connect_serial_modem()
     if connected:
@@ -46,7 +47,7 @@ class Modem:
     else:
       raise ModemConnectionError
 
-    self.receive_callback = receive_callback
+    self.unsolicited_response_received_callback = unsolicited_response_received_callback
 
 
   def _connect_serial_modem(self):
@@ -128,6 +129,12 @@ class Modem:
     self.read_thread.daemon = True
     self.read_thread.start()
 
+  def get_unsolicited_responses_received(self):
+    return self._unsolicited_responses_received
+
+  def clear_unsolicited_responses_received(self):
+    self._unsolicited_responses_received = []
+
   def _read_async(self):
     self._log("starting read thread")
     data_received = bytearray()
@@ -144,7 +151,7 @@ class Modem:
         self._log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
-          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), self.buffer))
+          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), bytearray(data_received)))
           self._log("Parser error: {}".format(error))
 
         for cmd in cmds:
@@ -157,10 +164,11 @@ class Modem:
             else:
               self._log("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
-          elif self.receive_callback != None:
-            self.receive_callback(cmd)
+          elif self.unsolicited_response_received_callback != None:
+            self.unsolicited_response_received_callback(cmd)
           else:
             self._log("Received a response which was not requested synchronously or no async callback provided")
+            self._unsolicited_responses_received.append(cmd)
 
     self._log("end read thread")
 
