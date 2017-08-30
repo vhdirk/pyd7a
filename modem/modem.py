@@ -37,6 +37,7 @@ class Modem:
     self._sync_execution_tag_id = None
     self._sync_execution_completed = False
     self._unsolicited_responses_received = []
+    self.unsolicited_response_received_callback = unsolicited_response_received_callback
 
     connected = self._connect_serial_modem()
     if connected:
@@ -46,8 +47,6 @@ class Modem:
       )
     else:
       raise ModemConnectionError
-
-    self.unsolicited_response_received_callback = unsolicited_response_received_callback
 
 
   def _connect_serial_modem(self):
