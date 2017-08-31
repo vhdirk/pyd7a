@@ -109,7 +109,7 @@ class Modem:
     self._log("Sending command of size ", len(data))
     self._log("> " + " ".join(map(lambda b: format(b, "02x"), data)))
     if timeout_seconds == 0:
-      return None
+      return []
 
     self._log("Waiting for response (max {} s)".format(timeout_seconds))
     start_time = datetime.now()
@@ -118,6 +118,7 @@ class Modem:
 
     if not self._sync_execution_completed:
       self._log("Command timeout (tag {})".format(alp_command.tag_id))
+      return []
 
     return self._sync_execution_response_cmds
 
