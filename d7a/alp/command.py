@@ -201,6 +201,12 @@ class Command(Validatable):
 
     return description.strip(", ")
 
+  def get_d7asp_interface_status(self):
+    if self.interface_status is None or self.interface_status.operand.interface_id != 0xD7:
+      return None
+
+    return self.interface_status.operation.operand.interface_status
+
   def __str__(self):
     output = "Command with tag {} ".format(self.tag_id)
     if(self.execution_completed):
