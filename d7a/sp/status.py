@@ -63,6 +63,29 @@ class Status(Validatable):
     self.addressee   = addressee
     super(Status, self).__init__()
 
+  @staticmethod
+  def parse(s):
+    channel_header  = ChannelHeader.parse(s)
+    channel_index   = s.read("uint:16")
+    rx_level        = s.read("int:8")
+    link_budget     = s.read("uint:8")
+    target_rx_level = s.read("uint:8")
+    nls             = s.read("bool")
+    missed          = s.read("bool")
+    retry           = s.read("bool")
+    unicast         = s.read("bool" )
+    _               = s.read("pad:4")
+    fifo_token      = s.read("uint:8")
+    seq_nr          = s.read("uint:8")
+    response_to     = CT.parse(s)
+    addressee       = Addressee.parse(s)
+
+    return Status(channel_header=channel_header, channel_index=channel_index,
+                    rx_level=rx_level, link_budget=link_budget,
+                    target_rx_level=target_rx_level, nls=nls, missed=missed,
+                    retry=retry, unicast=unicast, fifo_token=fifo_token,
+                    seq_nr=seq_nr, response_to=response_to, addressee=addressee)
+
   def __iter__(self):
     for byte in self.channel_header: yield byte
     for byte in bytearray(struct.pack("<h", self.channel_index)): yield byte
@@ -81,8 +104,8 @@ class Status(Validatable):
     for byte in self.addressee: yield byte
 
   def __str__(self):
-    return "unicast={}, nls={}, retry={}, missed={}, fifo_token={}, rx_level={}, " \
-          "seq_nr={}, target_rx_level={}, addressee={}, response_to={}, link_budget={}, channel_header={}".format(
+    return "unicast={}, nls={}, retry={}, missed={}, fifo_token={}, rx_level={}, seq_nr={}, target_rx_level={}, " \
+           "addressee={}, response_to={}, link_budget={}, channel_header={}, channel_index={}".format(
       self.unicast,
       self.nls,
       self.retry,
@@ -94,5 +117,6 @@ class Status(Validatable):
       self.addressee,
       self.response_to,
       self.link_budget,
-      self.channel_header
+      self.channel_header,
+      self.channel_index
     )
