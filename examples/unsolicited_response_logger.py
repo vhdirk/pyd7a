@@ -11,6 +11,11 @@ from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
 
+# This example can be used with a node running the gateway app included in OSS-7.
+# The gateway is continuously listening for foreground frames.
+# Messages pushed by other nodes (running for example the sensor_push app) will be received by the gateway node,
+# transmitted over serial and the received_command_callback() function below will be called.
+
 def received_command_callback(cmd):
   print cmd
 
@@ -22,19 +27,6 @@ argparser.add_argument("-v", "--verbose", help="verbose", default=False, action=
 config = argparser.parse_args()
 
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, show_logging=config.verbose)
-modem.execute_command_async(
-  alp_command=Command.create_with_read_file_action_system_file(
-    file=UidFile(),
-    interface_type=InterfaceType.D7ASP,
-    interface_configuration=Configuration(
-      qos=QoS(resp_mod=ResponseMode.RESP_MODE_ALL),
-      addressee=Addressee(
-        access_class=0x01,
-        id_type=IdType.NOID
-      )
-    )
-  )
-)
 
 while True:
   pass
