@@ -37,6 +37,9 @@ class TestCT(unittest.TestCase):
     self.assertEqual( bytearray(CT(1, 1))[0], int('00100001', 2))
     self.assertEqual( bytearray(CT(7,31))[0], int('11111111', 2))
 
+  def test_compress(self):
+    self.assertEqual(1024, CT.compress(1024).decompress())
+
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestCT)
   unittest.TextTestRunner(verbosity=2).run(suite)
