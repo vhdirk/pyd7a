@@ -6,14 +6,14 @@ from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.d7anp.addressee import IdType, NlsMethod
 
-from d7a.dll.parser import Parser
+from d7a.dll.parser import Parser, FrameType
 from d7a.support.Crc import calculate_crc
 from d7a.types.ct import CT
 
 
-class TestParser(unittest.TestCase):
+class TestForegroundFrameParser(unittest.TestCase):
   def setUp(self):
-    self.parser = Parser()
+    self.parser = Parser(FrameType.FOREGROUND)
 
   def test_read_id_command_frame(self):
     read_id_command = [
@@ -127,3 +127,23 @@ class TestParser(unittest.TestCase):
     self.assertEqual(alp_action.operand.offset.id, 0)
     self.assertEqual(alp_action.operand.offset.offset, 0)
     self.assertEqual(alp_action.operand.length, 8)
+
+class TestBackgroundFrameParser(unittest.TestCase):
+  def setUp(self):
+    self.parser = Parser(FrameType.BACKGROUND)
+
+  def test_background_frame(self):
+    frame = [
+      0x01, # subnet
+      0x80, # control
+      0x00, # payload
+      0x01, # payload
+      0x25, 0xDA # CRC
+    ]
+
+    (frames, info) = self.parser.parse(frame)
+    self.assertEqual(len(frames), 1)
+    self.assertEqual(frames[0].control.id_type, IdType.UID)
+    self.assertEqual(frames[0].control.tag, 0)
+    self.assertEqual(frames[0].payload, 1)
+    self.assertEqual(frames[0].crc16, 9690)

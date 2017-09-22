@@ -2,17 +2,17 @@ import pprint
 
 from d7a.d7anp.addressee import IdType
 from d7a.support.schema           import Validatable, Types
-from d7a.dll.control import Control
+from d7a.dll.foreground_frame_control import ForegroundFrameControl
 from d7a.d7anp.frame import Frame as D7anpFrame
 
 from PyCRC.CRCCCITT import CRCCCITT
 
-class Frame(Validatable):
+class ForegroundFrame(Validatable):
 
   SCHEMA = [{
     "length": Types.BYTE(),
     "subnet": Types.BYTE(),
-    "control": Types.OBJECT(Control),
+    "control": Types.OBJECT(ForegroundFrameControl),
     "target_address": Types.BYTES(), # TODO max size?
     "d7anp_frame": Types.OBJECT(D7anpFrame), # TODO assuming foreground frames for now
     "crc16"  : Types.BITS(16) # TODO does not work, look into this later {'validator': validate_crc }
@@ -27,7 +27,7 @@ class Frame(Validatable):
     self.crc16 = crc16
     # TODO validate CRC
 
-    super(Frame, self).__init__()
+    super(ForegroundFrame, self).__init__()
 
   # def validate_crc(self, value, error):
   #   raw_data = []
@@ -43,7 +43,7 @@ class Frame(Validatable):
   def parse(s):
     length = s.read("int:8")
     subnet = s.read("int:8")
-    control = Control.parse(s)
+    control = ForegroundFrameControl.parse(s)
     payload_length = length - 4 # substract subnet, control, crc
     if control.id_type == IdType.VID:
       target_address = map(ord, s.read("bytes:2"))
@@ -54,7 +54,7 @@ class Frame(Validatable):
     else:
       target_address = []
 
-    return Frame(
+    return ForegroundFrame(
       length=length,
       subnet=subnet,
       control=control,

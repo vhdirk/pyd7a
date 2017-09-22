@@ -1,17 +1,21 @@
+from enum import Enum
 
 from bitstring import ConstBitStream, ReadError
 
-from d7a.d7anp.addressee import IdType
-from d7a.dll.frame import Frame
-from d7a.dll.control import Control
-from d7a.d7anp.frame import Frame as D7anpFrame
+from d7a.dll.background_frame import BackgroundFrame
+from d7a.dll.foreground_frame import ForegroundFrame
 
 class ParseError(Exception): pass
 
+class FrameType(Enum):
+  FOREGROUND = 0
+  BACKGROUND = 1
+
 class Parser(object):
 
-  def __init__(self):
+  def __init__(self, frame_type):
     self.buffer = []
+    self.frame_type = frame_type
 
   def parse(self, frame):
     self.buffer.extend(frame)
@@ -46,7 +50,10 @@ class Parser(object):
     while retry and len(self.buffer) > 0:
       try:
         self.s      = ConstBitStream(bytes=self.buffer)
-        frame         = Frame.parse(self.s)
+        if self.frame_type == FrameType.FOREGROUND:
+          frame = ForegroundFrame.parse(self.s)
+        else:
+          frame = BackgroundFrame.parse(self.s)
         bits_parsed = self.s.pos
         self.shift_buffer(bits_parsed/8)
         retry = False         # got one, carry on
