@@ -1,3 +1,5 @@
+import pprint
+
 from d7a.d7anp.addressee import IdType
 from d7a.support.schema           import Validatable, Types
 from d7a.dll.control import Control
@@ -69,3 +71,6 @@ class Frame(Validatable):
     for byte in self.target_address: yield byte
     for byte in self.d7anp_frame: yield byte
     yield self.crc16
+
+  def __str__(self):
+    return pprint.PrettyPrinter().pformat(self.as_dict())
