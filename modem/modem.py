@@ -53,7 +53,7 @@ class Modem:
     self.dev = serial.Serial(
       port     = self.config["device"],
       baudrate = self.config["baudrate"],
-      timeout  = 0.5,
+      timeout  = None,
     )
 
     self.dev.flush() # ignore possible buffered data
