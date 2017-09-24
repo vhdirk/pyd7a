@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
-
-import sys
+import os
+from time import sleep
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -17,6 +17,7 @@ from modem.modem import Modem
 
 def received_command_callback(cmd):
   print cmd
+  os._exit(0)
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
@@ -42,4 +43,4 @@ modem.execute_command_async(
 )
 
 while True:
-  pass
+  sleep(5)
