@@ -13,7 +13,7 @@ from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
 # This example can be used with a node running the gateway app included in OSS-7, which is connect using the supplied serial device.
-# It will query the UID from other nodes running sensor_pull, using adhoc synchronization and print the results.
+# It will query the sensor file (file 0x40) from other nodes running sensor_pull, using adhoc synchronization and print the results.
 
 def received_command_callback(cmd):
   print cmd
@@ -29,8 +29,9 @@ config = argparser.parse_args()
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, show_logging=config.verbose)
 print "Executing query..."
 modem.execute_command_async(
-  alp_command=Command.create_with_read_file_action_system_file(
-    file=UidFile(),
+  alp_command=Command.create_with_read_file_action(
+    file_id=0x40,
+    length=8,
     interface_type=InterfaceType.D7ASP,
     interface_configuration=Configuration(
       qos=QoS(resp_mod=ResponseMode.RESP_MODE_ALL),
