@@ -17,7 +17,8 @@ from modem.modem import Modem
 
 def received_command_callback(cmd):
   print cmd
-  os._exit(0)
+  if cmd.execution_completed:
+    os._exit(0)
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
