@@ -169,7 +169,7 @@ define([
     function showCommandDetail(command){
 		console.log("show detail: " + command.tag_id);
 		$$("title").parse({'tag_id': command.tag_id});
-		$$("cmd_response").parse({'cmd_string': command.response_command_descriptions.join()});
+		$$("cmd_response").parse({'cmd_string': command.response_command_descriptions.join("<br>")});
         $$("query_window").show();
     }
 
