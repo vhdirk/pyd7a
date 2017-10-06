@@ -1,3 +1,5 @@
+import pprint
+
 from d7a.support.schema import Validatable, Types
 from d7a.types.ct import CT
 
@@ -23,3 +25,6 @@ class SubProfile(Validatable):
   def __iter__(self):
     yield self.subband_bitmap
     for byte in self.scan_automation_period: yield byte
+
+  def __str__(self):
+    return pprint.PrettyPrinter().pformat(self.as_dict())
