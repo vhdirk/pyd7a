@@ -37,6 +37,7 @@ class Modem:
     self._sync_execution_tag_id = None
     self._sync_execution_completed = False
     self._unsolicited_responses_received = []
+    self._read_async_active = False
     self.unsolicited_response_received_callback = unsolicited_response_received_callback
 
     connected = self._connect_serial_modem()
@@ -124,14 +125,15 @@ class Modem:
 
 
   def start_reading(self):
-    self.read_async_active = True
+    self._read_async_active = True
     self.read_thread = Thread(target=self._read_async)
     self.read_thread.daemon = True
     self.read_thread.start()
 
 
   def stop_reading(self):
-    self.read_async_active = False
+    self._read_async_active = False
+    self.dev.cancel_read()
     self.read_thread.join()
 
   def get_unsolicited_responses_received(self):
@@ -143,7 +145,7 @@ class Modem:
   def _read_async(self):
     self._log("starting read thread")
     data_received = bytearray()
-    while self.read_async_active:
+    while self._read_async_active:
       try:
         data_received = self.dev.read()
       except serial.SerialException:
