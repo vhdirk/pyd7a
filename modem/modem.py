@@ -57,7 +57,7 @@ class Modem:
     )
 
     self.dev.flush() # ignore possible buffered data
-    self._start_reading()
+    self.start_reading()
     read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
     read_modem_info_action.add_action(
       RegularAction(
@@ -123,11 +123,16 @@ class Modem:
     return self._sync_execution_response_cmds
 
 
-  def _start_reading(self):
+  def start_reading(self):
     self.read_async_active = True
     self.read_thread = Thread(target=self._read_async)
     self.read_thread.daemon = True
     self.read_thread.start()
+
+
+  def stop_reading(self):
+    self.read_async_active = False
+    self.read_thread.join()
 
   def get_unsolicited_responses_received(self):
     return self._unsolicited_responses_received
