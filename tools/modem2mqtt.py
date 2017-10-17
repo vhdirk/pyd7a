@@ -79,18 +79,23 @@ class Modem2Mqtt():
 
   def run(self):
     print("Started")
-    while True:
+    keep_running = True
+    while keep_running:
       try:
         data = self.serial.read()
+        if data:
+          data = bytearray(data)
+          self.publish_to_mqtt(data)
+          self.keep_stats()
       except serial.SerialException:
         time.sleep(1)
         print("resetting serial connection...")
         self.setup_modem()
         return
-      if data:
-        data = bytearray(data)
-        self.publish_to_mqtt(data)
-        self.keep_stats()
+      except KeyboardInterrupt:
+        print("received KeyboardInterrupt... stopping processing")
+        keep_running = False
+
       self.report_stats()
 
   def keep_stats(self):
