@@ -35,6 +35,7 @@ class Modem2Mqtt():
     modem = Modem(self.config.device, self.config.rate, None, show_logging=self.config.verbose)
     self.serial = modem.dev
     self.modem_uid = modem.uid
+    modem.stop_reading()  # so we can read the serial stream ourself
 
   def connect_to_mqtt(self):
     self.connected_to_mqtt = False
@@ -80,7 +81,7 @@ class Modem2Mqtt():
     print("Started")
     while True:
       try:
-        data = self.serial.read(256)
+        data = self.serial.read()
       except serial.SerialException:
         time.sleep(1)
         print("resetting serial connection...")
