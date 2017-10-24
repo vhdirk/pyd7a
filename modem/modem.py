@@ -71,7 +71,7 @@ class Modem:
       )
     )
 
-    resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=10)
+    resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=60)
 
     if len(resp_cmd) == 0:
       self._log("Timed out reading node information")
