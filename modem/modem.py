@@ -6,6 +6,7 @@ from datetime import datetime
 import struct
 from threading import Thread
 
+import logging
 import serial
 from bitstring import ConstBitStream
 
@@ -23,8 +24,8 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.system_file_ids import SystemFileIds
 
 class Modem:
-  def __init__(self, device, baudrate, unsolicited_response_received_callback, show_logging=True):
-    self.show_logging = show_logging
+  def __init__(self, device, baudrate, unsolicited_response_received_callback):
+    self.log = logging.getLogger(__name__)
     self.parser = Parser()
     self.config = {
       "device"   : device,
@@ -42,7 +43,7 @@ class Modem:
 
     connected = self._connect_serial_modem()
     if connected:
-      print("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
+      self.log.info("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
         self.config["device"], self.uid, self.firmware_version.d7ap_version,
         self.firmware_version.application_name, self.firmware_version.git_sha1)
       )
@@ -74,7 +75,7 @@ class Modem:
     resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=60)
 
     if len(resp_cmd) == 0:
-      self._log("Timed out reading node information")
+      self.log.warning("Timed out reading node information")
       return False
 
     for action in resp_cmd[0].actions:
@@ -90,9 +91,6 @@ class Modem:
     return False
 
 
-  def _log(self, *msg):
-    if self.show_logging: print " ".join(map(str, msg))
-
   def execute_command_async(self, alp_command):
     self.execute_command(alp_command, timeout_seconds=0)
 
@@ -107,18 +105,18 @@ class Modem:
 
     self.dev.write(data)
     self.dev.flush()
-    self._log("Sending command of size ", len(data))
-    self._log("> " + " ".join(map(lambda b: format(b, "02x"), data)))
+    self.log.info("Sending command of size %s" % len(data))
+    self.log.debug("> " + " ".join(map(lambda b: format(b, "02x"), data)))
     if timeout_seconds == 0:
       return []
 
-    self._log("Waiting for response (max {} s)".format(timeout_seconds))
+    self.log.info("Waiting for response (max {} s)".format(timeout_seconds))
     start_time = datetime.now()
     while not self._sync_execution_completed and (datetime.now() - start_time).total_seconds() < timeout_seconds:
       time.sleep(0.05)
 
     if not self._sync_execution_completed:
-      self._log("Command timeout (tag {})".format(alp_command.tag_id))
+      self.log.info("Command timeout (tag {})".format(alp_command.tag_id))
       return []
 
     return self._sync_execution_response_cmds
@@ -143,41 +141,41 @@ class Modem:
     self._unsolicited_responses_received = []
 
   def _read_async(self):
-    self._log("starting read thread")
+    self.log.info("starting read thread")
     data_received = bytearray()
     while self._read_async_active:
       try:
         data_received = self.dev.read()
       except serial.SerialException:
-        self._log("SerialException received, trying to reconnect")
+        self.log.warning("SerialException received, trying to reconnect")
         self.dev.close()
         time.sleep(5)
         self._connect_serial_modem()
 
       if len(data_received) > 0:
-        self._log("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
+        self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(map(lambda b: format(b, "02x"), bytearray(data_received)))
-          self._log("Parser error: {}".format(error))
+          self.log.warning("Parser error: {}".format(error))
 
         for cmd in cmds:
           if self._sync_execution_tag_id == cmd.tag_id:
-            self._log("Received response for sync execution")
+            self.log.info("Received response for sync execution")
             self._sync_execution_response_cmds.append(cmd)
             if cmd.execution_completed:
-              self._log("cmd with tag {} done".format(cmd.tag_id))
+              self.log.info("cmd with tag {} done".format(cmd.tag_id))
               self._sync_execution_completed = True
             else:
-              self._log("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
+              self.log.info("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
           elif self.unsolicited_response_received_callback != None:
             self.unsolicited_response_received_callback(cmd)
           else:
-            self._log("Received a response which was not requested synchronously or no async callback provided")
+            self.log.info("Received a response which was not requested synchronously or no async callback provided")
             self._unsolicited_responses_received.append(cmd)
 
-    self._log("end read thread")
+    self.log.info("end read thread")
 
 
 class ModemConnectionError(Exception):

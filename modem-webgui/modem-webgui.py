@@ -5,6 +5,7 @@ import json
 import eventlet
 from datetime import time, datetime
 import jsonpickle
+import logging
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS, cross_origin
@@ -19,6 +20,7 @@ from d7a.system_files.system_files import SystemFiles
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.types.ct import CT
 from modem.modem import Modem
+from util.logger import configure_default_logger
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # do not cache static assets for now
@@ -93,7 +95,7 @@ def on_execute_raw_alp(data):
 @socketio.on('read_local_system_file')
 def on_read_local_system_file(data):
   cmd = Command.create_with_read_file_action_system_file(SystemFiles.files[SystemFileIds(int(data['system_file_id']))])
-  print("executing cmd: {}".format(cmd))
+  logging.info("executing cmd: {}".format(cmd))
   modem.execute_command_async(cmd)
 
   return {'tag_id': cmd.tag_id}
@@ -102,13 +104,13 @@ def on_read_local_system_file(data):
 def on_write_local_system_file(data):
   file = jsonpickle.decode(json.dumps(data))
   cmd = Command.create_with_write_file_action_system_file(file)
-  print("executing cmd: {}".format(cmd))
+  logging.info("executing cmd: {}".format(cmd))
   modem.execute_command_async(cmd)
   return {'tag_id': cmd.tag_id}
 
 @socketio.on('read_local_file')
 def on_read_local_file(data):
-  print("read_local_file")
+  logging.info("read_local_file")
   cmd = Command.create_with_read_file_action(
     file_id=int(data['file_id']),
     offset=int(data['offset']),
@@ -119,8 +121,8 @@ def on_read_local_file(data):
 
 @socketio.on('execute_command')
 def execute_command(data):
-  print("execute_command")
-  print data
+  logging.info("execute_command")
+  logging.info(data)
 
   interface_configuration = None
   interface_type = InterfaceType(int(data["interface"]))
@@ -149,7 +151,7 @@ def execute_command(data):
     length=int(data["length"])
   )
 
-  print("executing cmd: {}".format(cmd))
+  logging.info("executing cmd: {}".format(cmd))
   modem.execute_command_async(cmd)
   return {
     'tag_id': cmd.tag_id,
@@ -164,7 +166,7 @@ def on_connect():
   if modem == None:
     modem = Modem(config.device, config.rate, command_received_callback)
 
-  print("modem: " + str(modem.uid))
+  logging.info("modem: " + str(modem.uid))
   emit('module_info', {
     'uid': modem.uid,
     'application_name': modem.firmware_version.application_name,
@@ -175,11 +177,11 @@ def on_connect():
 
 @socketio.on('disconnect')
 def on_disconnect():
-  print('Client disconnected', request.sid)
+  logging.info('Client disconnected %s' % request.sid)
 
 
 def command_received_callback(cmd):
-  print("cmd received: {}".format(cmd))
+  logging.info("cmd received: {}".format(cmd))
   with app.test_request_context('/'):
     socketio.emit("received_alp_command", {
       'tag_id': cmd.tag_id,
@@ -188,11 +190,11 @@ def command_received_callback(cmd):
       'response_command': json.loads(jsonpickle.encode(cmd)) # we use jsonpickle here as an easy way to serialize the whole object structure
     }, broadcast=True)
 
-    print("broadcasted recv command")
+    logging.info("broadcasted recv command")
 
 @socketio.on_error_default
 def default_error_handler(e):
-  print("Error {} in {} with args".format(e, request.event["message"], request.event["args"]))
+  logging.warn("Error {} in {} with args".format(e, request.event["message"], request.event["args"]))
 
 if __name__ == '__main__':
   argparser = argparse.ArgumentParser()
@@ -200,6 +202,8 @@ if __name__ == '__main__':
                          default="/dev/ttyUSB0")
   argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
   argparser.add_argument("-p", "--port", help="TCP port used by webserver", type=int, default=5000)
+  argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
   config = argparser.parse_args()
+  configure_default_logger(config.verbose)
   modem = None
   socketio.run(app, debug=True, host="0.0.0.0", port=config.port)

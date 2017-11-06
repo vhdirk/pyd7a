@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 import argparse
+
+import logging
 import serial
 import time
 
 import paho.mqtt.client as mqtt
 
 from modem.modem import Modem
+from util.logger import configure_default_logger
 
 
 class Modem2Mqtt():
@@ -26,13 +29,14 @@ class Modem2Mqtt():
     self.next_report = 0
 
     self.config = argparser.parse_args()
+    configure_default_logger(self.config.verbose)
     self.setup_modem()
     self.connect_to_mqtt()
 
   def setup_modem(self):
     # we use Modem here only for reading the modem information, not for parsing.
     # reading the bytes from serial (after initial connect) is not done using Modem but overridden here
-    modem = Modem(self.config.device, self.config.rate, None, show_logging=self.config.verbose)
+    modem = Modem(self.config.device, self.config.rate, None)
     self.serial = modem.dev
     self.modem_uid = modem.uid
     modem.stop_reading()  # so we can read the serial stream ourself
@@ -48,7 +52,7 @@ class Modem2Mqtt():
     self.mq.connect(self.config.broker, 1883, 60)
     self.mq.loop_start()
     while not self.connected_to_mqtt: pass  # busy wait until connected
-    print("Connected to MQTT broker on {}, sending to topic {} and subscribed to topic {}".format(
+    logging.info("Connected to MQTT broker on {}, sending to topic {} and subscribed to topic {}".format(
       self.config.broker,
       self.mqtt_topic_incoming,
       self.mqtt_topic_outgoing
@@ -59,7 +63,7 @@ class Modem2Mqtt():
     self.connected_to_mqtt = True
 
   def on_mqtt_message(self, client, config, msg):
-    print("on_message") # TODO
+    logging.info("on_message") # TODO
     # try:    self.handle_msg(msg.topic, msg.payload)
     # except:
     #   exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -78,7 +82,7 @@ class Modem2Mqtt():
 
 
   def run(self):
-    print("Started")
+    logging.info("Started")
     keep_running = True
     while keep_running:
       try:
@@ -89,11 +93,11 @@ class Modem2Mqtt():
           self.keep_stats()
       except serial.SerialException:
         time.sleep(1)
-        print("resetting serial connection...")
+        logging.info("resetting serial connection...")
         self.setup_modem()
         return
       except KeyboardInterrupt:
-        print("received KeyboardInterrupt... stopping processing")
+        logging.info("received KeyboardInterrupt... stopping processing")
         keep_running = False
 
       self.report_stats()
@@ -104,7 +108,7 @@ class Modem2Mqtt():
   def report_stats(self):
     if self.next_report < time.time():
       if self.bridge_count > 0:
-        print("bridged %s messages" % str(self.bridge_count))
+        logging.info("bridged %s messages" % str(self.bridge_count))
         self.bridge_count = 0
       self.next_report = time.time() + 15 # report at most every 15 seconds
 

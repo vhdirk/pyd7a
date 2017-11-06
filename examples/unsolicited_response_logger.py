@@ -2,6 +2,8 @@
 
 import argparse
 
+import logging
+
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import Addressee, IdType
@@ -15,9 +17,11 @@ from modem.modem import Modem
 # The gateway is continuously listening for foreground frames.
 # Messages pushed by other nodes (running for example the sensor_push app) will be received by the gateway node,
 # transmitted over serial and the received_command_callback() function below will be called.
+from util.logger import configure_default_logger
+
 
 def received_command_callback(cmd):
-  print cmd
+  logging.info(cmd)
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
@@ -26,7 +30,9 @@ argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=i
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
 config = argparser.parse_args()
 
-modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, show_logging=config.verbose)
+configure_default_logger(config.verbose)
+
+modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
 
 while True:
   pass

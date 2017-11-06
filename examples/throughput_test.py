@@ -19,6 +19,7 @@ from d7a.types.ct import CT
 from modem.modem import Modem
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.system_files.dll_config import DllConfigFile
+from util.logger import configure_default_logger
 
 
 class ThroughtPutTest:
@@ -40,6 +41,8 @@ class ThroughtPutTest:
     self.argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     self.config = self.argparser.parse_args()
 
+    configure_default_logger(self.config.verbose)
+
     if self.config.serial_transmitter == None and self.config.serial_receiver == None:
       self.argparser.error("At least a transmitter or receiver is required.")
 
@@ -50,7 +53,7 @@ class ThroughtPutTest:
       self.transmitter_modem = None
       print("Running without transmitter")
     else:
-      self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None, show_logging=self.config.verbose)
+      self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None)
       access_profile = AccessProfile(
         channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
                                      channel_coding=ChannelCoding.PN9,
@@ -72,7 +75,7 @@ class ThroughtPutTest:
       self.receiver_modem = None
       print("Running without receiver")
     else:
-      self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback, show_logging=self.config.verbose)
+      self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback)
       self.receiver_modem.execute_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)), timeout_seconds=1)
       print("Receiver scanning on Access Class = 0x01")
 
