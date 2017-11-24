@@ -63,6 +63,12 @@ class Status(Validatable):
     self.addressee   = addressee
     super(Status, self).__init__()
 
+  def get_short_channel_string(self):
+    band = self.channel_header.channel_band.name.lstrip("BAND_")
+    cl = self.channel_header.channel_class.name[:1]
+    return "{0}{1}{2:0>3}".format(band, cl, self.channel_index)
+
+
   @staticmethod
   def parse(s):
     channel_header  = ChannelHeader.parse(s)
