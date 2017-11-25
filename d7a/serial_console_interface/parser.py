@@ -60,7 +60,7 @@ class Parser(object):
         retry = False         # got one, carry on
       except ReadError:       # not enough to read, carry on and wait for more
         retry = False
-      except ParseError as e: # actual problem with current buffer, need to skip
+      except Exception as e: # actual problem with current buffer, need to skip
         errors.append({
           "error"   : e.args[0],
           "buffer"  : " ".join(map(lambda b: format(b, "02x"), self.buffer)),
