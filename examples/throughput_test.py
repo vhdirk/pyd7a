@@ -58,7 +58,7 @@ class ThroughtPutTest:
         channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
                                      channel_coding=ChannelCoding.PN9,
                                      channel_class=ChannelClass.NORMAL_RATE),
-        sub_profiles=[SubProfile(subband_bitmap=0x01, scan_automation_period=CT(exp=0, mant=0)), SubProfile(), SubProfile(), SubProfile()],
+        sub_profiles=[SubProfile(subband_bitmap=0x00, scan_automation_period=CT(exp=0, mant=0)), SubProfile(), SubProfile(), SubProfile()],
         sub_bands=[SubBand(
           channel_index_start=0,
           channel_index_end=0,
@@ -76,6 +76,22 @@ class ThroughtPutTest:
       print("Running without receiver")
     else:
       self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback)
+      access_profile = AccessProfile(
+        channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
+                                     channel_coding=ChannelCoding.PN9,
+                                     channel_class=ChannelClass.NORMAL_RATE),
+        sub_profiles=[SubProfile(subband_bitmap=0x01, scan_automation_period=CT(exp=0, mant=0)), SubProfile(), SubProfile(), SubProfile()],
+        sub_bands=[SubBand(
+          channel_index_start=0,
+          channel_index_end=0,
+          eirp=10,
+          cca=86 # TODO
+        )]
+      )
+
+      print("Write Access Profile")
+      write_ap_cmd = Command.create_with_write_file_action_system_file(file=AccessProfileFile(access_profile=access_profile, access_specifier=0))
+      self.receiver_modem.execute_command(write_ap_cmd, timeout_seconds=1)
       self.receiver_modem.execute_command(Command.create_with_write_file_action_system_file(DllConfigFile(active_access_class=0x01)), timeout_seconds=1)
       print("Receiver scanning on Access Class = 0x01")
 
