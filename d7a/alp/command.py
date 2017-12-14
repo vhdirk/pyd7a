@@ -8,7 +8,9 @@ import random
 
 from d7a.alp.action import Action
 from d7a.alp.interface import InterfaceType
-from d7a.alp.operands.file import Offset, DataRequest, Data
+from d7a.alp.operands.file import DataRequest, Data
+from d7a.alp.operands.length import Length
+from d7a.alp.operands.offset import Offset
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.tag_id import TagId
 from d7a.alp.operations.forward import Forward
@@ -112,8 +114,8 @@ class Command(Validatable):
       RegularAction(
         operation=ReadFileData(
           operand=DataRequest(
-            offset=Offset(id=file_id, offset=offset), # TODO offset size
-            length=length
+            offset=Offset(id=file_id, offset=Length(offset)), # TODO offset size
+            length=Length(length)
           )
         )
       )
@@ -130,7 +132,7 @@ class Command(Validatable):
       RegularAction(
         operation=WriteFileData(
           operand=Data(
-            offset=Offset(id=file_id, offset=offset), # TODO offset size
+            offset=Offset(id=file_id, offset=Length(offset)), # TODO offset size
             data=data
           )
         )

@@ -28,7 +28,7 @@ class TestParser(unittest.TestCase):
 
     (cmds, info) = self.parser.parse(frame)
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
-    self.assertEqual(cmds[0].actions[0].operation.operand.length, 4)
+    self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
   def test_bad_identifier(self):
     (cmds, info) = self.parser.parse([
@@ -148,12 +148,12 @@ class TestParser(unittest.TestCase):
     # first frame should parse
     (cmds, info) = self.parser.parse(frame)
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
-    self.assertEqual(cmds[0].actions[0].operation.operand.length, 4)
+    self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
     # and now complete the second frame and check this is parsed as well
     (cmds, info) = self.parser.parse(alp_cmd_bytes) # the missing bytes only, without the frame header
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
-    self.assertEqual(cmds[0].actions[0].operation.operand.length, 4)
+    self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
 
 if __name__ == '__main__':

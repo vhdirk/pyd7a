@@ -9,7 +9,8 @@ from d7a.alp.parser                       import Parser
 from d7a.alp.command                      import Command
 from d7a.alp.action                       import Action
 from d7a.alp.operations.responses         import ReturnFileData
-from d7a.alp.operands.file                import Data, Offset
+from d7a.alp.operands.file                import Data
+from d7a.alp.operands.offset import Offset
 from d7a.alp.regular_action import RegularAction
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.d7anp.addressee import Addressee

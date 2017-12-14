@@ -65,8 +65,8 @@ class TestForegroundFrameParser(unittest.TestCase):
     self.assertEqual(type(alp_action.operation), ReadFileData)
     self.assertEqual(type(alp_action.operand), DataRequest)
     self.assertEqual(alp_action.operand.offset.id, 0)
-    self.assertEqual(alp_action.operand.offset.offset, 0)
-    self.assertEqual(alp_action.operand.length, 8)
+    self.assertEqual(alp_action.operand.offset.offset.value, 0)
+    self.assertEqual(alp_action.operand.length.value, 8)
     # TODO self.assertEqual(len(frame.payload), 16)
     hexstring = binascii.hexlify(bytearray(read_id_command[:-2])).decode('hex') # TODO there must be an easier way...
     self.assertEqual(frame.crc16, CRCCCITT(version='FFFF').calculate(hexstring))
@@ -125,8 +125,8 @@ class TestForegroundFrameParser(unittest.TestCase):
     self.assertEqual(type(alp_action.operation), ReturnFileData)
     self.assertEqual(type(alp_action.operand), Data)
     self.assertEqual(alp_action.operand.offset.id, 0)
-    self.assertEqual(alp_action.operand.offset.offset, 0)
-    self.assertEqual(alp_action.operand.length, 8)
+    self.assertEqual(alp_action.operand.offset.offset.value, 0)
+    self.assertEqual(alp_action.operand.length.value, 8)
 
 class TestBackgroundFrameParser(unittest.TestCase):
   def setUp(self):

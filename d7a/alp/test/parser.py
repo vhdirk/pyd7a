@@ -43,7 +43,7 @@ class TestParser(unittest.TestCase):
     cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(len(cmd.actions), 1)
     self.assertEqual(cmd.actions[0].operation.op, 32)
-    self.assertEqual(cmd.actions[0].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
 
   def test_basic_valid_message_actions_swapped(self):
     cmd_data = self.interface_status_action + [
@@ -55,7 +55,7 @@ class TestParser(unittest.TestCase):
     ]
     cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(cmd.actions[0].operation.op, 32)
-    self.assertEqual(cmd.actions[0].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
 
   def test_command_without_interface_status(self):
     cmd_data = [
@@ -115,9 +115,9 @@ class TestParser(unittest.TestCase):
     cmd_bytes = alp_action_bytes + alp_action_bytes + self.interface_status_action
     cmd = Parser().parse(ConstBitStream(bytes=cmd_bytes), len(cmd_bytes))
     self.assertEqual(cmd.actions[0].operation.op, 32)
-    self.assertEqual(cmd.actions[0].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
     self.assertEqual(cmd.actions[1].operation.op, 32)
-    self.assertEqual(cmd.actions[1].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[1].operation.operand.length.value, 4)
 
   def test_multiple_non_grouped_actions_in_command(self):
     alp_action_bytes = [
@@ -133,9 +133,9 @@ class TestParser(unittest.TestCase):
 
     self.assertEqual(len(cmd.actions), 2)
     self.assertEqual(cmd.actions[0].operation.op, 32)
-    self.assertEqual(cmd.actions[0].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
     self.assertEqual(cmd.actions[1].operation.op, 32)
-    self.assertEqual(cmd.actions[1].operation.operand.length, 4)
+    self.assertEqual(cmd.actions[1].operation.operand.length.value, 4)
 
   # TODO not implemented yet
   # def test_multiple_grouped_actions_in_command(self):

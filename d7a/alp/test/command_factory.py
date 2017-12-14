@@ -3,7 +3,8 @@ import binascii
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
-from d7a.alp.operands.file import DataRequest, Offset, Data
+from d7a.alp.operands.file import DataRequest, Data
+from d7a.alp.operands.offset import Offset
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.requests import ReadFileData
@@ -21,9 +22,8 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0].operation), ReadFileData)
     self.assertEqual(type(c.actions[0].operand), DataRequest)
     self.assertEqual(c.actions[0].operand.offset.id, 1)
-    self.assertEqual(c.actions[0].operand.offset.size, 1)
-    self.assertEqual(c.actions[0].operand.offset.offset, 0)
-    self.assertEqual(c.actions[0].operand.length, 10)
+    self.assertEqual(c.actions[0].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[0].operand.length.value, 10)
 
   def test_create_with_write_file_action(self):
     data = [0, 1, 2, 3, 4, 5]
@@ -33,9 +33,8 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0].operation), WriteFileData)
     self.assertEqual(type(c.actions[0].operand), Data)
     self.assertEqual(c.actions[0].operand.offset.id, 1)
-    self.assertEqual(c.actions[0].operand.offset.size, 1)
-    self.assertEqual(c.actions[0].operand.offset.offset, 0)
-    self.assertEqual(c.actions[0].operand.length, 6)
+    self.assertEqual(c.actions[0].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[0].operand.length.value, 6)
     self.assertEqual(c.actions[0].operand.data, data)
 
   def test_create_with_return_file_data_action(self):
@@ -46,9 +45,8 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[0].operation), ReturnFileData)
     self.assertEqual(type(c.actions[0].operand), Data)
     self.assertEqual(c.actions[0].operand.offset.id, 0x40)
-    self.assertEqual(c.actions[0].operand.offset.size, 1)
-    self.assertEqual(c.actions[0].operand.offset.offset, 0)
-    self.assertEqual(c.actions[0].operand.length, 1)
+    self.assertEqual(c.actions[0].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[0].operand.length.value, 1)
     self.assertEqual(c.actions[0].operand.data, data)
 
   def test_create_with_read_file_action_d7asp(self):
@@ -66,9 +64,8 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[1].operation), ReadFileData)
     self.assertEqual(type(c.actions[1].operand), DataRequest)
     self.assertEqual(c.actions[1].operand.offset.id, 1)
-    self.assertEqual(c.actions[1].operand.offset.size, 1)
-    self.assertEqual(c.actions[1].operand.offset.offset, 0)
-    self.assertEqual(c.actions[1].operand.length, 10)
+    self.assertEqual(c.actions[1].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[1].operand.length.value, 10)
 
   def test_create_with_write_file_action_d7asp(self):
     data = [0, 1, 2, 3, 4, 5]
@@ -83,9 +80,8 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[1].operation), WriteFileData)
     self.assertEqual(type(c.actions[1].operand), Data)
     self.assertEqual(c.actions[1].operand.offset.id, 1)
-    self.assertEqual(c.actions[1].operand.offset.size, 1)
-    self.assertEqual(c.actions[1].operand.offset.offset, 0)
-    self.assertEqual(c.actions[1].operand.length, 6)
+    self.assertEqual(c.actions[1].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[1].operand.length.value, 6)
     self.assertEqual(c.actions[1].operand.data, data)
 
   def test_create_with_return_file_data_action_d7asp(self):
@@ -101,7 +97,6 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(type(c.actions[1].operation), ReturnFileData)
     self.assertEqual(type(c.actions[1].operand), Data)
     self.assertEqual(c.actions[1].operand.offset.id, 0x40)
-    self.assertEqual(c.actions[1].operand.offset.size, 1)
-    self.assertEqual(c.actions[1].operand.offset.offset, 0)
-    self.assertEqual(c.actions[1].operand.length, 1)
+    self.assertEqual(c.actions[1].operand.offset.offset.value, 0)
+    self.assertEqual(c.actions[1].operand.length.value, 1)
     self.assertEqual(c.actions[1].operand.data, data)

@@ -9,6 +9,7 @@ from d7a.alp.forward_action import ForwardAction
 from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
+from d7a.alp.operands.length import Length
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.status import InterfaceStatus
 from d7a.alp.operations.tag_response import TagResponse
@@ -17,7 +18,8 @@ from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.alp.regular_action import RegularAction
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.operations.requests  import ReadFileData
-from d7a.alp.operands.file        import Offset, Data, DataRequest
+from d7a.alp.operands.file        import Data, DataRequest
+from d7a.alp.operands.offset import Offset
 from d7a.alp.tag_response_action import TagResponseAction
 from d7a.parse_error              import ParseError
 from d7a.sp.configuration import Configuration
@@ -77,7 +79,7 @@ class Parser(object):
 
   def parse_alp_file_data_request_operand(self, s):
     offset = self.parse_offset(s)
-    length = s.read("uint:8")
+    length = Length.parse(s)
     return DataRequest(length=length, offset=offset)
 
   def parse_alp_return_file_data_action(self, b7, b6, s):
@@ -88,8 +90,8 @@ class Parser(object):
 
   def parse_alp_return_file_data_operand(self, s):
     offset = self.parse_offset(s)
-    length = s.read("uint:8") # TODO assuming 1 bute for now but can be 4 bytes
-    data   = s.read("bytes:" + str(length))
+    length = Length.parse(s)
+    data   = s.read("bytes:" + str(length.value))
     return Data(offset=offset, data=map(ord,data))
 
   def parse_alp_return_status_action(self, b7, b6, s):
@@ -142,8 +144,4 @@ class Parser(object):
     )
 
   def parse_offset(self, s):
-    id     = s.read("uint:8")
-    size   = s.read("uint:2") # + 1 = already read
-
-    offset = s.read("uint:" + str(6+(size * 8)))
-    return Offset(id=id, size=size+1, offset=offset)
+    return Offset.parse(s)

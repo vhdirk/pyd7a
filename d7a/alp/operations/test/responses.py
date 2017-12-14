@@ -15,7 +15,7 @@ class TestReturnFileData(unittest.TestCase):
     rfd  = ReturnFileData(data)
     self.assertEqual(rfd.op, 32)
     self.assertIs(rfd.operand, data)
-    self.assertEqual(rfd.operand.length, 4)
+    self.assertEqual(rfd.operand.length.value, 4)
   
   def test_byte_generation(self):
     data  = Data([0x01, 0x02, 0x03, 0x04])

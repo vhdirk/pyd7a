@@ -6,7 +6,8 @@ from bitstring import ConstBitStream
 
 from d7a.alp.operations.operation import Operation
 
-from d7a.alp.operands.file        import Data, Offset
+from d7a.alp.operands.file        import Data
+from d7a.alp.operands.offset import Offset
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.system_files import SystemFiles
 
