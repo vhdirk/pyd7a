@@ -2,7 +2,7 @@ import unittest
 
 from bitstring import ConstBitStream
 
-from d7a.fs.permission import Permission
+from d7a.fs.file_permissions import FilePermissions
 
 
 class TestPermission(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestPermission(unittest.TestCase):
       0xFC
     ]
 
-    permission = Permission.parse(ConstBitStream(bytes=permission_bytes))
+    permission = FilePermissions.parse(ConstBitStream(bytes=permission_bytes))
 
     self.assertEqual(permission.encrypted, True)
     self.assertEqual(permission.executable, True)
@@ -24,7 +24,7 @@ class TestPermission(unittest.TestCase):
     self.assertEqual(permission.guest_executeable, False)
 
   def test_byte_generation(self):
-    p = Permission(encrypted=True, executeable=True, user_readable=True, user_writeable=True, user_executeable=True,
+    p = FilePermissions(encrypted=True, executeable=True, user_readable=True, user_writeable=True, user_executeable=True,
                    guest_readable=True, guest_writeable=False, guest_executeable=False)
     bytes = bytearray(p)
     self.assertEqual(bytes, bytearray([0xFC]))

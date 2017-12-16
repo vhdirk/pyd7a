@@ -1,7 +1,7 @@
 from d7a.support.schema import Validatable, Types
 
 
-class Permission(Validatable):
+class FilePermissions(Validatable):
   SCHEMA = [{
     "encrypted": Types.BOOLEAN(),
     "executable": Types.BOOLEAN(),
@@ -36,7 +36,7 @@ class Permission(Validatable):
     guest_readable = s.read("bool")
     guest_writeable = s.read("bool")
     guest_executable = s.read("bool")
-    return Permission(encrypted=encrypted, executeable=executeable, user_readable=user_readable,
+    return FilePermissions(encrypted=encrypted, executeable=executeable, user_readable=user_readable,
                       user_writeable=user_writeable, user_executeable=user_executable,
                       guest_readable=guest_readable, guest_writeable=guest_writeable, guest_executeable=guest_executable)
 
