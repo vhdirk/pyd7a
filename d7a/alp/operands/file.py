@@ -57,3 +57,20 @@ class DataRequest(Validatable):
 
   def __str__(self):
     return "{}, length={}".format(self.offset, self.length)
+
+
+class FileIdOperand(Validatable):
+
+  SCHEMA = [{
+    "file_id": Types.BYTE()
+  }]
+
+  def __init__(self, file_id):
+    self.file_id = file_id
+    super(FileIdOperand, self).__init__()
+
+  def __iter__(self):
+    yield self.file_id
+
+  def __str__(self):
+    return "file-id={}".format(self.file_id)
