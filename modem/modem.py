@@ -11,7 +11,8 @@ import serial
 from bitstring import ConstBitStream
 
 from d7a.alp.operands.file import DataRequest
-from d7a.alp.operands.file import Offset
+from d7a.alp.operands.length import Length
+from d7a.alp.operands.offset import Offset
 from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.regular_action import RegularAction
@@ -24,7 +25,7 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.system_file_ids import SystemFileIds
 
 class Modem:
-  def __init__(self, device, baudrate, unsolicited_response_received_callback):
+  def __init__(self, device, baudrate, unsolicited_response_received_callback=None):
     self.log = logging.getLogger(__name__)
     self.parser = Parser()
     self.config = {
@@ -65,7 +66,7 @@ class Modem:
       RegularAction(
         operation=ReadFileData(
           operand=DataRequest(
-            offset=Offset(id=FirmwareVersionFile().id, offset=0),  # TODO offset size
+            offset=Offset(id=FirmwareVersionFile().id, offset=Length(0)),  # TODO offset size
             length=FirmwareVersionFile().length
           )
         )
