@@ -8,16 +8,17 @@ import random
 
 from d7a.alp.action import Action
 from d7a.alp.interface import InterfaceType
-from d7a.alp.operands.file import DataRequest, Data
+from d7a.alp.operands.file import DataRequest, Data, FileIdOperand
+from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.length import Length
 from d7a.alp.operands.offset import Offset
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.tag_id import TagId
 from d7a.alp.operations.forward import Forward
-from d7a.alp.operations.requests import ReadFileData
+from d7a.alp.operations.requests import ReadFileData, ReadFileHeader
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.operations.tag_request import TagRequest
-from d7a.alp.operations.write_operations import WriteFileData
+from d7a.alp.operations.write_operations import WriteFileData, WriteFileHeader
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.alp.tag_response_action import TagResponseAction
 from d7a.parse_error import ParseError
@@ -170,6 +171,40 @@ class Command(Validatable):
           operand=Data(
             data=data,
             offset=Offset(id=file_id)
+          )
+        )
+      )
+    )
+
+    return cmd
+
+  @staticmethod
+  def create_with_read_file_header(file_id, interface_type=InterfaceType.HOST, interface_configuration=None):
+    cmd = Command()
+    cmd.add_forward_action(interface_type, interface_configuration)
+    cmd.add_action(
+      RegularAction(
+        operation=ReadFileHeader(
+          operand=FileIdOperand(
+            file_id=file_id
+          )
+        )
+      )
+    )
+
+    return cmd
+
+
+  @staticmethod
+  def create_with_write_file_header(file_id, file_header, interface_type=InterfaceType.HOST, interface_configuration=None):
+    cmd = Command()
+    cmd.add_forward_action(interface_type, interface_configuration)
+    cmd.add_action(
+      RegularAction(
+        operation=WriteFileHeader(
+          operand=FileHeaderOperand(
+            file_id=file_id,
+            file_header=file_header
           )
         )
       )

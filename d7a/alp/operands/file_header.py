@@ -9,8 +9,9 @@ class FileHeaderOperand(Validatable):
     "file_header": Types.OBJECT(FileHeader)
   }]
 
-  def __init__(self, file_id):
+  def __init__(self, file_id, file_header):
     self.file_id = file_id
+    self.file_header = file_header
     super(FileHeaderOperand, self).__init__()
 
   def __iter__(self):
