@@ -29,4 +29,4 @@ class Offset(Validatable):
     for byte in self.offset: yield byte
 
   def __str__(self):
-    return "file-id={}, size={}, offset={}".format(self.id, self.size, self.offset)
+    return "file-id={}, offset={}".format(self.id, self.offset)

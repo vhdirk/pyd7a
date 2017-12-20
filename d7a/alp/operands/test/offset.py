@@ -41,3 +41,6 @@ class TestOffset(unittest.TestCase):
     offset_bytes = [0x20, 0x40, 0x41]
     offset = Offset.parse(ConstBitStream(bytes=offset_bytes))
     self.assertEqual(offset.offset.value, 65)
+
+  def test_to_str(self):
+    Offset().__str__()
