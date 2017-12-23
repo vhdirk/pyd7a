@@ -47,4 +47,4 @@ class Length(Validatable):
       for byte in length_bytes[1:]: yield byte
 
   def __str__(self):
-    return "TODO"
+    return str(self.value)
