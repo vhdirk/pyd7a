@@ -7,6 +7,7 @@ import unittest
 
 from bitstring import ConstBitStream
 
+from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
 
@@ -98,7 +99,7 @@ class TestParser(unittest.TestCase):
 
   def test_unsupported_action(self):
     alp_action_bytes = [
-      0x21,
+      0x25,
       0x40,
       0x00,
       0x00
@@ -272,6 +273,14 @@ class TestParser(unittest.TestCase):
 
     with self.assertRaises(ParseError):
       cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+
+  def test_return_file_header(self):
+    cmd_data = [ 0x21, 0x02, 0x00, 0x03, 0x00, 0x00, 0x0F, 0x00, 0x00,  0x00, 0x0F, 0x00, 0x00,  0x00 ]
+    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operand), FileHeaderOperand)
+    self.assertEqual(cmd.actions[0].operand.file_id, 2)
+    self.assertEqual(cmd.actions[0].operand.file_header.properties.act_enabled, False)
 
   def test_indirect_fwd(self):
     cmd_data = [

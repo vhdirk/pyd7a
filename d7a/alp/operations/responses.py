@@ -4,6 +4,7 @@
 # class implementation of responses
 from bitstring import ConstBitStream
 
+from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operations.operation import Operation
 
 from d7a.alp.operands.file        import Data
@@ -32,3 +33,9 @@ class ReturnFileData(Operation):
       self.systemfile_type = systemfile_type
       self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
 
+
+class ReturnFileHeader(Operation):
+  def __init__(self, *args, **kwargs):
+    self.op     = 33
+    self.operand_class = FileHeaderOperand
+    super(ReturnFileHeader, self).__init__(*args, **kwargs)

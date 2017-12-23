@@ -8,6 +8,7 @@ from d7a.alp.command              import Command
 from d7a.alp.forward_action import ForwardAction
 from d7a.alp.indirect_forward_action import IndirectForwardAction
 from d7a.alp.interface import InterfaceType
+from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
@@ -19,7 +20,7 @@ from d7a.alp.operations.tag_response import TagResponse
 from d7a.alp.operations.write_operations import WriteFileData
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.alp.regular_action import RegularAction
-from d7a.alp.operations.responses import ReturnFileData
+from d7a.alp.operations.responses import ReturnFileData, ReturnFileHeader
 from d7a.alp.operations.requests  import ReadFileData
 from d7a.alp.operands.file        import Data, DataRequest
 from d7a.alp.operands.offset import Offset
@@ -60,6 +61,7 @@ class Parser(object):
         1  :  self.parse_alp_read_file_data_action,
         4  :  self.parse_alp_write_file_data_action,
         32 :  self.parse_alp_return_file_data_action,
+        33 :  self.parse_alp_return_file_header_action,
         34 :  self.parse_alp_return_status_action,
         35 :  self.parse_tag_response_action,
         50 :  self.parse_forward_action,
@@ -91,6 +93,12 @@ class Parser(object):
     return RegularAction(group=b7,
                         resp=b6,
                         operation=ReturnFileData(operand=operand))
+
+  def parse_alp_return_file_header_action(self, b7, b6, s):
+    operand = FileHeaderOperand.parse(s)
+    return RegularAction(group=b7,
+                        resp=b6,
+                        operation=ReturnFileHeader(operand=operand))
 
   def parse_alp_return_file_data_operand(self, s):
     offset = self.parse_offset(s)

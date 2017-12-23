@@ -12,7 +12,7 @@ class ReadFileData(Operation):
 
 class ReadFileHeader(Operation):
   def __init__(self, *args, **kwargs):
-    self.op = 6
+    self.op = 2
     self.operand_class = FileIdOperand
     super(ReadFileHeader, self).__init__(*args, **kwargs)
 
