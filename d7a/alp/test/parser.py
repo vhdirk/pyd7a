@@ -6,9 +6,12 @@
 import unittest
 
 from bitstring import ConstBitStream
+
+from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
 
 from d7a.alp.parser import Parser
+from d7a.d7anp.addressee import Addressee, IdType
 from d7a.parse_error import ParseError
 from d7a.phy.channel_header import ChannelBand, ChannelCoding, ChannelClass
 
@@ -269,6 +272,37 @@ class TestParser(unittest.TestCase):
 
     with self.assertRaises(ParseError):
       cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+
+  def test_indirect_fwd(self):
+    cmd_data = [
+      51, # indirect fwd, no overload
+      64  # interface file id
+    ]
+
+    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operand), IndirectInterfaceOperand)
+    self.assertEqual(cmd.actions[0].overload, False)
+    self.assertEqual(cmd.actions[0].operand.interface_file_id, 64)
+    self.assertEqual(cmd.actions[0].operand.interface_configuration_overload, None)
+
+  def test_indirect_fwd_with_overload(self):
+    cmd_data = [
+      (1 << 7) + 51, # indirect fwd, no overload
+      64, # interface file id
+      1 << 4,  # addressee ctrl (NOID, nls_method=NONE)
+      0  # access class
+    ]
+
+    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operand), IndirectInterfaceOperand)
+    self.assertEqual(cmd.actions[0].overload, True)
+    self.assertEqual(cmd.actions[0].operand.interface_file_id, 64)
+    self.assertEqual(type(cmd.actions[0].operand.interface_configuration_overload), Addressee)
+    self.assertEqual(cmd.actions[0].operand.interface_configuration_overload.id_type, IdType.NOID)
+
+
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestParser)

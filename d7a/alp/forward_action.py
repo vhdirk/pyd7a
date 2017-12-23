@@ -2,7 +2,6 @@ from d7a.alp.action import Action
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.nop import NoOperation
-from d7a.alp.operations.operation import Operation
 from d7a.support.schema import Types
 
 
@@ -10,7 +9,7 @@ class ForwardAction(Action):
   SCHEMA = [{
     "resp"     : Types.BOOLEAN(),
     "op"       : Types.BITS(6),
-    "operation": Types.OBJECT(Operation),
+    "operation": Types.OBJECT(Forward),
     "operand"  : Types.OBJECT(InterfaceConfiguration)  # TODO for now only D7 interface is supported
   }]
 

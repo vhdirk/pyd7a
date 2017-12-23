@@ -6,11 +6,14 @@ import struct
 
 from d7a.alp.command              import Command
 from d7a.alp.forward_action import ForwardAction
+from d7a.alp.indirect_forward_action import IndirectForwardAction
 from d7a.alp.interface import InterfaceType
+from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
 from d7a.alp.operands.length import Length
 from d7a.alp.operations.forward import Forward
+from d7a.alp.operations.indirect_forward import IndirectForward
 from d7a.alp.operations.status import InterfaceStatus
 from d7a.alp.operations.tag_response import TagResponse
 from d7a.alp.operations.write_operations import WriteFileData
@@ -60,6 +63,7 @@ class Parser(object):
         34 :  self.parse_alp_return_status_action,
         35 :  self.parse_tag_response_action,
         50 :  self.parse_forward_action,
+        51 :  self.parse_indirect_forward_action,
         52 :  self.parse_tag_request_action
       }[op](b7, b6, s)
     except KeyError:
@@ -122,6 +126,17 @@ class Parser(object):
   def parse_tag_response_action(self, b7, b6, s):
     tag_id = s.read("uint:8")
     return TagResponseAction(eop=b7, error=b6, operation=TagResponse(operand=TagId(tag_id=tag_id)))
+
+  def parse_indirect_forward_action(self, b7, b6, s):
+    interface_file_id = int(s.read("uint:8"))
+    overload = b7
+    overload_config = None
+    if overload:
+      # TODO we are assuming D7ASP interface here
+      overload_config = Addressee.parse(s)
+
+    return IndirectForwardAction(overload=overload, resp=b6, operation=IndirectForward(
+      operand=IndirectInterfaceOperand(interface_file_id=interface_file_id, interface_configuration_overload=overload_config)))
 
   def parse_forward_action(self, b7, b6, s):
     if b7:
