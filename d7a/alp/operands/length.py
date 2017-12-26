@@ -48,3 +48,14 @@ class Length(Validatable):
 
   def __str__(self):
     return str(self.value)
+
+  def __eq__(self, other):
+      if isinstance(other, self.__class__):
+        return self.value == other.value
+      elif isinstance(other, int):
+        return self.value == other
+      else:
+        return False
+
+  def __ne__(self, other):
+      return not self.__eq__(other)
