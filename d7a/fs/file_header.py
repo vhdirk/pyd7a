@@ -52,6 +52,6 @@ class FileHeader(Validatable):
 
 
   def __str__(self):
-    return "permissions={}, properties={}, alp_command_file_id={}, interface_file_id={}, file_size={}, allocated_size={}".format(
+    return "permissions={}, properties=({}), alp_command_file_id={}, interface_file_id={}, file_size={}, allocated_size={}".format(
       self.permissions, self.properties, self.alp_command_file_id, self.interface_file_id, self.file_size, self.allocated_size
     )

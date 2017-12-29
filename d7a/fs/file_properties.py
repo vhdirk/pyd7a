@@ -45,3 +45,10 @@ class FileProperties(Validatable):
     byte += self.act_condition.value << 4
     byte += self.storage_class.value
     yield byte
+
+  def __str__(self):
+    return "act_enabled={}, act_condition={}, storage_class={}".format(
+      self.act_enabled,
+      self.act_condition,
+      self.storage_class
+    )
