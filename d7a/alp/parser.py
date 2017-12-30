@@ -13,6 +13,8 @@ from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
 from d7a.alp.operands.length import Length
+from d7a.alp.operands.query import QueryOperand
+from d7a.alp.operations.break_query import BreakQuery
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.indirect_forward import IndirectForward
 from d7a.alp.operations.status import InterfaceStatus
@@ -60,6 +62,7 @@ class Parser(object):
       return{
         1  :  self.parse_alp_read_file_data_action,
         4  :  self.parse_alp_write_file_data_action,
+        9  :  self.parse_break_query_action,
         32 :  self.parse_alp_return_file_data_action,
         33 :  self.parse_alp_return_file_header_action,
         34 :  self.parse_alp_return_status_action,
@@ -87,6 +90,9 @@ class Parser(object):
     offset = self.parse_offset(s)
     length = Length.parse(s)
     return DataRequest(length=length, offset=offset)
+
+  def parse_break_query_action(self, b7, b6, s):
+    return RegularAction(group=b7, resp=b6, operation=BreakQuery(operand=QueryOperand.parse(s)))
 
   def parse_alp_return_file_data_action(self, b7, b6, s):
     operand = self.parse_alp_return_file_data_operand(s)

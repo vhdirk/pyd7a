@@ -10,6 +10,7 @@ from bitstring import ConstBitStream
 from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
+from d7a.alp.operands.query import QueryOperand
 
 from d7a.alp.parser import Parser
 from d7a.d7anp.addressee import Addressee, IdType
@@ -311,7 +312,18 @@ class TestParser(unittest.TestCase):
     self.assertEqual(type(cmd.actions[0].operand.interface_configuration_overload), Addressee)
     self.assertEqual(cmd.actions[0].operand.interface_configuration_overload.id_type, IdType.NOID)
 
+  def test_break_query(self):
+    cmd_data = [
+      9, # break query
+      0x44,  # arith comp with value, no mask, unsigned, >
+      0x01,  # compare length
+      25,  # compare value
+      0x20, 0x01  # file offset
+    ]
 
+    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operand), QueryOperand)
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestParser)
