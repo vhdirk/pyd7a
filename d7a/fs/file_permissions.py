@@ -13,8 +13,8 @@ class FilePermissions(Validatable):
     "guest_executable": Types.BOOLEAN()
   }]
 
-  def __init__(self, encrypted, executeable, user_readable, user_writeable, user_executeable, guest_readable,
-               guest_writeable, guest_executeable):
+  def __init__(self, encrypted=False, executeable=False, user_readable=True, user_writeable=True, user_executeable=True,
+               guest_readable= True, guest_writeable=True, guest_executeable=True):
     self.encrypted = encrypted
     self.executable = executeable
     self.user_readable = user_readable
