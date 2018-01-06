@@ -25,7 +25,7 @@ class Offset(Validatable):
     return Offset(id=id, offset=offset)
 
   def __iter__(self):
-    yield chr(self.id)
+    yield self.id
     for byte in self.offset: yield byte
 
   def __str__(self):
