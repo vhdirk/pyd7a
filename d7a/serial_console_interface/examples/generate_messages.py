@@ -56,7 +56,7 @@ output_serial_frame(
     interface_type=InterfaceType.D7ASP,
     interface_configuration=Configuration(
       qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
-      addressee=Addressee(id_type=IdType.NOID)
+      addressee=Addressee(access_class=0x01, id_type=IdType.NOID)
     )
   )
 )
