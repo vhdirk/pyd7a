@@ -124,6 +124,12 @@ class TestAddressee(unittest.TestCase):
     self.assertEqual(bs[0], int('00010010', 2))
     self.assertEqual(bs[1], 5)
 
+    bs = bytearray(Addressee(id_type=IdType.NBID, id=CT.compress(100)))
+    self.assertEqual(len(bs), 3)
+    self.assertEqual(bs[0], int('00000000', 2))
+    self.assertEqual(bs[1], 0)
+    self.assertEqual(bs[2], 0x39)
+
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestAddressee)
   unittest.TextTestRunner(verbosity=2).run(suite)

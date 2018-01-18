@@ -112,7 +112,12 @@ class Addressee(Validatable):
     yield byte
     yield self.access_class
     if self.id_length > 0:
-      id = bytearray(struct.pack(">Q", self.id))[8-self.id_length:]
+      id_value = self.id
+      if self.id_type == IdType.NBID:
+        # self.id is a CT
+        id_value = self.id.compressed_value()
+
+      id = bytearray(struct.pack(">Q", id_value))[8-self.id_length:]
       for byte in id: yield byte
 
   def __str__(self):
