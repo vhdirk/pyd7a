@@ -165,6 +165,7 @@ def on_connect():
   global modem
   if modem == None:
     modem = Modem(config.device, config.rate, command_received_callback)
+    modem.connect()
 
   logging.info("modem: " + str(modem.uid))
   emit('module_info', {

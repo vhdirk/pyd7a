@@ -46,6 +46,7 @@ config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
+modem.connect()
 
 # command to be executed as an action: first do an arithmetic comparison of the sensor value with the supplied value...
 query_sensor_file_cmd = Command(generate_tag_request_action=False)

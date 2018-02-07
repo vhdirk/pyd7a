@@ -42,18 +42,6 @@ class Modem:
     self._read_async_active = False
     self.unsolicited_response_received_callback = unsolicited_response_received_callback
     self.connected = False
-
-    self.connected = self._connect_serial_modem()
-    if self.connected:
-      self.log.info("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
-        self.config["device"], self.uid, self.firmware_version.d7ap_version,
-        self.firmware_version.application_name, self.firmware_version.git_sha1)
-      )
-    else:
-      raise ModemConnectionError
-
-
-  def _connect_serial_modem(self):
     self.dev = serial.Serial(
       port     = self.config["device"],
       baudrate = self.config["baudrate"],
@@ -68,7 +56,13 @@ class Modem:
     )
 
     self.dev.flush() # ignore possible buffered data
+
     self.start_reading()
+
+  def connect(self):
+    if self.connected:
+      return
+
     read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
     read_modem_info_action.add_action(
       RegularAction(
@@ -95,9 +89,17 @@ class Modem:
             self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
 
     if self.uid and self.firmware_version:
-      return True
+      self.connected = True
 
-    return False
+
+    if self.connected:
+      self.log.info("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
+        self.config["device"], self.uid, self.firmware_version.d7ap_version,
+        self.firmware_version.application_name, self.firmware_version.git_sha1)
+      )
+      return True
+    else:
+      return False
 
 
   def execute_command_async(self, alp_command):
@@ -136,7 +138,6 @@ class Modem:
     self.read_thread = Thread(target=self._read_async)
     self.read_thread.daemon = True
     self.read_thread.start()
-
 
   def stop_reading(self):
     self._read_async_active = False

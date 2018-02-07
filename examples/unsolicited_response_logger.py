@@ -33,6 +33,7 @@ config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
+modem.connect()
 
 while True:
   pass

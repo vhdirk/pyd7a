@@ -54,6 +54,7 @@ class ThroughtPutTest:
       print("Running without transmitter")
     else:
       self.transmitter_modem = Modem(self.config.serial_transmitter, self.config.rate, None)
+      self.transmitter_modem.connect()
       access_profile = AccessProfile(
         channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
                                      channel_coding=ChannelCoding.PN9,
@@ -76,6 +77,7 @@ class ThroughtPutTest:
       print("Running without receiver")
     else:
       self.receiver_modem = Modem(self.config.serial_receiver, self.config.rate, self.receiver_cmd_callback)
+      self.receiver_modem.connect()
       access_profile = AccessProfile(
         channel_header=ChannelHeader(channel_band=ChannelBand.BAND_868,
                                      channel_coding=ChannelCoding.PN9,
