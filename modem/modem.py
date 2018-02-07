@@ -41,9 +41,10 @@ class Modem:
     self._unsolicited_responses_received = []
     self._read_async_active = False
     self.unsolicited_response_received_callback = unsolicited_response_received_callback
+    self.connected = False
 
-    connected = self._connect_serial_modem()
-    if connected:
+    self.connected = self._connect_serial_modem()
+    if self.connected:
       self.log.info("connected to {}, node UID {} running D7AP v{}, application \"{}\" with git sha1 {}".format(
         self.config["device"], self.uid, self.firmware_version.d7ap_version,
         self.firmware_version.application_name, self.firmware_version.git_sha1)
@@ -177,7 +178,7 @@ class Modem:
             else:
               self.log.info("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
-          elif self.unsolicited_response_received_callback != None:
+          elif self.unsolicited_response_received_callback != None and self.connected: # skip responses until connected
             self.unsolicited_response_received_callback(cmd)
           else:
             self.log.info("Received a response which was not requested synchronously or no async callback provided")
