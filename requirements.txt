@@ -5,7 +5,7 @@ Flask
 Flask-SocketIO
 Flask-Cors
 PyCRC
-pyserial>=3.1.1
+pyserial>=3.4.0
 unittest2
 coverage
 enum34
