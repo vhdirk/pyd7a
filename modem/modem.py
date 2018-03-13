@@ -84,7 +84,7 @@ class Modem:
     for action in resp_cmd[0].actions:
       if type(action) is RegularAction and type(action.operation) is ReturnFileData:
           if action.operand.offset.id == SystemFileIds.UID.value:
-            self.uid = '{:x}'.format(struct.unpack(">Q", bytearray(action.operand.data))[0])
+            self.uid = '{:x}'.format(struct.unpack(">Q", str(bytearray(action.operand.data)))[0])
           if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
             self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
 
