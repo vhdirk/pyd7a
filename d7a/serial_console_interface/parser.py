@@ -10,8 +10,9 @@ from d7a.parse_error              import ParseError
 
 class Parser(object):
 
-  def __init__(self):
+  def __init__(self, skip_alp_parsing=False):
     self.buffer = bytearray()
+    self.skip_alp_parsing = skip_alp_parsing
 
   def shift_buffer(self, start):
     self.buffer = self.buffer[start:]
@@ -54,7 +55,14 @@ class Parser(object):
       try:
         s           = ConstBitStream(bytes=self.buffer)
         cmd_length  = self.parse_serial_interface_header(s)
-        cmd         = AlpParser().parse(s, cmd_length)
+        if self.skip_alp_parsing:
+          if s.length < cmd_length:
+            raise ReadError
+
+          cmd = s.read("bytes:" + str(cmd_length))
+        else:
+          cmd = AlpParser().parse(s, cmd_length)
+
         bits_parsed = s.pos
         self.shift_buffer(bits_parsed/8)
         retry = False         # got one, carry on

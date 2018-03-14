@@ -25,9 +25,9 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.system_file_ids import SystemFileIds
 
 class Modem:
-  def __init__(self, device, baudrate, unsolicited_response_received_callback=None):
+  def __init__(self, device, baudrate, unsolicited_response_received_callback=None, skip_alp_parsing=False):
     self.log = logging.getLogger(__name__)
-    self.parser = Parser()
+    self.parser = Parser(skip_alp_parsing)
     self.config = {
       "device"   : device,
       "baudrate" : baudrate
@@ -35,6 +35,7 @@ class Modem:
 
     self.uid = None
     self.firmware_version = None
+    self.skip_alp_parsing = skip_alp_parsing
     self._sync_execution_response_cmds = []
     self._sync_execution_tag_id = None
     self._sync_execution_completed = False
@@ -75,6 +76,12 @@ class Modem:
       )
     )
 
+    if self.skip_alp_parsing:
+      self.execute_command_async(read_modem_info_action)
+      self.log.info("Running in skip_alp_parsing mode, not checking if we can receive the modem's UID")
+      self.connected = True
+      return True
+
     resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=10)
 
     if len(resp_cmd) == 0:
@@ -106,6 +113,11 @@ class Modem:
     self.execute_command(alp_command, timeout_seconds=0)
 
   def execute_command(self, alp_command, timeout_seconds=10):
+    if self.skip_alp_parsing:
+      self.log.info("Running in skip_alp_parsing mode, execute_command() synchronously is not possible in this mode,"
+                    "executing async instead ")
+      timeout_seconds = 0
+
     data = self.parser.build_serial_frame(alp_command)
     self._sync_execution_response_cmds = []
     self._sync_execution_tag_id = None
@@ -170,7 +182,7 @@ class Modem:
           self.log.warning("Parser error: {}".format(error))
 
         for cmd in cmds:
-          if self._sync_execution_tag_id == cmd.tag_id:
+          if not self.skip_alp_parsing and self._sync_execution_tag_id == cmd.tag_id:
             self.log.info("Received response for sync execution")
             self._sync_execution_response_cmds.append(cmd)
             if cmd.execution_completed:
