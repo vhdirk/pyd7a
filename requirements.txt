@@ -1,5 +1,5 @@
 bitstring
-Cerberus
+Cerberus==1.1
 eventlet
 Flask
 Flask-SocketIO
