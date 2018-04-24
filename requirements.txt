@@ -1,9 +1,9 @@
 bitstring
 Cerberus==1.1
-eventlet
-Flask
-Flask-SocketIO
-Flask-Cors
+#eventlet
+#Flask
+#Flask-SocketIO
+#Flask-Cors
 PyCRC
 pyserial>=3.4.0
 unittest2
