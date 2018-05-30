@@ -79,17 +79,17 @@ output_serial_frame(
 )
 
 output_serial_frame(
-  "Read ID file, without QoS, broadcast",
+  "Read ID file, with QoS, broadcast",
   Command.create_with_read_file_action(
     file_id=0x00,
     offset=0,
     length=8,
     interface_type=InterfaceType.D7ASP,
     interface_configuration=Configuration(
-      qos=QoS(resp_mod=ResponseMode.RESP_MODE_NO),
+      qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
       addressee=Addressee(
         id_type=IdType.NOID,
-        access_class=2
+        access_class=0x01
       )
     )
   )
