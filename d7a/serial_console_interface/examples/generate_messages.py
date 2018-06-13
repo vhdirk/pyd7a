@@ -6,6 +6,9 @@ from d7a.serial_console_interface.parser import *
 from pprint import pprint
 import binascii
 
+from d7a.types.ct import CT
+
+
 def output_serial_frame(description, command):
   print("\n=== {0} ===\n".format(description))
 
@@ -91,6 +94,25 @@ output_serial_frame(
         id_type=IdType.NOID,
         access_class=0x01
       )
+    )
+  )
+)
+
+output_serial_frame(
+  "Dormant session, Read ID file",
+  Command.create_with_read_file_action(
+    file_id=0x00,
+    offset=0,
+    length=8,
+    interface_type=InterfaceType.D7ASP,
+    interface_configuration=Configuration(
+      qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
+      addressee=Addressee(
+        id_type=IdType.UID,
+        id=0x463230390023001F,
+        access_class=0x21
+      ),
+      dorm_to=CT.compress(1024 * 60 * 5)
     )
   )
 )
