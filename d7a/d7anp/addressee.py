@@ -121,4 +121,4 @@ class Addressee(Validatable):
       for byte in id: yield byte
 
   def __str__(self):
-    return "ac={}, id_type={}, id={}".format(self.access_class, self.id_type, hex(self.id))
+    return "ac={}, id_type={}, id={}".format(self.access_class, self.id_type, self.id)
