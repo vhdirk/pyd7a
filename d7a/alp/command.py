@@ -88,6 +88,17 @@ class Command(Validatable):
         )
       )
 
+    elif interface_type == InterfaceType.SERIAL:
+      self.actions.append(
+        RegularAction(
+          operation=Forward(
+            operand=InterfaceConfiguration(
+              interface_id=InterfaceType.SERIAL
+            )
+          )
+        )
+      )
+
   @staticmethod
   def create_with_read_file_action_system_file(file, interface_type=InterfaceType.HOST, interface_configuration=None):
     # default to host interface, when D7ASP interface is used prepend with Forward action

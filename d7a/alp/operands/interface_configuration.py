@@ -7,17 +7,18 @@ class InterfaceConfiguration(Validatable):
 
   SCHEMA = [{
     "interface_id"        : Types.ENUM(InterfaceType),
-    "interface_configuration"    : Types.OBJECT(Configuration)
+    "interface_configuration"    : Types.OBJECT(Configuration, nullable=True)
   }]
 
-  def __init__(self, interface_id, interface_configuration):
+  def __init__(self, interface_id, interface_configuration=None):
     self.interface_id = interface_id
     self.interface_configuration   = interface_configuration
     super(InterfaceConfiguration, self).__init__()
 
   def __iter__(self):
     yield self.interface_id.value
-    for byte in self.interface_configuration: yield byte
+    if self.interface_configuration:
+      for byte in self.interface_configuration: yield byte
 
   def __str__(self):
     return "interface-id={}, configuration={}".format(self.interface_id, self.interface_configuration)
