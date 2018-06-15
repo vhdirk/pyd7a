@@ -99,20 +99,20 @@ output_serial_frame(
 )
 
 output_serial_frame(
-  "Dormant session, Read ID file",
-  Command.create_with_read_file_action(
-    file_id=0x00,
-    offset=0,
-    length=8,
-    interface_type=InterfaceType.D7ASP,
-    interface_configuration=Configuration(
-      qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
-      addressee=Addressee(
-        id_type=IdType.UID,
-        id=0x463230390023001F,
-        access_class=0x21
-      ),
-      dorm_to=CT.compress(1024 * 60 * 5)
+  "Dormant session, write file",
+    Command.create_with_write_file_action(
+      file_id=0x40,
+      offset=0,
+      data=[0],
+      interface_type=InterfaceType.D7ASP,
+      interface_configuration=Configuration(
+        qos=QoS(resp_mod=ResponseMode.RESP_MODE_ANY),
+        addressee=Addressee(
+          id_type=IdType.UID,
+          id=0xE0022600017B388F,
+          access_class=0x21
+        ),
+        dorm_to=CT.compress(60 * 5)
+      )
     )
-  )
 )
