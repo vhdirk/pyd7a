@@ -157,11 +157,16 @@ class Parser(object):
       raise ParseError("bit 7 is RFU")
 
     interface_id = InterfaceType(int(s.read("uint:8")))
-    assert(interface_id == InterfaceType.D7ASP)
-    interface_config = Configuration.parse(s)
+    interface_config = None
+    if(interface_id == InterfaceType.D7ASP):
+      interface_config = Configuration.parse(s)
+    elif(interface_id == InterfaceType.SERIAL):
+      pass # no interface config
+    else:
+      assert(False)
+
     return ForwardAction(resp=b6, operation=Forward(operand=InterfaceConfiguration(interface_id=interface_id,
                                                                                    interface_configuration=interface_config)))
-
   def parse_alp_interface_status_host(self, s):
     pass # no interface status defined for host interface
 
