@@ -77,9 +77,9 @@ class Modem:
     )
 
     if self.skip_alp_parsing:
-      self.execute_command_async(read_modem_info_action)
       self.log.info("Running in skip_alp_parsing mode, not checking if we can receive the modem's UID")
       self.connected = True
+      self.execute_command_async(read_modem_info_action)
       return True
 
     resp_cmd = self.execute_command(read_modem_info_action, timeout_seconds=10)
