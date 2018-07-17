@@ -86,7 +86,7 @@ class Modem2Mqtt():
     keep_running = True
     while keep_running:
       try:
-        data = self.serial.read()
+        data = self.serial.read(256)
         if data:
           data = bytearray(data)
           self.publish_to_mqtt(data)
