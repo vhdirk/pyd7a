@@ -5,6 +5,7 @@ from datetime import datetime
 
 import struct
 from threading import Thread
+import threading
 
 import logging
 import serial
@@ -32,7 +33,7 @@ class Modem:
       "device"   : device,
       "baudrate" : baudrate
     }
-
+    self.lock=threading.Lock()
     self.uid = None
     self.firmware_version = None
     self.skip_alp_parsing = skip_alp_parsing
@@ -125,9 +126,9 @@ class Modem:
     if(timeout_seconds > 0):
       assert self._sync_execution_tag_id is None
       self._sync_execution_tag_id = alp_command.tag_id
-
-    self.dev.write(data)
-    self.dev.flush()
+    with self.lock:
+      self.dev.write(data)
+      self.dev.flush()
     self.log.info("Sending command of size %s" % len(data))
     self.log.debug("> " + " ".join(map(lambda b: format(b, "02x"), data)))
     if timeout_seconds == 0:
