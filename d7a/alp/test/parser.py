@@ -7,10 +7,14 @@ import unittest
 
 from bitstring import ConstBitStream
 
+from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
+from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
+from d7a.alp.operands.lorawan_interface_configuration import LoRaWANInterfaceConfiguration
 from d7a.alp.operands.query import QueryOperand
+from d7a.alp.operations.forward import Forward
 
 from d7a.alp.parser import Parser
 from d7a.d7anp.addressee import Addressee, IdType
@@ -324,6 +328,47 @@ class TestParser(unittest.TestCase):
     cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(len(cmd.actions), 1)
     self.assertEqual(type(cmd.actions[0].operand), QueryOperand)
+
+  def test_break_query(self):
+    cmd_data = [
+      9, # break query
+      0x44,  # arith comp with value, no mask, unsigned, >
+      0x01,  # compare length
+      25,  # compare value
+      0x20, 0x01  # file offset
+    ]
+
+    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operand), QueryOperand)
+
+  def test_parse_forward_LoRaWAN_iface(self):
+    lorawan_config = LoRaWANInterfaceConfiguration(
+      use_ota_activation=False,
+      request_ack=True,
+      app_port=0x01,
+      netw_session_key=[0] * 16,
+      app_session_key=[1] * 16,
+      dev_addr=[3] * 4,
+      netw_id=[4] * 4
+    )
+
+    bytes = bytearray(lorawan_config)
+
+    bytes = [
+      50,  # forward
+      2,  # LoRaWAN iface id
+    ]
+
+    bytes.extend(bytearray(lorawan_config))
+
+
+    cmd = Parser().parse(ConstBitStream(bytes=bytes), len(bytes))
+    self.assertEqual(len(cmd.actions), 1)
+    self.assertEqual(type(cmd.actions[0].operation), Forward)
+    self.assertEqual(type(cmd.actions[0].operand), InterfaceConfiguration)
+    self.assertEqual(cmd.actions[0].operand.interface_id, InterfaceType.LORAWAN)
+    self.assertEqual(type(cmd.actions[0].operand.interface_configuration), LoRaWANInterfaceConfiguration)
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestParser)

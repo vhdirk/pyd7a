@@ -1,13 +1,11 @@
 from d7a.alp.interface import InterfaceType
-from d7a.sp.configuration import Configuration
 from d7a.support.schema import Validatable, Types
 
 
 class InterfaceConfiguration(Validatable):
-
   SCHEMA = [{
     "interface_id"        : Types.ENUM(InterfaceType),
-    "interface_configuration"    : Types.OBJECT(Configuration, nullable=True)
+    "interface_configuration"    : Types.OBJECT(Validatable, nullable=True)
   }]
 
   def __init__(self, interface_id, interface_configuration=None):
