@@ -349,8 +349,8 @@ class TestParser(unittest.TestCase):
       app_port=0x01,
       netw_session_key=[0] * 16,
       app_session_key=[1] * 16,
-      dev_addr=[3] * 4,
-      netw_id=[4] * 4
+      dev_addr=1,
+      netw_id=2
     )
 
     bytes = bytearray(lorawan_config)

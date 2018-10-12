@@ -30,10 +30,10 @@ class TestForward(unittest.TestCase):
       use_ota_activation=False,
       request_ack=False,
       app_port=0x01,
-      netw_session_key=[0] * 16,
-      app_session_key=[1] * 16,
-      dev_addr=[3] * 4,
-      netw_id=[4] * 4
+      netw_session_key=[0x53,0X1b,0Xd9,0Xc5,0Xec,0X5d,0X8b,0Xa5,0Xef,0X3b,0X26,0X2c,0Xeb,0Xfb,0X3e,0X66],
+      app_session_key=[0x53,0X1b,0Xd9,0Xc5,0Xec,0X5d,0X8b,0Xa5,0Xef,0X3b,0X26,0X2c,0Xeb,0Xfb,0X3e,0X66] ,
+      dev_addr=1,
+      netw_id=2
     )
 
     forward_action = Forward(

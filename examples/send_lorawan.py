@@ -40,12 +40,12 @@ result = modem.execute_command(
     interface_type=InterfaceType.LORAWAN,
     interface_configuration=LoRaWANInterfaceConfiguration(
       use_ota_activation=False,
-      request_ack=False,
+      request_ack=True,
       app_port=0x01,
-      netw_session_key=[0] * 16,
-      app_session_key=[1] * 16,
-      dev_addr=[3] * 4,
-      netw_id=[4] * 4
+      netw_session_key=[0x53, 0x1b, 0xd9, 0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
+      app_session_key=[0x53, 0x1b, 0xd9,0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66] ,
+      dev_addr=0x00112233,
+      netw_id=0x000017
     )
   ),
   timeout_seconds=100
