@@ -1,7 +1,6 @@
 import unittest
 
 from bitstring import ConstBitStream
-
 from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.lorawan_interface_configuration import LoRaWANInterfaceConfiguration
@@ -30,10 +29,13 @@ class TestForward(unittest.TestCase):
       use_ota_activation=False,
       request_ack=False,
       app_port=0x01,
-      netw_session_key=[0x53,0X1b,0Xd9,0Xc5,0Xec,0X5d,0X8b,0Xa5,0Xef,0X3b,0X26,0X2c,0Xeb,0Xfb,0X3e,0X66],
-      app_session_key=[0x53,0X1b,0Xd9,0Xc5,0Xec,0X5d,0X8b,0Xa5,0Xef,0X3b,0X26,0X2c,0Xeb,0Xfb,0X3e,0X66] ,
+      netw_session_key=[0x53, 0X1b, 0Xd9, 0Xc5, 0Xec, 0X5d, 0X8b, 0Xa5, 0Xef, 0X3b, 0X26, 0X2c, 0Xeb, 0Xfb, 0X3e, 0X66],
+      app_session_key=[0x53, 0X1b, 0Xd9, 0Xc5, 0Xec, 0X5d, 0X8b, 0Xa5, 0Xef, 0X3b, 0X26, 0X2c, 0Xeb, 0Xfb, 0X3e, 0X66],
       dev_addr=1,
-      netw_id=2
+      netw_id=2,
+      device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],
+      app_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X0D, 0X9F],
+      app_key=[0X7E, 0XEF, 0X56, 0XEC, 0XDA, 0X1D, 0XD5, 0XA4, 0X70, 0X59, 0XFD, 0X35, 0X9C, 0XE6, 0X80, 0XCD]
     )
 
     forward_action = Forward(

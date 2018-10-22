@@ -350,7 +350,10 @@ class TestParser(unittest.TestCase):
       netw_session_key=[0] * 16,
       app_session_key=[1] * 16,
       dev_addr=1,
-      netw_id=2
+      netw_id=2,
+      device_eui=[0] * 8,
+      app_eui=[0] * 8,
+      app_key=[0] * 16
     )
 
     bytes = bytearray(lorawan_config)
