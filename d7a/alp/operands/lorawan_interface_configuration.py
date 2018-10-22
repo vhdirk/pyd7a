@@ -76,17 +76,17 @@ class LoRaWANInterfaceConfiguration(Validatable):
       device_eui = s.read("bytes:8")
       app_eui = s.read("bytes:8")
       app_key = s.read("bytes:16")
-      netw_session_key = [0] * 16,
-      app_session_key = [1] * 16,
-      dev_addr = 1,
-      netw_id = 2,
+      netw_session_key = [0] * 16
+      app_session_key = [1] * 16
+      dev_addr = 1
+      netw_id = 2
     else:
       netw_session_key = s.read("bytes:16")
       app_session_key = s.read("bytes:16")
       dev_addr = s.read("uint:32")
       netw_id = s.read("uint:32")
-      device_eui = [0] * 8,
-      app_eui = [0] * 8,
+      device_eui = [0] * 8
+      app_eui = [0] * 8
       app_key = [0] * 16
     return LoRaWANInterfaceConfiguration(
       use_ota_activation = use_ota,
