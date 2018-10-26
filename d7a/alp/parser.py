@@ -13,7 +13,8 @@ from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.interface_status import InterfaceStatusOperand
 from d7a.alp.operands.length import Length
-from d7a.alp.operands.lorawan_interface_configuration import LoRaWANInterfaceConfiguration
+from d7a.alp.operands.lorawan_interface_configuration_abp import LoRaWANInterfaceConfigurationABP
+from d7a.alp.operands.lorawan_interface_configuration_otaa import LoRaWANInterfaceConfigurationOTAA
 from d7a.alp.operands.query import QueryOperand
 from d7a.alp.operations.break_query import BreakQuery
 from d7a.alp.operations.forward import Forward
@@ -163,8 +164,10 @@ class Parser(object):
       interface_config = Configuration.parse(s)
     elif(interface_id == InterfaceType.SERIAL):
       pass # no interface config
-    elif(interface_id == InterfaceType.LORAWAN):
-      interface_config = LoRaWANInterfaceConfiguration.parse(s)
+    elif(interface_id == InterfaceType.LORAWAN_ABP):
+      interface_config = LoRaWANInterfaceConfigurationABP.parse(s)
+    elif (interface_id == InterfaceType.LORAWAN_OTAA):
+      interface_config = LoRaWANInterfaceConfigurationOTAA.parse(s)
     else:
       assert(False)
 

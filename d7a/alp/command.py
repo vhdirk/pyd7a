@@ -97,12 +97,23 @@ class Command(Validatable):
           )
         )
       )
-    elif interface_type == InterfaceType.LORAWAN:
+    elif interface_type == InterfaceType.LORAWAN_ABP:
       self.actions.append(
         RegularAction(
           operation=Forward(
             operand=InterfaceConfiguration(
-              interface_id=InterfaceType.LORAWAN,
+              interface_id=InterfaceType.LORAWAN_ABP,
+              interface_configuration=interface_configuration
+            )
+          )
+        )
+      )
+    elif interface_type == InterfaceType.LORAWAN_OTAA:
+      self.actions.append(
+        RegularAction(
+          operation=Forward(
+            operand=InterfaceConfiguration(
+              interface_id=InterfaceType.LORAWAN_OTAA,
               interface_configuration=interface_configuration
             )
           )

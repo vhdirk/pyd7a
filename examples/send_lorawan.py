@@ -7,7 +7,8 @@ import logging
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
-from d7a.alp.operands.lorawan_interface_configuration import LoRaWANInterfaceConfiguration
+from d7a.alp.operands.lorawan_interface_configuration_otaa import LoRaWANInterfaceConfigurationOTAA
+from d7a.alp.operands.lorawan_interface_configuration_abp import LoRaWANInterfaceConfigurationABP
 
 from modem.modem import Modem
 
@@ -26,6 +27,7 @@ argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
+argparser.add_argument("-otaa", "--over-the-air-activation", help="Enable over the air activation", default=False, action="store_true")
 config = argparser.parse_args()
 
 configure_default_logger(config.verbose)
@@ -33,25 +35,41 @@ configure_default_logger(config.verbose)
 modem = Modem(config.device, config.rate, )
 modem.connect()
 logging.info("Executing query...")
-result = modem.execute_command(
-  alp_command=Command.create_with_read_file_action(
-    file_id=0x40,
-    length=8,
-    interface_type=InterfaceType.LORAWAN,
-    interface_configuration=LoRaWANInterfaceConfiguration(
-      use_ota_activation=False,
-      request_ack=True,
-      app_port=0x01,
-      netw_session_key=[0x53, 0x1b, 0xd9, 0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
-      app_session_key=[0x53, 0x1b, 0xd9,0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
-      dev_addr=0x00112233,
-      netw_id=0x000017,
-      device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],
-      app_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X0D, 0X9F],
-      app_key=[0X7E, 0XEF, 0X56, 0XEC, 0XDA, 0X1D, 0XD5, 0XA4, 0X70, 0X59, 0XFD, 0X35, 0X9C, 0XE6, 0X80, 0XCD]
-    )
-  ),
-  timeout_seconds=100
-)
+if(config.over_the_air_activation):
+	result = modem.execute_command(
+	  alp_command=Command.create_with_read_file_action(
+		file_id=0x40,
+		length=8,
+		interface_type=InterfaceType.LORAWAN_OTAA,
+		interface_configuration=LoRaWANInterfaceConfigurationOTAA(
+		  use_ota_activation=False,
+		  request_ack=False,
+		  app_port=0x01,
+		  device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],
+		  app_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X0D, 0X9F],
+		  app_key=[0X7E, 0XEF, 0X56, 0XEC, 0XDA, 0X1D, 0XD5, 0XA4, 0X70, 0X59, 0XFD, 0X35, 0X9C, 0XE6, 0X80, 0XCD]
+		)
+	  ),
+	  timeout_seconds=100
+	)
+
+else:
+	result = modem.execute_command(
+	  alp_command=Command.create_with_read_file_action(
+		file_id=0x40,
+		length=8,
+		interface_type=InterfaceType.LORAWAN_ABP,
+		interface_configuration=LoRaWANInterfaceConfigurationABP(
+		  use_ota_activation=False,
+		  request_ack=False,
+		  app_port=0x01,
+		  netw_session_key=[0x53, 0x1b, 0xd9, 0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
+		  app_session_key=[0x53, 0x1b, 0xd9,0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
+		  dev_addr=0x00112233,
+		  netw_id=0x000017,
+		)
+	  ),
+	  timeout_seconds=100
+	)
 
 print result
