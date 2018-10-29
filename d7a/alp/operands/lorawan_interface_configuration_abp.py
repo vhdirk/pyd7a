@@ -7,7 +7,6 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
 
   SCHEMA = [{
     # # TODO first byte is extensible with other fields, for example ADR or SFx
-    # "use_ota_activation": Types.BOOLEAN(),
     # "request_ack": Types.BOOLEAN(),
     # "application_port": Types.BYTE(),
     # "netw_session_key": Types.BYTES(),
@@ -16,8 +15,7 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
     # "netw_id": Types.BYTES(),
   }]
 
-  def __init__(self, use_ota_activation, request_ack, app_port, netw_session_key, app_session_key, dev_addr, netw_id):
-    self.use_ota_activation = use_ota_activation
+  def __init__(self, request_ack, app_port, netw_session_key, app_session_key, dev_addr, netw_id):
     self.request_ack = request_ack
     self.app_port = app_port
     self.netw_session_key = netw_session_key
@@ -28,8 +26,6 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
 
   def __iter__(self):
     byte = 0
-    if self.use_ota_activation:
-      byte |= 1
     if self.request_ack:
       byte |= 1 << 1
 
@@ -54,15 +50,15 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
   def parse(s):
     _rfu = s.read("bits:6")
     request_ack = s.read("bool")
-    use_ota = s.read("bool")
+    _rfu = s.read("bits:1")
     app_port = s.read("uint:8")
+
     netw_session_key = s.read("bytes:16")
     app_session_key = s.read("bytes:16")
     dev_addr = s.read("uint:32")
     netw_id = s.read("uint:32")
 
     return LoRaWANInterfaceConfigurationABP(
-      use_ota_activation=use_ota,
       request_ack=request_ack,
       app_port=app_port,
       netw_session_key=netw_session_key,

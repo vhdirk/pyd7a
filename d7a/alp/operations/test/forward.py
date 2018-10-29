@@ -27,7 +27,6 @@ class TestForward(unittest.TestCase):
 
   def test_byte_generation_forward_LoRaWAN_ABP_iface(self):
     lorawan_config = LoRaWANInterfaceConfigurationABP(
-      use_ota_activation=False,
       request_ack=False,
       app_port=0x01,
       netw_session_key=[0x53, 0X1b, 0Xd9, 0Xc5, 0Xec, 0X5d, 0X8b, 0Xa5, 0Xef, 0X3b, 0X26, 0X2c, 0Xeb, 0Xfb, 0X3e, 0X66],
@@ -50,7 +49,6 @@ class TestForward(unittest.TestCase):
 
   def test_byte_generation_forward_LoRaWAN_OTAA_iface(self):
     lorawan_config = LoRaWANInterfaceConfigurationOTAA(
-      use_ota_activation=True,
       request_ack=False,
       app_port=0x01,
       device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],

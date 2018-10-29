@@ -7,7 +7,6 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
 
   SCHEMA = [{
     # # TODO first byte is extensible with other fields, for example ADR or SFx
-    # "use_ota_activation": Types.BOOLEAN(),
     # "request_ack": Types.BOOLEAN(),
     # "application_port": Types.BYTE(),
     # "device_eui": Types.BYTES(),
@@ -15,8 +14,7 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     # "app_key": Types.BYTES()
   }]
 
-  def __init__(self, use_ota_activation, request_ack, app_port, device_eui, app_eui, app_key):
-    self.use_ota_activation = use_ota_activation
+  def __init__(self, request_ack, app_port, device_eui, app_eui, app_key):
     self.request_ack = request_ack
     self.app_port = app_port
     self.device_eui = device_eui
@@ -26,8 +24,6 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
 
   def __iter__(self):
     byte = 0
-    if self.use_ota_activation:
-      byte |= 1
     if self.request_ack:
       byte |= 1 << 1
 
@@ -51,7 +47,7 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
   def parse(s):
     _rfu = s.read("bits:6")
     request_ack = s.read("bool")
-    use_ota = s.read("bool")
+    _rfu = s.read("bits:1")
     app_port = s.read("uint:8")
 
     device_eui = s.read("bytes:8")
@@ -59,7 +55,6 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     app_key = s.read("bytes:16")
 
     return LoRaWANInterfaceConfigurationOTAA(
-      use_ota_activation=use_ota,
       request_ack=request_ack,
       app_port=app_port,
       device_eui=device_eui,

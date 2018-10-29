@@ -42,7 +42,6 @@ if(config.over_the_air_activation):
 		length=8,
 		interface_type=InterfaceType.LORAWAN_OTAA,
 		interface_configuration=LoRaWANInterfaceConfigurationOTAA(
-		  use_ota_activation=False,
 		  request_ack=False,
 		  app_port=0x01,
 		  device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],
@@ -60,7 +59,6 @@ else:
 		length=8,
 		interface_type=InterfaceType.LORAWAN_ABP,
 		interface_configuration=LoRaWANInterfaceConfigurationABP(
-		  use_ota_activation=False,
 		  request_ack=False,
 		  app_port=0x01,
 		  netw_session_key=[0x53, 0x1b, 0xd9, 0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
