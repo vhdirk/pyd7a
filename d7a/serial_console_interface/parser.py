@@ -6,7 +6,19 @@
 from bitstring                    import ConstBitStream, ReadError
 from d7a.alp.parser               import Parser as AlpParser
 from d7a.parse_error              import ParseError
+import enum
+import crc16
+import struct
+from pprint import pprint
 
+up_counter = 1
+down_counter = 1
+
+class MessageType(enum.Enum):
+  ALP_DATA = 0X01
+  PING_REQUEST = 0X02
+  PING_RESPONSE = 0X03
+  LOGGING = 0X04
 
 class Parser(object):
 
@@ -22,13 +34,25 @@ class Parser(object):
     self.buffer.extend(msg)
     return self.parse_buffer()
 
+
+#|sync|sync|counter|message type|length|crc1|crc2|
   @staticmethod
   def build_serial_frame(command):
-    buffer = bytearray([ 'A', 'T', '$', 'D', 0xC0, 0 ])
+    global up_counter
+    buffer = bytearray([ 0xC0, 0])
     alp_command_bytes = bytearray(command)
+    buffer.append(up_counter)
+    temp = MessageType.ALP_DATA
+    buffer.append(temp.value)
     buffer.append(len(alp_command_bytes))
+    crc = crc16.crc16xmodem(bytes(alp_command_bytes), 0xffff)
+    buffer = buffer + struct.pack(">H", crc)
     buffer = buffer + alp_command_bytes
+    up_counter = up_counter + 1
+    if up_counter > 255:
+      up_counter = 0
     return buffer
+
 
   def parse_buffer(self):
     parsed = 0
@@ -97,14 +121,33 @@ class Parser(object):
       self.buffer = bytearray()
       return skipped
 
+  # |sync|sync|counter|message type|length|crc1|crc2|
   def parse_serial_interface_header(self, s):
-      b = s.read("uint:8")
-      if b != 0xC0 : raise ParseError("expected 0xC0, found {0}".format(b))
-      version = s.read("uint:8")
-      if version != 0: raise ParseError("Expected version 0, found {0}".format(version))
-      cmd_len = s.read("uint:8")
-      if len(self.buffer) - s.bytepos < cmd_len:
-        raise ReadError("ALP command not complete yet, expected {0} bytes, got {1}".format(cmd_len, s.len - s.bytepos))
+    global down_counter
+    b = s.read("uint:8")
+    if b != 0xC0:
+      raise ParseError("expected 0xC0, found {0}".format(b))
+    version = s.read("uint:8")
+    if version != 0:
+      raise ParseError("Expected version 0, found {0}".format(version))
+    counter = s.read("uint:8")
+    if counter != down_counter:
+      pprint("counters not equal") #TODO consequence?
+      down_counter = counter #reset counter
+    message_type = s.read("uint:8") #TODO different handler?
+    cmd_len = s.read("uint:8")
+    crc1 = s.read("uint:8")
+    crc2 = s.read("uint:8")
+    if len(self.buffer) - s.bytepos < cmd_len:
+      raise ReadError("ALP command not complete yet, expected {0} bytes, got {1}".format(cmd_len, s.len - s.bytepos))
+    payload = s.peeklist('bytes:b', b=cmd_len)[0]
+    crc = crc16.crc16xmodem(bytes(payload), 0xffff)
+    crc_calculated = int(bytes(bytearray([crc1, crc2])).encode('hex'), 16)
+    down_counter = down_counter + 1
+    if down_counter > 255:
+      down_counter = 0
+    if crc != crc_calculated:
+      raise ParseError("CRC is incorrect found {0} and exprected {1}".format(crc, crc_calculated))
 
-      return cmd_len
+    return cmd_len
 
