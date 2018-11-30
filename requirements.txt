@@ -12,6 +12,4 @@ enum34
 jsonpickle
 paho-mqtt
 traceback2
-struct
-crc16
 enum

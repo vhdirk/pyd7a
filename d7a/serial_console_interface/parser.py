@@ -7,8 +7,7 @@ from bitstring                    import ConstBitStream, ReadError
 from d7a.alp.parser               import Parser as AlpParser
 from d7a.parse_error              import ParseError
 import enum
-import crc16
-import struct
+from d7a.support.Crc import calculate_crc
 from pprint import pprint
 
 up_counter = 1
@@ -45,9 +44,8 @@ class Parser(object):
     temp = MessageType.ALP_DATA
     buffer.append(temp.value)
     buffer.append(len(alp_command_bytes))
-    crc = crc16.crc16xmodem(bytes(alp_command_bytes), 0xffff)
-    buffer = buffer + struct.pack(">H", crc)
-    buffer = buffer + alp_command_bytes
+    crc = calculate_crc(bytes(alp_command_bytes))
+    buffer = buffer + bytes(bytearray(crc)) + alp_command_bytes
     up_counter = up_counter + 1
     if up_counter > 255:
       up_counter = 0
@@ -141,12 +139,11 @@ class Parser(object):
     if len(self.buffer) - s.bytepos < cmd_len:
       raise ReadError("ALP command not complete yet, expected {0} bytes, got {1}".format(cmd_len, s.len - s.bytepos))
     payload = s.peeklist('bytes:b', b=cmd_len)[0]
-    crc = crc16.crc16xmodem(bytes(payload), 0xffff)
-    crc_calculated = int(bytes(bytearray([crc1, crc2])).encode('hex'), 16)
+    crc = calculate_crc(bytes(payload))
     down_counter = down_counter + 1
     if down_counter > 255:
       down_counter = 0
-    if crc != crc_calculated:
+    if crc[0] != crc1 or crc[1] != crc2:
       raise ParseError("CRC is incorrect found {0} and exprected {1}".format(crc, crc_calculated))
 
     return cmd_len

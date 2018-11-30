@@ -4,8 +4,8 @@
 # unit tests for the serial interface parser
 
 import unittest
-import crc16
-import struct
+import pprint
+from d7a.support.Crc import calculate_crc
 
 from d7a.serial_console_interface.parser import Parser
 counter = 0
@@ -25,8 +25,8 @@ class TestParser(unittest.TestCase):
       0x00, 0xf3, 0x00, 0x00                          # data
     ]
     # calculate crc
-    crc_int = crc16.crc16xmodem(bytes(bytearray(alp_cmd_bytes)), 0xffff)
-    crc_array = struct.pack(">H", crc_int)
+    crc_array = calculate_crc(alp_cmd_bytes)
+
     # |sync|sync|counter|message type|length|crc1|crc2|
     frame = [
       0xC0,                                           # interface sync byte
