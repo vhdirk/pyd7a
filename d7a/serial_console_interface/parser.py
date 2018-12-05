@@ -10,8 +10,7 @@ import enum
 from d7a.support.Crc import calculate_crc
 from pprint import pprint
 
-up_counter = 1
-down_counter = 1
+
 
 class MessageType(enum.Enum):
   ALP_DATA = 0X01
@@ -24,6 +23,8 @@ class Parser(object):
   def __init__(self, skip_alp_parsing=False):
     self.buffer = bytearray()
     self.skip_alp_parsing = skip_alp_parsing
+    self.up_counter = 0
+    self.down_counter = 0
 
   def shift_buffer(self, start):
     self.buffer = self.buffer[start:]
@@ -35,20 +36,17 @@ class Parser(object):
 
 
 #|sync|sync|counter|message type|length|crc1|crc2|
-  @staticmethod
-  def build_serial_frame(command):
-    global up_counter
+  def build_serial_frame(self,command):
     buffer = bytearray([ 0xC0, 0])
     alp_command_bytes = bytearray(command)
-    buffer.append(up_counter)
-    temp = MessageType.ALP_DATA
-    buffer.append(temp.value)
+    buffer.append(Parser.up_counter)
+    buffer.append(MessageType.ALP_DATA.value)
     buffer.append(len(alp_command_bytes))
     crc = calculate_crc(bytes(alp_command_bytes))
     buffer = buffer + bytes(bytearray(crc)) + alp_command_bytes
-    up_counter = up_counter + 1
-    if up_counter > 255:
-      up_counter = 0
+    Parser.up_counter = self.up_counter + 1
+    if self.up_counter > 255:
+      self.up_counter = 0
     return buffer
 
 
@@ -121,7 +119,6 @@ class Parser(object):
 
   # |sync|sync|counter|message type|length|crc1|crc2|
   def parse_serial_interface_header(self, s):
-    global down_counter
     b = s.read("uint:8")
     if b != 0xC0:
       raise ParseError("expected 0xC0, found {0}".format(b))
@@ -129,9 +126,6 @@ class Parser(object):
     if version != 0:
       raise ParseError("Expected version 0, found {0}".format(version))
     counter = s.read("uint:8")
-    if counter != down_counter:
-      pprint("counters not equal") #TODO consequence?
-      down_counter = counter #reset counter
     message_type = s.read("uint:8") #TODO different handler?
     cmd_len = s.read("uint:8")
     crc1 = s.read("uint:8")
@@ -140,9 +134,12 @@ class Parser(object):
       raise ReadError("ALP command not complete yet, expected {0} bytes, got {1}".format(cmd_len, s.len - s.bytepos))
     payload = s.peeklist('bytes:b', b=cmd_len)[0]
     crc = calculate_crc(bytes(payload))
-    down_counter = down_counter + 1
-    if down_counter > 255:
-      down_counter = 0
+    self.down_counter = self.down_counter + 1
+    if self.down_counter > 255:
+      self.down_counter = 0
+    if counter != self.down_counter:
+      pprint("counters not equal") #TODO consequence?
+      self.down_counter = counter #reset counter
     if crc[0] != crc1 or crc[1] != crc2:
       raise ParseError("CRC is incorrect found {0} and exprected {1}".format(crc, crc_calculated))
 
