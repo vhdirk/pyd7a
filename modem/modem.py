@@ -17,7 +17,7 @@ from d7a.alp.operands.offset import Offset
 from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.regular_action import RegularAction
-from d7a.serial_console_interface.parser import Parser
+from d7a.serial_modem_interface.parser import Parser
 
 from d7a.alp.command import Command
 from d7a.system_files.firmware_version import FirmwareVersionFile

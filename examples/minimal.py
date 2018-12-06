@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from d7a.serial_console_interface.parser import Parser
+from d7a.serial_modem_interface.parser import Parser
 from pprint import pprint
 
 cmd = [

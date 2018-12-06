@@ -7,7 +7,7 @@ import unittest
 import pprint
 from d7a.support.Crc import calculate_crc
 
-from d7a.serial_console_interface.parser import Parser
+from d7a.serial_modem_interface.parser import Parser
 
 class TestParser(unittest.TestCase):
   def setUp(self):
