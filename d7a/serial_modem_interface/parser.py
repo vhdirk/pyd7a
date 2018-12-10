@@ -39,12 +39,12 @@ class Parser(object):
   def build_serial_frame(self,command):
     buffer = bytearray([ 0xC0, 0])
     alp_command_bytes = bytearray(command)
-    buffer.append(Parser.up_counter)
+    buffer.append(self.up_counter)
     buffer.append(MessageType.ALP_DATA.value)
     buffer.append(len(alp_command_bytes))
     crc = calculate_crc(bytes(alp_command_bytes))
     buffer = buffer + bytes(bytearray(crc)) + alp_command_bytes
-    Parser.up_counter = self.up_counter + 1
+    self.up_counter = self.up_counter + 1
     if self.up_counter > 255:
       self.up_counter = 0
     return buffer
