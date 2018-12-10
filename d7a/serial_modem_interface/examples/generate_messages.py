@@ -2,7 +2,7 @@
 from d7a.d7anp.addressee import Addressee, IdType
 from d7a.sp.qos import QoS, ResponseMode
 from d7a.alp.command import *
-from d7a.serial_console_interface.parser import *
+from d7a.serial_modem_interface.parser import *
 from pprint import pprint
 import binascii
 

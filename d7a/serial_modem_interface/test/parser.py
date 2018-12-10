@@ -4,14 +4,18 @@
 # unit tests for the serial interface parser
 
 import unittest
+import pprint
+from d7a.support.Crc import calculate_crc
 
-from d7a.serial_console_interface.parser import Parser
+from d7a.serial_modem_interface.parser import Parser
 
 class TestParser(unittest.TestCase):
   def setUp(self):
     self.parser = Parser()
+    self.counter = 0
 
   def test_basic_valid_message(self):
+    self.counter = self.counter + 1
     alp_cmd_bytes = [
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
@@ -19,11 +23,18 @@ class TestParser(unittest.TestCase):
       0x04,                                           # length
       0x00, 0xf3, 0x00, 0x00                          # data
     ]
+    # calculate crc
+    crc_array = calculate_crc(alp_cmd_bytes)
 
+    # |sync|sync|counter|message type|length|crc1|crc2|
     frame = [
       0xC0,                                           # interface sync byte
       0,                                              # interface version
+      self.counter,                                   # counter
+      0x01,                                           # message type,
       len(alp_cmd_bytes),                             # ALP cmd length
+      crc_array[0], crc_array[1]                      # ALP crc
+
     ] + alp_cmd_bytes
 
     (cmds, info) = self.parser.parse(frame)
@@ -74,13 +85,18 @@ class TestParser(unittest.TestCase):
     self.assertEquals(skipped, 1)
     self.assertEquals(self.parser.buffer, bytearray([ 0xc0, 0x10, 0x20, 0x30 ]))
 
+  # |sync|sync|counter|message type|length|crc1|crc2|
   def test_bad_identifier_with_identifier_in_body(self):
+    self.counter = self.counter + 1
     (cmds, info) = self.parser.parse(bytearray([
       0x0c, # that's 0c not c0 ! ;-)
       0x04, 0x00, 0x00, 0x00,
       0x20,
-      0x24, 0x8a, 0xc0, 0x00, 7, 0x0b, 0x35, 0x2c,
-      0x7d,       # ^ here's another one
+      0x24, 0x8a,
+      0xc0, 0x00,                       # here's another one
+      self.counter, 0X01, 7, 0x33, 0xAD,        # calculated crc beforehand
+      0x0b, 0x35, 0x2c,
+      0x7d,
       0x40,
       0x00,
       0x00
@@ -90,6 +106,7 @@ class TestParser(unittest.TestCase):
     self.assertEquals(info["errors"][0]["skipped"], 8)
 
   def test_partial_command(self):
+    self.counter = self.counter + 1
     alp_action_bytes = bytearray([
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
@@ -101,13 +118,13 @@ class TestParser(unittest.TestCase):
     (cmds, info) = self.parser.parse(bytearray([
       0xc0,                                           # interface start
       0,
-      2 * len(alp_action_bytes)                        # expect 2 ALP actions but only one in buffer
+      self.counter, 0x01, 2 * len(alp_action_bytes), 0xDC, 0xF8  # expect 2 ALP actions but only one in buffer
     ]) + alp_action_bytes)
     self.assertEquals(len(cmds), 0)
     self.assertEquals(len(info["errors"]), 0)
     self.assertEquals(info["parsed"], 0)
 
-  def test_continue_partial_command(self):
+  def test_continue_partial_command(self): # ?
     self.test_partial_command() # incomplete command, add second ALP action to complete it ...
     (cmds, info) = self.parser.parse(bytearray([
       0x20,                                           # action=32/ReturnFileData
@@ -126,6 +143,7 @@ class TestParser(unittest.TestCase):
 
 
   def test_continue_partial_second_frame(self):
+    self.counter = self.counter + 1
     alp_cmd_bytes = [
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
@@ -137,14 +155,14 @@ class TestParser(unittest.TestCase):
     frame = [
       0xC0,                                           # interface sync byte
       0,                                              # interface version
-      len(alp_cmd_bytes),                             # ALP cmd length
+      self.counter, 0x01, len(alp_cmd_bytes), 0xA4, 0xBE,     # calculated crc beforehand
     ] + alp_cmd_bytes + [
       # second, partial frame
-      0xC0,
-      0,
-      len(alp_cmd_bytes)
+      0xC0,                                           # interface sync byte
+      0,                                              # interface version
+      self.counter + 1, 0x01, len(alp_cmd_bytes), 0xA4, 0xBE,     # calculated crc beforehand
     ]
-
+    self.counter = self.counter + 1
     # first frame should parse
     (cmds, info) = self.parser.parse(frame)
     self.assertEqual(cmds[0].actions[0].operation.op, 32)

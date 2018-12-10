@@ -4,7 +4,7 @@ from bitstring import ConstBitStream
 
 from d7a.alp.parser import Parser as AlpParser
 from d7a.dll.parser import Parser as DllFrameParser, FrameType
-from d7a.serial_console_interface.parser import Parser as SerialParser
+from d7a.serial_modem_interface.parser import Parser as SerialParser
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.system_files import SystemFiles
 
