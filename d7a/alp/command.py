@@ -87,7 +87,6 @@ class Command(Validatable):
           )
         )
       )
-
     elif interface_type == InterfaceType.SERIAL:
       self.actions.append(
         RegularAction(
@@ -98,6 +97,32 @@ class Command(Validatable):
           )
         )
       )
+    elif interface_type == InterfaceType.LORAWAN_ABP:
+      self.actions.append(
+        RegularAction(
+          operation=Forward(
+            operand=InterfaceConfiguration(
+              interface_id=InterfaceType.LORAWAN_ABP,
+              interface_configuration=interface_configuration
+            )
+          )
+        )
+      )
+    elif interface_type == InterfaceType.LORAWAN_OTAA:
+      self.actions.append(
+        RegularAction(
+          operation=Forward(
+            operand=InterfaceConfiguration(
+              interface_id=InterfaceType.LORAWAN_OTAA,
+              interface_configuration=interface_configuration
+            )
+          )
+        )
+      )
+    elif interface_type == InterfaceType.HOST:
+      pass
+    else:
+      raise ValueError("interface_type {} is not supported".format(interface_type))
 
   @staticmethod
   def create_with_read_file_action_system_file(file, interface_type=InterfaceType.HOST, interface_configuration=None):
