@@ -17,11 +17,13 @@ class Modem2Mqtt():
   def __init__(self):
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-d", "--device", help="serial device /dev file modem",
-                           default="/dev/ttyUSB0")
+                           default="/dev/ttyACM0")
     argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
     argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     argparser.add_argument("-b", "--broker", help="mqtt broker hostname",
                              default="localhost")
+    argparser.add_argument("-t", "--topic", help="mqtt topic",
+                             default="/ww/")
 
     self.serial = None
     self.modem_uid = None
@@ -47,8 +49,8 @@ class Modem2Mqtt():
     self.mq = mqtt.Client("", True, None, mqtt.MQTTv31)
     self.mq.on_connect = self.on_mqtt_connect
     self.mq.on_message = self.on_mqtt_message
-    self.mqtt_topic_incoming = "/DASH7/{}/incoming".format(self.modem_uid)
-    self.mqtt_topic_outgoing = "/DASH7/{}/outgoing".format(self.modem_uid)
+    self.mqtt_topic_incoming = self.config.topic.format(self.modem_uid)
+    self.mqtt_topic_outgoing = self.config.topic.format(self.modem_uid)
     self.mq.connect(self.config.broker, 1883, 60)
     self.mq.loop_start()
     while not self.connected_to_mqtt: pass  # busy wait until connected
