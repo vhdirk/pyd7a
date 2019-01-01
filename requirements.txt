@@ -12,3 +12,4 @@ enum34
 jsonpickle
 paho-mqtt
 traceback2
+cogapp
