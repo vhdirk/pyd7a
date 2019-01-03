@@ -40,10 +40,10 @@ class FirmwareVersionFile(File, Validatable):
     yield self.d7a_protocol_version_major
     yield self.d7a_protocol_version_minor
 
-    for byte in bytearray(self.application_name.encode("ASCII")):
+    for byte in bytearray(self.application_name.encode("ASCII").ljust(6)):
       yield byte
 
-    for byte in bytearray(self.git_sha1.encode("ASCII")):
+    for byte in bytearray(self.git_sha1.encode("ASCII").ljust(7)):
       yield byte
 
   def __str__(self):
