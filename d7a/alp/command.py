@@ -152,7 +152,7 @@ class Command(Validatable):
         operation=ReadFileData(
           operand=DataRequest(
             offset=Offset(id=file_id, offset=Length(offset)), # TODO offset size
-            length=Length(length)
+            length=length
           )
         )
       )
