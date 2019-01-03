@@ -48,7 +48,7 @@ class DataRequest(Validatable):
 
   def __init__(self, length, offset=Offset()):
     self.offset = offset
-    self.length = length
+    self.length = Length(length)
     super(DataRequest, self).__init__()
 
   def __iter__(self):
