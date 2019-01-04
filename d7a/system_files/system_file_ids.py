@@ -9,7 +9,7 @@ class SystemFileIds(Enum):
   DEVICE_STATUS = 0x04
   ENGINEERING_MODE = 0x05
   VID = 0x06
-  # 0x07 RFU
+  RFU_07 = 0x07
   PHY_CONFIG = 0x08
   PHY_STATUS = 0x09
   DLL_CONFIG = 0x0A
@@ -22,7 +22,9 @@ class SystemFileIds(Enum):
   TRL_STATUS = 0x11
   SEL_CONFIG = 0x12
   FOF_STATUS = 0x13
-  # 0x14-0x16 RFU
+  RFU_14 = 0x14
+  RFU_15 = 0x15
+  RFU_16 = 0x16
   LOCATION_DATA = 0x17
   # 0x18-0x1F reserved for D7AALP
   ACCESS_PROFILE_0 = 0x20

@@ -16,6 +16,7 @@ class SystemFiles:
     SystemFileIds.DEVICE_STATUS: NotImplementedFile(SystemFileIds.DEVICE_STATUS, 9),
     SystemFileIds.ENGINEERING_MODE: NotImplementedFile(SystemFileIds.ENGINEERING_MODE, 0),
     SystemFileIds.VID: NotImplementedFile(SystemFileIds.VID, 3),
+    SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_07, 0),
     SystemFileIds.PHY_CONFIG: NotImplementedFile(SystemFileIds.PHY_CONFIG, 9),
     SystemFileIds.PHY_STATUS: NotImplementedFile(SystemFileIds.PHY_STATUS, 24),  # TODO assuming 3 channels for now
     SystemFileIds.DLL_CONFIG: DllConfigFile(),
@@ -28,6 +29,9 @@ class SystemFiles:
     SystemFileIds.TRL_STATUS: NotImplementedFile(SystemFileIds.TRL_STATUS, 1),  # TODO 0 TRL records
     SystemFileIds.SEL_CONFIG: NotImplementedFile(SystemFileIds.SEL_CONFIG, 6),
     SystemFileIds.FOF_STATUS: NotImplementedFile(SystemFileIds.FOF_STATUS, 10),
+    SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_14, 0),
+    SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_15, 0),
+    SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_16, 0),
     SystemFileIds.LOCATION_DATA: NotImplementedFile(SystemFileIds.LOCATION_DATA, 1),  # TODO 0 recorded locations
     SystemFileIds.ACCESS_PROFILE_0: AccessProfileFile(access_specifier=0),
     SystemFileIds.ACCESS_PROFILE_1: AccessProfileFile(access_specifier=1),
