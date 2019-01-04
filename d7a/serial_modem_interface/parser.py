@@ -141,7 +141,7 @@ class Parser(object):
       pprint("counters not equal") #TODO consequence?
       self.down_counter = counter #reset counter
     if crc[0] != crc1 or crc[1] != crc2:
-      raise ParseError("CRC is incorrect found {0} and exprected {1}".format(crc, crc_calculated))
+      raise ParseError("CRC is incorrect found {} {} and expected {} {}".format(crc1, crc2, crc[0], crc[1]))
 
     return cmd_len
 
