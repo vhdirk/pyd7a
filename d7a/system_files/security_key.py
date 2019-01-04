@@ -22,7 +22,7 @@ class SecurityKeyFile(File, Validatable):
     return SecurityKeyFile(key)
 
   def __iter__(self):
-    for byte in bytearray(self.key):
+    for byte in [(self.key & (0xff << pos * 8)) >> pos * 8 for pos in range(16)]:
       yield byte
 
   def __str__(self):
