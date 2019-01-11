@@ -61,11 +61,31 @@ class TestSubband(unittest.TestCase):
 
     self.assertEqual(len(expected), len(bytes))
 
-  def test_parse(self):
+
+  def test_byte_generation_neg_eirp(self):
+    expected = [
+      0, 0, # channel index start
+      16, 0, # channel index end
+      0xF6, # eirp
+      86, # ccao
+      255 # duty
+    ]
+    sb = SubBand(channel_index_start=0,
+                 channel_index_end=16,
+                 eirp=-10,
+                 cca=86,
+                 duty=255)
+    bytes = bytearray(sb)
+    for i in xrange(len(bytes)):
+      self.assertEqual(expected[i], bytes[i])
+
+    self.assertEqual(len(expected), len(bytes))
+
+  def test_parse_neg_eirp(self):
     bytes = [
       0, 0,  # channel index start
       16, 0,  # channel index end
-      10,  # eirp
+      0xF6,  # eirp
       86,  # ccao
       255  # duty
     ]
@@ -73,6 +93,6 @@ class TestSubband(unittest.TestCase):
     sb = SubBand.parse(ConstBitStream(bytes=bytes))
     self.assertEqual(sb.channel_index_start, 0)
     self.assertEqual(sb.channel_index_end, 16)
-    self.assertEqual(sb.eirp, 10)
+    self.assertEqual(sb.eirp, -10)
     self.assertEqual(sb.cca, 86)
     self.assertEqual(sb.duty, 255)
