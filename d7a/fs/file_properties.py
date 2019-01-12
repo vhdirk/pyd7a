@@ -52,3 +52,12 @@ class FileProperties(Validatable):
       self.act_condition,
       self.storage_class
     )
+
+  def __eq__(self, other):
+    if isinstance(other, FileProperties):
+      return self.__dict__ == other.__dict__
+
+    return False
+
+  def __ne__(self, other):
+    return not self.__eq__(other)

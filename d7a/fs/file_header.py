@@ -49,7 +49,14 @@ class FileHeader(Validatable):
     for byte in bytearray(struct.pack(">I", self.allocated_size)):
       yield byte
 
+  def __eq__(self, other):
+    if isinstance(other, FileHeader):
+      return self.__dict__ == other.__dict__
 
+    return False
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
 
   def __str__(self):
     return "permissions={}, properties=({}), alp_command_file_id={}, interface_file_id={}, file_size={}, allocated_size={}".format(
