@@ -14,6 +14,7 @@ from d7a.alp.operands.length import Length
 from d7a.alp.operands.offset import Offset
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.tag_id import TagId
+from d7a.alp.operations.file_management import CreateNewFile
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.requests import ReadFileData, ReadFileHeader
 from d7a.alp.operations.responses import ReturnFileData
@@ -238,6 +239,23 @@ class Command(Validatable):
     cmd.add_action(
       RegularAction(
         operation=WriteFileHeader(
+          operand=FileHeaderOperand(
+            file_id=file_id,
+            file_header=file_header
+          )
+        )
+      )
+    )
+
+    return cmd
+
+  @staticmethod
+  def create_with_create_new_file(file_id, file_header, interface_type=InterfaceType.HOST, interface_configuration=None):
+    cmd = Command()
+    cmd.add_forward_action(interface_type, interface_configuration)
+    cmd.add_action(
+      RegularAction(
+        operation=CreateNewFile(
           operand=FileHeaderOperand(
             file_id=file_id,
             file_header=file_header

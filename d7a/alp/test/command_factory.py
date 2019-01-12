@@ -7,6 +7,7 @@ from d7a.alp.operands.file import DataRequest, Data, FileIdOperand
 from d7a.alp.operands.file_header import FileHeaderOperand
 from d7a.alp.operands.offset import Offset
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
+from d7a.alp.operations.file_management import CreateNewFile
 from d7a.alp.operations.forward import Forward
 from d7a.alp.operations.requests import ReadFileData, ReadFileHeader
 from d7a.alp.operations.responses import ReturnFileData
@@ -138,6 +139,33 @@ class TestCommandFactory(unittest.TestCase):
     self.assertEqual(len(c.actions), 1)
     self.assertEqual(type(c.actions[0]), RegularAction)
     self.assertEqual(type(c.actions[0].operation), WriteFileHeader)
+    self.assertEqual(type(c.actions[0].operand), FileHeaderOperand)
+    self.assertEqual(c.actions[0].operand.file_id, 0x40)
+    self.assertEqual(c.actions[0].operand.file_header, file_header)
+
+  def test_create_with_create_file(self):
+    file_header = FileHeader(
+      permissions=FilePermissions(
+        executeable=True,
+        encrypted=False,
+        user_readable=True,
+        user_writeable=True,
+        user_executeable=False,
+        guest_readable=True,
+        guest_executeable=False,
+        guest_writeable=False
+      ),
+      properties=FileProperties(act_enabled=False, act_condition=ActionCondition.WRITE, storage_class=StorageClass.PERMANENT),
+      alp_command_file_id=0x41,
+      interface_file_id=0x42,
+      file_size=1,
+      allocated_size=1
+    )
+
+    c = Command.create_with_create_new_file(file_id=0x40, file_header=file_header)
+    self.assertEqual(len(c.actions), 1)
+    self.assertEqual(type(c.actions[0]), RegularAction)
+    self.assertEqual(type(c.actions[0].operation), CreateNewFile)
     self.assertEqual(type(c.actions[0].operand), FileHeaderOperand)
     self.assertEqual(c.actions[0].operand.file_id, 0x40)
     self.assertEqual(c.actions[0].operand.file_header, file_header)
