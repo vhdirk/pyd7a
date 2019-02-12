@@ -3,6 +3,11 @@
 import argparse
 
 import logging
+import platform
+import signal
+import sys
+import traceback
+
 import serial
 import time
 
@@ -18,12 +23,13 @@ class Modem2Mqtt():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                            default="/dev/ttyACM0")
+    argparser.add_argument("-di", "--device-id", help="gateway device-id", required=True)
     argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
     argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
     argparser.add_argument("-b", "--broker", help="mqtt broker hostname",
                              default="localhost")
     argparser.add_argument("-t", "--topic", help="mqtt topic",
-                             default="/ww/")
+                             default="/gw/{}")
 
     self.serial = None
     self.modem_uid = None
@@ -32,16 +38,11 @@ class Modem2Mqtt():
 
     self.config = argparser.parse_args()
     configure_default_logger(self.config.verbose)
-    self.setup_modem()
+
+    self.modem = Modem(self.config.device, self.config.rate, self.on_command_received, skip_alp_parsing=True)
+    self.modem.connect()
     self.connect_to_mqtt()
 
-  def setup_modem(self):
-    # we use Modem here only for reading the modem information, not for parsing.
-    # reading the bytes from serial (after initial connect) is not done using Modem but overridden here
-    modem = Modem(self.config.device, self.config.rate, None)
-    self.serial = modem.dev
-    self.modem_uid = modem.uid
-    modem.stop_reading()  # so we can read the serial stream ourself
 
   def connect_to_mqtt(self):
     self.connected_to_mqtt = False
@@ -49,19 +50,19 @@ class Modem2Mqtt():
     self.mq = mqtt.Client("", True, None, mqtt.MQTTv31)
     self.mq.on_connect = self.on_mqtt_connect
     self.mq.on_message = self.on_mqtt_message
-    self.mqtt_topic_incoming = self.config.topic.format(self.modem_uid)
-    self.mqtt_topic_outgoing = self.config.topic.format(self.modem_uid)
+    self.mqtt_topic_incoming = self.config.topic.format(self.config.device_id)
+    #self.mqtt_topic_outgoing = self.config.topic.format(self.modem_uid)
+
     self.mq.connect(self.config.broker, 1883, 60)
     self.mq.loop_start()
     while not self.connected_to_mqtt: pass  # busy wait until connected
-    logging.info("Connected to MQTT broker on {}, sending to topic {} and subscribed to topic {}".format(
+    logging.info("Connected to MQTT broker on {}, sending to topic {}".format(
       self.config.broker,
-      self.mqtt_topic_incoming,
-      self.mqtt_topic_outgoing
+      self.mqtt_topic_incoming
     ))
 
   def on_mqtt_connect(self, client, config, flags, rc):
-    self.mq.subscribe(self.mqtt_topic_outgoing)
+    #self.mq.subscribe(self.mqtt_topic_outgoing)
     self.connected_to_mqtt = True
 
   def on_mqtt_message(self, client, config, msg):
@@ -82,22 +83,28 @@ class Modem2Mqtt():
       self.mq.disconnect()
     except: pass
 
+  def on_command_received(self, cmd):
+    try:
+      logging.info("Command received: binary ALP (size {})".format(len(cmd)))
+
+      # publish raw ALP command to incoming ALP topic, we will not parse the file contents here (since we don't know how)
+      # so pass it as an opaque BLOB for parsing in backend
+      self.publish_to_mqtt(bytearray(cmd))
+    except:
+      exc_type, exc_value, exc_traceback = sys.exc_info()
+      lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+      trace = "".join(lines)
+      logging.error("Exception while processing command: \n{}".format(trace))
 
   def run(self):
     logging.info("Started")
     keep_running = True
     while keep_running:
       try:
-        data = self.serial.read(256)
-        if data:
-          data = bytearray(data)
-          self.publish_to_mqtt(data)
-          self.keep_stats()
-      except serial.SerialException:
-        time.sleep(1)
-        logging.info("resetting serial connection...")
-        self.setup_modem()
-        return
+        if platform.system() == "Windows":
+          time.sleep(1)
+        else:
+          signal.pause()
       except KeyboardInterrupt:
         logging.info("received KeyboardInterrupt... stopping processing")
         keep_running = False
