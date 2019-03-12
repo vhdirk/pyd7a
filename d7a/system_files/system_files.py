@@ -5,6 +5,7 @@ from d7a.system_files.not_implemented import NotImplementedFile
 from d7a.system_files.security_key import SecurityKeyFile
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.uid import UidFile
+from d7a.system_files.engineering_mode import EngineeringModeFile
 
 
 class SystemFiles:
@@ -14,7 +15,7 @@ class SystemFiles:
     SystemFileIds.FIRMWARE_VERSION: FirmwareVersionFile(),
     SystemFileIds.DEVICE_CAPACITY: NotImplementedFile(SystemFileIds.DEVICE_CAPACITY.value, 19),
     SystemFileIds.DEVICE_STATUS: NotImplementedFile(SystemFileIds.DEVICE_STATUS, 9),
-    SystemFileIds.ENGINEERING_MODE: NotImplementedFile(SystemFileIds.ENGINEERING_MODE, 0),
+    SystemFileIds.ENGINEERING_MODE: EngineeringModeFile(),
     SystemFileIds.VID: NotImplementedFile(SystemFileIds.VID, 3),
     SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_07, 0),
     SystemFileIds.PHY_CONFIG: NotImplementedFile(SystemFileIds.PHY_CONFIG, 9),
