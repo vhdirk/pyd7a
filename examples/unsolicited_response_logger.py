@@ -3,6 +3,7 @@
 import argparse
 
 import logging
+import sys
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -11,6 +12,7 @@ from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.uid import UidFile
 from modem.modem import Modem
+
 
 
 # This example can be used with a node running the gateway app included in OSS-7.
@@ -35,5 +37,8 @@ configure_default_logger(config.verbose)
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
 modem.connect()
 
-while True:
-  pass
+try:
+  while True:
+    pass
+except KeyboardInterrupt:
+  sys.exit(0)

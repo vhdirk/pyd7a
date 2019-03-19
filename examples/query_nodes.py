@@ -3,6 +3,7 @@
 import argparse
 import os
 from time import sleep
+import sys
 
 import logging
 
@@ -50,6 +51,8 @@ modem.execute_command_async(
     )
   )
 )
-
-while True:
-  sleep(5)
+try:
+  while True:
+    sleep(5)
+except KeyboardInterrupt:
+  sys.exit(0)
