@@ -20,12 +20,12 @@ class EngineeringModeFile(File, Validatable):
   def __init__(self, mode=0, flags=0, timeout=0, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.LO_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp= 0):
     self.mode = mode
     self.flags = flags
-    self.timeout = flags
+    self.timeout = timeout
     self.channel_header = channel_header
     self.center_freq_index = center_freq_index
     self.eirp = eirp
-    Validatable.__init__(self)
     File.__init__(self, SystemFileIds.ENGINEERING_MODE, 9)
+    Validatable.__init__(self)
 
   @staticmethod
   def parse(s):
@@ -49,8 +49,9 @@ class EngineeringModeFile(File, Validatable):
     yield self.mode
     yield self.flags
     yield self.timeout
-    yield self.channel_header
-    yield self.center_freq_index
+    for byte in self.channel_header:
+      yield byte
+    for byte in bytearray(struct.pack("<h", self.center_freq_index)): yield byte
     yield self.eirp
 
   def __str__(self):
