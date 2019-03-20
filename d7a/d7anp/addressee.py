@@ -102,6 +102,9 @@ class Addressee(Validatable):
     cl    = s.read("uint:8")
     l     = Addressee.length_for(id_type)
     id    = s.read("uint:"+str(l*8)) if l > 0 else None
+    if id_type == IdType.NBID:
+      id = CT(id)
+
     return Addressee(id_type=id_type, access_class=cl, id=id, nls_method=nls_method)
 
   def __iter__(self):
