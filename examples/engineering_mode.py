@@ -44,7 +44,7 @@ modem = Modem(config.device, config.rate, unsolicited_response_received_callback
 modem.connect()
 logging.info("Executing query...")
 
-emFile = EngineeringModeFile(mode=1, flags=0, timeout=10, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.NORMAL_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp= 0)
+emFile = EngineeringModeFile(mode=1, flags=0, timeout=10, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.NORMAL_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp=0)
 print(emFile)
 
 waiting_for_requests += 1

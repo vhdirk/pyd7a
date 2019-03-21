@@ -5,6 +5,7 @@ from d7a.support.schema import Validatable, Types
 
 class ChannelCoding(Enum):
   PN9 = 0x00
+  RFU = 0x01
   FEC_PN9 = 0x02
 
 

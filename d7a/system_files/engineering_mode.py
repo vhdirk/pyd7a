@@ -17,7 +17,7 @@ class EngineeringModeFile(File, Validatable):
     "eirp": Types.INTEGER(min=-128, max=127)
   }]
 
-  def __init__(self, mode=0, flags=0, timeout=0, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.LO_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp= 0):
+  def __init__(self, mode=0, flags=0, timeout=0, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.LO_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp=0):
     self.mode = mode
     self.flags = flags
     self.timeout = timeout
@@ -43,7 +43,7 @@ class EngineeringModeFile(File, Validatable):
     channel_header = ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)
     center_freq_index = s.read("uint:16")
     eirp = s.read("int:8")
-    return EngineeringModeFile(mode=mode, flags=flags, timeout=timeout, channel_header=channel_header, center_freq_index=center_freq_index, eirp= eirp)
+    return EngineeringModeFile(mode=mode, flags=flags, timeout=timeout, channel_header=channel_header, center_freq_index=center_freq_index, eirp=eirp)
 
   def __iter__(self):
     yield self.mode
