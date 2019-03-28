@@ -1,40 +1,23 @@
 #!/usr/bin/env python
 
 import argparse
-import os
-from time import sleep
 import sys
 import logging
 
 from d7a.alp.command import Command
-from d7a.alp.interface import InterfaceType
-from d7a.d7anp.addressee import Addressee, IdType
-from d7a.dll.access_profile import AccessProfile
-from d7a.dll.sub_profile import SubProfile
+
 from d7a.phy.channel_id import ChannelID
-from d7a.phy.subband import SubBand
-from d7a.sp.configuration import Configuration
-from d7a.sp.qos import QoS, ResponseMode
-from d7a.system_files.access_profile import AccessProfileFile
-from d7a.system_files.uid import UidFile
 from d7a.system_files.engineering_mode import EngineeringModeFile, EngineeringModeMode
-from d7a.system_files.system_file_ids import SystemFileIds
-from d7a.phy.channel_header import ChannelHeader,ChannelCoding,ChannelClass,ChannelBand
+
 from modem.modem import Modem
 
-# This example can be used with a node running the gateway app included in OSS-7, which is connect using the supplied serial device.
-# It will query the sensor file (file 0x40) from other nodes running sensor_pull, using adhoc synchronization and print the results.
 from util.logger import configure_default_logger
 
-waiting_for_requests = 0
 
 def received_command_callback(cmd):
-  global waiting_for_requests
   logging.info(cmd)
   if cmd.execution_completed:
-    waiting_for_requests -= 1
-    if waiting_for_requests <= 0:
-      os._exit(0)
+      sys.exit(0)
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
@@ -64,10 +47,3 @@ modem.execute_command(
     data=list(emFile),
   )
 )
-
-
-try:
-  while True:
-    sleep(5)
-except KeyboardInterrupt:
-  sys.exit(0)
