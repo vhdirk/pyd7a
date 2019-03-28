@@ -51,12 +51,6 @@ class TestStatus(unittest.TestCase):
     for i in xrange(10):
       self.assertEqual(expected[i], bytes[i])
 
-  def test_get_short_channel_string(self):
-    s = Status(channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
-      nls=False, missed=False, retry=False, unicast=False, fifo_token=100,
-      seq_nr=0, response_to=CT(0, 20), addressee=Addressee())
-    self.assertEqual(s.get_short_channel_string(), "433N016")
-
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestStatus)
   unittest.TextTestRunner(verbosity=1).run(suite)

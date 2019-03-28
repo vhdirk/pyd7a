@@ -9,6 +9,16 @@ class ChannelCoding(Enum):
   FEC_PN9 = 0x02
   CW = 0x03
 
+  def to_char(self):
+    return self.name[:1]
+
+  @staticmethod
+  def from_char(c):
+    if c == "P": return ChannelCoding.PN9
+    if c == "F": return ChannelCoding.FEC_PN9
+    if c == "C": return ChannelCoding.CW
+
+    raise NotImplementedError
 
 class ChannelClass(Enum):
   LO_RATE = 0x00
@@ -16,10 +26,34 @@ class ChannelClass(Enum):
   NORMAL_RATE = 0x02
   HI_RATE = 0x03
 
+  def to_char(self):
+    c = self.name[:1]
+    if self.value == ChannelClass.LORA:
+      c = "R"
+
+    return c
+
+  @staticmethod
+  def from_char(c):
+    if c == "L": return ChannelClass.LO_RATE
+    if c == "N": return ChannelClass.NORMAL_RATE
+    if c == "H": return ChannelClass.HI_RATE
+    if c == "R": return ChannelClass.LORA
+
+    raise NotImplementedError
+
 class ChannelBand(Enum):
   BAND_433 = 0x02
   BAND_868 = 0x03
   BAND_915 = 0x04
+
+  @staticmethod
+  def from_string(s):
+    if s == "433": return ChannelBand.BAND_433
+    if s == "868": return ChannelBand.BAND_868
+    if s == "915": return ChannelBand.BAND_915
+
+    raise NotImplementedError
 
 class ChannelHeader(Validatable):
   # TODO
@@ -50,11 +84,18 @@ class ChannelHeader(Validatable):
     return ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)
 
   def __str__(self):
-    return "coding={}, class={}, band={}".format(
-      self.channel_coding,
-      self.channel_class,
-      self.channel_band
-    )
+    band = self.channel_band.name.lstrip("BAND_")
+    cl = self.channel_class.to_char()
+    coding = self.channel_coding.to_char()
+
+    return "{0}{1}{2}".format(band, cl, coding)
+
+  @staticmethod
+  def from_string(s):
+    channel_band = ChannelBand.from_string(s[0:3])
+    channel_class = ChannelClass.from_char(s[3])
+    channel_coding = ChannelCoding.from_char(s[4])
+    return ChannelHeader(channel_band=channel_band, channel_class=channel_class, channel_coding=channel_coding)
 
   def __eq__(self, other):
     if type(other) is type(self):
