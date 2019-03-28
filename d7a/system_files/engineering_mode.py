@@ -1,61 +1,77 @@
 import struct
 
+from enum import Enum
+
+from d7a.phy.channel_id import ChannelID
 from d7a.support.schema import Validatable, Types
 from d7a.system_files.file import File
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.phy.channel_header import ChannelHeader,ChannelCoding,ChannelClass,ChannelBand
 
+class EngineeringModeMode(Enum):
+  ENGINEERING_MODE_MODE_OFF = 0
+  ENGINEERING_MODE_MODE_CONT_TX = 1
+  ENGINEERING_MODE_MODE_TRANSIENT_TX = 2
+  ENGINEERING_MODE_MODE_PER_RX = 3
+  ENGINEERING_MODE_MODE_PER_TX = 4
+
+  @staticmethod
+  def from_string(s):
+    if s == "OFF": return EngineeringModeMode.ENGINEERING_MODE_MODE_OFF
+    if s == "CONT_TX": return EngineeringModeMode.ENGINEERING_MODE_MODE_CONT_TX
+    if s == "TRANSIENT_TX": return EngineeringModeMode.ENGINEERING_MODE_MODE_TRANSIENT_TX
+    if s == "PER_RX": return EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX
+    if s == "PER_TX": return EngineeringModeMode.ENGINEERING_MODE_MODE_PER_TX
+
+    raise NotImplementedError
+
+  def __str__(self):
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF: return "OFF"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_CONT_TX: return "CONT_TX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_TRANSIENT_TX: return "TRANSIENT_TX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX: return "PER_RX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_TX: return "PER_TX"
 
 class EngineeringModeFile(File, Validatable):
 
   SCHEMA = [{
-    "mode": Types.INTEGER(min=0, max=255),
+    "mode": Types.ENUM(EngineeringModeMode),
     "flags": Types.INTEGER(min=0, max=255),
     "timeout": Types.INTEGER(min=0, max=255),
-    "channel_header": Types.OBJECT(ChannelHeader),
-    "center_freq_index": Types.INTEGER(min=0, max=0xFFFF),
+    "channel_id": Types.OBJECT(ChannelID),
     "eirp": Types.INTEGER(min=-128, max=127)
   }]
 
-  def __init__(self, mode=0, flags=0, timeout=0, channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.LO_RATE,ChannelBand.BAND_868), center_freq_index=0, eirp=0):
+  def __init__(self, mode=EngineeringModeMode.ENGINEERING_MODE_MODE_OFF, flags=0, timeout=0,
+               channel_id=ChannelID(channel_header=ChannelHeader(ChannelCoding.PN9,ChannelClass.LO_RATE,ChannelBand.BAND_868),
+                                    channel_index=0),
+               eirp=0):
     self.mode = mode
     self.flags = flags
     self.timeout = timeout
-    self.channel_header = channel_header
-    self.center_freq_index = center_freq_index
+    self.channel_id = channel_id
     self.eirp = eirp
     File.__init__(self, SystemFileIds.ENGINEERING_MODE, 9)
     Validatable.__init__(self)
 
   @staticmethod
   def parse(s):
-    mode = s.read("uint:8")
+    mode = EngineeringModeMode(int(s.read("uint:8")))
     flags = s.read("uint:8")
     timeout = s.read("uint:8")
-    s.read("uint:1")  # RFU
-    channel_band_value = s.read("uint:3")
-    if (channel_band_value == 0):
-      channel_band_value = 3 ## fix schema error if all zeros are read
-    channel_band = ChannelBand(channel_band_value)
-    channel_class = ChannelClass(s.read("uint:2"))
-    channel_coding = ChannelCoding(s.read("uint:2"))
-
-    channel_header = ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)
-    center_freq_index = s.read("uint:16")
+    channel_id= ChannelID.parse(s)
     eirp = s.read("int:8")
-    s.read("uint:16")  # RFU
-    return EngineeringModeFile(mode=mode, flags=flags, timeout=timeout, channel_header=channel_header, center_freq_index=center_freq_index, eirp=eirp)
+    return EngineeringModeFile(mode=mode, flags=flags, timeout=timeout, channel_id=channel_id, eirp=eirp)
 
   def __iter__(self):
-    yield self.mode
+    yield int(self.mode.value)
     yield self.flags
     yield self.timeout
-    for byte in self.channel_header:
+    for byte in self.channel_id:
       yield byte
-    for byte in bytearray(struct.pack("<h", self.center_freq_index)): yield byte
     yield self.eirp
     yield 0
     yield 0
 
   def __str__(self):
-    return "mode={}, flags={}, timeout={}, channel_header={{{}}}, center_freq_index={}, eirp={}".format(hex(self.mode), hex(self.flags),self.timeout, self.channel_header, self.center_freq_index, self.eirp)
+    return "mode={}, flags={}, timeout={}, channel_id={{{}}}, eirp={}".format(self.mode, hex(self.flags),self.timeout, self.channel_id, self.eirp)
