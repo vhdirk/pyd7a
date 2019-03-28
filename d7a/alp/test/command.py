@@ -15,6 +15,7 @@ from d7a.alp.regular_action import RegularAction
 from d7a.alp.status_action import StatusAction, StatusActionOperandExtensions
 from d7a.d7anp.addressee import Addressee
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
+from d7a.phy.channel_id import ChannelID
 from d7a.sp.status                        import Status as D7ASpStatus
 from d7a.alp.operands.interface_status    import InterfaceStatusOperand
 from d7a.types.ct import CT
@@ -42,10 +43,12 @@ class TestCommand(unittest.TestCase):
               operand=InterfaceStatusOperand(
                 interface_id=0xD7,
                 interface_status=D7ASpStatus(
-                  channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                  channel_id=ChannelID(
+                    channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
                                                channel_class=ChannelClass.LO_RATE,
                                                channel_coding=ChannelCoding.PN9),
-                  channel_index=16,
+                    channel_index=16
+                  ),
                   rx_level=70,
                   link_budget=80,
                   target_rx_level=80,
@@ -108,10 +111,12 @@ class TestCommand(unittest.TestCase):
             operand=InterfaceStatusOperand(
               interface_id=0xD7,
               interface_status=D7ASpStatus(
-                channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
+                channel_id=ChannelID(
+                  channel_header=ChannelHeader(channel_band=ChannelBand.BAND_433,
                                              channel_class=ChannelClass.LO_RATE,
                                              channel_coding=ChannelCoding.PN9),
-                channel_index=16,
+                  channel_index=16
+                ),
                 rx_level=70,
                 link_budget=80,
                 target_rx_level=80,

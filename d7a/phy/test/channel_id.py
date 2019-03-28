@@ -27,7 +27,7 @@ class TestChannelID(unittest.TestCase):
   def test_parse(self):
     bytes = [
       0b00101000, # header
-      16, 0  # channel_id
+      0, 16  # channel_id
     ]
 
     ch = ChannelID.parse(ConstBitStream(bytes=bytes))

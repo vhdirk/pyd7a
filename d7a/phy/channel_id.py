@@ -24,7 +24,7 @@ class ChannelID(Validatable):
   @staticmethod
   def parse(s):
     channel_header = ChannelHeader.parse(s)
-    channel_index = s.read("uintle:16")
+    channel_index = s.read("uint:16")
     return ChannelID(channel_header=channel_header, channel_index=channel_index)
 
   def __str__(self):
