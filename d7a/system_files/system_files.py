@@ -6,12 +6,13 @@ from d7a.system_files.security_key import SecurityKeyFile
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.uid import UidFile
 from d7a.system_files.engineering_mode import EngineeringModeFile
+from d7a.system_files.factory_settings import FactorySettingsFile
 
 
 class SystemFiles:
   files = {
     SystemFileIds.UID: UidFile(),
-    SystemFileIds.FACTORY_SETTINGS: NotImplementedFile(SystemFileIds.FACTORY_SETTINGS.value, 0),
+    SystemFileIds.FACTORY_SETTINGS: FactorySettingsFile(),
     SystemFileIds.FIRMWARE_VERSION: FirmwareVersionFile(),
     SystemFileIds.DEVICE_CAPACITY: NotImplementedFile(SystemFileIds.DEVICE_CAPACITY.value, 19),
     SystemFileIds.DEVICE_STATUS: NotImplementedFile(SystemFileIds.DEVICE_STATUS, 9),
