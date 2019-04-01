@@ -47,3 +47,9 @@ modem.execute_command(
     data=list(emFile),
   )
 )
+
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    sys.exit(0)
