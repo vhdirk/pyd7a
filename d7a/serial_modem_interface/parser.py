@@ -2,6 +2,7 @@
 # author: Christophe VG <contact@christophe.vg>
 
 # a parser for ALP commands wrapped in serial interface frames
+import binascii
 
 from bitstring                    import ConstBitStream, ReadError
 from d7a.alp.parser               import Parser as AlpParser
@@ -74,14 +75,17 @@ class Parser(object):
     while retry and len(self.buffer) > 0:
       try:
         s           = ConstBitStream(bytes=self.buffer)
-        cmd_length  = self.parse_serial_interface_header(s)
-        if self.skip_alp_parsing:
-          if s.length < cmd_length:
-            raise ReadError
+        cmd_length, message_type = self.parse_serial_interface_header(s)
+        if message_type != 4:
+          if self.skip_alp_parsing:
+            if s.length < cmd_length:
+              raise ReadError
 
-          cmd = s.read("bytes:" + str(cmd_length))
-        else:
-          cmd = AlpParser().parse(s, cmd_length)
+            cmd = s.read("bytes:" + str(cmd_length))
+          else:
+            cmd = AlpParser().parse(s, cmd_length)
+        else:  # logging mode
+          print(s.readlist('bytes:b', b=cmd_length)[0])
 
         bits_parsed = s.pos
         self.shift_buffer(bits_parsed/8)
@@ -143,5 +147,5 @@ class Parser(object):
     if crc[0] != crc1 or crc[1] != crc2:
       raise ParseError("CRC is incorrect found {} {} and expected {} {}".format(crc1, crc2, crc[0], crc[1]))
 
-    return cmd_len
+    return cmd_len, message_type
 

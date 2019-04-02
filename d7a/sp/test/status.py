@@ -6,6 +6,7 @@
 import unittest
 
 from d7a.phy.channel_header import ChannelHeader, ChannelClass, ChannelCoding, ChannelBand
+from d7a.phy.channel_id import ChannelID
 from d7a.types.ct     import CT
 from d7a.d7anp.addressee import Addressee
 from d7a.sp.session   import States
@@ -33,7 +34,7 @@ class TestStatus(unittest.TestCase):
       0                                                # access class
     ]
     bytes = bytearray(Status(
-      channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
+      channel_id =ChannelID(self.valid_channel_header, channel_index=16), rx_level=70, link_budget=80, target_rx_level=80,
       nls=False, missed=False, retry=False, unicast=False, fifo_token=100,
       seq_nr=0, response_to=CT(0, 20), addressee=Addressee()
     ))
@@ -42,7 +43,7 @@ class TestStatus(unittest.TestCase):
       self.assertEqual(expected[i], bytes[i])
 
     bytes = bytearray(Status(
-      channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
+      channel_id=ChannelID(channel_header=self.valid_channel_header, channel_index=16), rx_level=70, link_budget=80, target_rx_level=80,
       unicast=False, fifo_token=100, seq_nr=0, response_to=CT(0, 20), addressee=Addressee(),
       nls=True, missed=True, retry=True))
 
@@ -50,12 +51,6 @@ class TestStatus(unittest.TestCase):
     self.assertEqual(len(bytes), 12)
     for i in xrange(10):
       self.assertEqual(expected[i], bytes[i])
-
-  def test_get_short_channel_string(self):
-    s = Status(channel_header=self.valid_channel_header, channel_index=16, rx_level=70, link_budget=80, target_rx_level=80,
-      nls=False, missed=False, retry=False, unicast=False, fifo_token=100,
-      seq_nr=0, response_to=CT(0, 20), addressee=Addressee())
-    self.assertEqual(s.get_short_channel_string(), "433N016")
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestStatus)
