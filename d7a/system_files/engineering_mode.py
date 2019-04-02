@@ -32,7 +32,7 @@ class EngineeringModeFile(File, Validatable):
     mode = s.read("uint:8")
     flags = s.read("uint:8")
     timeout = s.read("uint:8")
-    s.read("uint:1") # RFU
+    s.read("uint:1")  # RFU
     channel_band_value = s.read("uint:3")
     if (channel_band_value == 0):
       channel_band_value = 3 ## fix schema error if all zeros are read
@@ -43,6 +43,7 @@ class EngineeringModeFile(File, Validatable):
     channel_header = ChannelHeader(channel_coding=channel_coding, channel_class=channel_class, channel_band=channel_band)
     center_freq_index = s.read("uint:16")
     eirp = s.read("int:8")
+    s.read("uint:16")  # RFU
     return EngineeringModeFile(mode=mode, flags=flags, timeout=timeout, channel_header=channel_header, center_freq_index=center_freq_index, eirp=eirp)
 
   def __iter__(self):
@@ -53,6 +54,8 @@ class EngineeringModeFile(File, Validatable):
       yield byte
     for byte in bytearray(struct.pack("<h", self.center_freq_index)): yield byte
     yield self.eirp
+    yield 0
+    yield 0
 
   def __str__(self):
     return "mode={}, flags={}, timeout={}, channel_header={{{}}}, center_freq_index={}, eirp={}".format(hex(self.mode), hex(self.flags),self.timeout, self.channel_header, self.center_freq_index, self.eirp)
