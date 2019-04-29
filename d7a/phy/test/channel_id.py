@@ -10,7 +10,7 @@ class TestChannelID(unittest.TestCase):
   def test_byte_generation(self):
     expected = [
       0b00101000,
-      16, 0  # channel_id
+      0, 16  # channel_id
     ]
 
     channel_id = ChannelID(

@@ -22,7 +22,7 @@ class TestStatus(unittest.TestCase):
   def test_byte_generation(self):
     expected = [
       40,                                              # channel_header
-      16, 0,                                           # channel_id
+      0, 16,                                           # channel_id
       70,                                              # rxlevel (- dBm)
       80,                                              # link budget
       80,                                              # target rx level

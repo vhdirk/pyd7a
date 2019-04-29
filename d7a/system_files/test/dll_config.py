@@ -10,7 +10,10 @@ class TestDllConfigFile(unittest.TestCase):
   def test_default_constructor(self):
     c = DllConfigFile()
     self.assertEqual(c.active_access_class, 0)
-    self.assertEqual(c.vid, 0xFFFF)
+    self.assertEqual(c.lq_filter, 0)
+    self.assertEqual(c.nf_ctrl, 0)
+    self.assertEqual(c.rx_nf_method_parameter, 0)
+    self.assertEqual(c.tx_nf_method_parameter, 0)
 
   def test_invalid_access_class(self):
     def bad(): DllConfigFile(active_access_class=0xFF01) # can be max 0xFF
@@ -19,22 +22,38 @@ class TestDllConfigFile(unittest.TestCase):
   def test_parsing(self):
     file_contents = [
       5,          # active access class
-      0x00, 0x09  # VID
+      0x00, 0x00, # RFU
+      0x01,       # LQ filter
+      0x02,       # NF CTRL
+      0x03,       # RX NF Method Parameter
+      0x04,       # TX NF Method Parameter
      ]
 
     config = DllConfigFile.parse(ConstBitStream(bytes=file_contents))
     self.assertEqual(config.active_access_class, 5)
-    self.assertEqual(config.vid, 9)
+    self.assertEqual(config.lq_filter, 1)
+    self.assertEqual(config.nf_ctrl, 2)
+    self.assertEqual(config.rx_nf_method_parameter, 3)
+    self.assertEqual(config.tx_nf_method_parameter, 4)
 
   def test_byte_generation(self):
     bytes = bytearray(DllConfigFile())
-    self.assertEqual(len(bytes), 3)
+    self.assertEqual(len(bytes), 7)
     self.assertEqual(bytes[0], 0)
-    self.assertEqual(bytes[1], 0xFF)
-    self.assertEqual(bytes[2], 0xFF)
+    self.assertEqual(bytes[1], 0)
+    self.assertEqual(bytes[2], 0)
+    self.assertEqual(bytes[3], 0)
+    self.assertEqual(bytes[4], 0)
+    self.assertEqual(bytes[5], 0)
+    self.assertEqual(bytes[6], 0)
 
-    bytes = bytearray(DllConfigFile(active_access_class=5, vid=100))
-    self.assertEqual(len(bytes), 3)
+    bytes = bytearray(DllConfigFile(active_access_class=5, lq_filter=1, nf_ctrl=2,
+                                    rx_nf_method_parameter=3, tx_nf_method_parameter=4))
+    self.assertEqual(len(bytes), 7)
     self.assertEqual(bytes[0], 5)
     self.assertEqual(bytes[1], 0)
-    self.assertEqual(bytes[2], 100)
+    self.assertEqual(bytes[2], 0)
+    self.assertEqual(bytes[3], 1)
+    self.assertEqual(bytes[4], 2)
+    self.assertEqual(bytes[5], 3)
+    self.assertEqual(bytes[6], 4)
