@@ -14,7 +14,7 @@ class FactorySettingsFile(File, Validatable):
     "rx_bw_high_rate": Types.INTEGER(min=0, max=0xFFFFFFFF)
   }]
 
-  def __init__(self, gain=0, rx_bw_low_rate=20936, rx_bw_normal_rate=157291, rx_bw_high_rate=251736):
+  def __init__(self, gain=0, rx_bw_low_rate=10468, rx_bw_normal_rate=78646, rx_bw_high_rate=125868):
     self.gain = gain
     self.rx_bw_low_rate = rx_bw_low_rate
     self.rx_bw_normal_rate = rx_bw_normal_rate
