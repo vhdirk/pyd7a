@@ -24,16 +24,16 @@ class SubBand(Validatable):
     super(SubBand, self).__init__()
 
   def __iter__(self):
-    for byte in bytearray(struct.pack("<h", self.channel_index_start)): yield byte
-    for byte in bytearray(struct.pack("<h", self.channel_index_end)): yield byte
+    for byte in bytearray(struct.pack(">H", self.channel_index_start)): yield byte
+    for byte in bytearray(struct.pack(">H", self.channel_index_end)): yield byte
     for byte in bytearray(struct.pack("b", self.eirp)): yield byte
     yield self.cca
     yield self.duty
 
   @staticmethod
   def parse(s):
-    channel_index_start = struct.unpack("<h", s.read("bytes:2"))[0]
-    channel_index_end = struct.unpack("<h", s.read("bytes:2"))[0]
+    channel_index_start = struct.unpack(">H", s.read("bytes:2"))[0]
+    channel_index_end = struct.unpack(">H", s.read("bytes:2"))[0]
     eirp = s.read("int:8")
     cca = s.read("uint:8")
     duty = s.read("uint:8")
