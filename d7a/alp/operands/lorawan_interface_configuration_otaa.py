@@ -6,17 +6,21 @@ from d7a.support.schema import Validatable, Types
 class LoRaWANInterfaceConfigurationOTAA(Validatable):
 
   SCHEMA = [{
-    # # TODO first byte is extensible with other fields, for example ADR or SFx
+    # # TODO first byte is extensible with other fields
+    # "adr_enabled": Types.BOOLEAN(),
     # "request_ack": Types.BOOLEAN(),
     # "application_port": Types.BYTE(),
+    # "data_rate": Types.BYTE(),
     # "device_eui": Types.BYTES(),
     # "app_eui": Types.BYTES(),
     # "app_key": Types.BYTES()
   }]
 
-  def __init__(self, request_ack, app_port, device_eui, app_eui, app_key):
+  def __init__(self, adr_enabled, request_ack, app_port, data_rate, device_eui, app_eui, app_key):
+    self.adr_enabled = adr_enabled
     self.request_ack = request_ack
     self.app_port = app_port
+    self.data_rate = data_rate
     self.device_eui = device_eui
     self.app_eui = app_eui
     self.app_key = app_key
@@ -27,9 +31,13 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     if self.request_ack:
       byte |= 1 << 1
 
+    if self.adr_enabled:
+      byte |= 1 << 2
+
     yield byte
     yield self.app_port
-
+    yield self.data_rate
+    
     for byte in self.device_eui:
       yield byte
 
@@ -45,18 +53,21 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
 
   @staticmethod
   def parse(s):
-    _rfu = s.read("bits:6")
+    _rfu = s.read("bits:5")
+    adr_enabled = s.read("bool")
     request_ack = s.read("bool")
     _rfu = s.read("bits:1")
     app_port = s.read("uint:8")
-
+    data_rate = s.read("uint:8")
     device_eui = s.read("bytes:8")
     app_eui = s.read("bytes:8")
     app_key = s.read("bytes:16")
 
     return LoRaWANInterfaceConfigurationOTAA(
       request_ack=request_ack,
+      adr_enabled=adr_enabled,
       app_port=app_port,
+      data_rate=data_rate,
       device_eui=device_eui,
       app_eui=app_eui,
       app_key=app_key

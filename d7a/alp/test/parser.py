@@ -345,8 +345,10 @@ class TestParser(unittest.TestCase):
 
   def test_parse_forward_LoRaWAN_iface_ABP(self):
     lorawan_config = LoRaWANInterfaceConfigurationABP(
+      adr_enabled=True,
       request_ack=True,
       app_port=0x01,
+      data_rate=0,
       netw_session_key=[0] * 16,
       app_session_key=[1] * 16,
       dev_addr=1,
@@ -371,8 +373,10 @@ class TestParser(unittest.TestCase):
 
   def test_parse_forward_LoRaWAN_iface_OTAA(self):
     lorawan_config = LoRaWANInterfaceConfigurationOTAA(
+      adr_enabled=True,
       request_ack=True,
       app_port=0x01,
+      data_rate=0,
       device_eui=[0] * 8,
       app_eui=[0] * 8,
       app_key=[0] * 16
