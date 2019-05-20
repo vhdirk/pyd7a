@@ -18,7 +18,7 @@ class ChannelID(Validatable):
 
   def __iter__(self):
     for byte in self.channel_header: yield byte
-    for byte in bytearray(struct.pack("<h", self.channel_index)): yield byte
+    for byte in bytearray(struct.pack(">H", self.channel_index)): yield byte
 
 
   @staticmethod

@@ -45,7 +45,7 @@ class TestSubband(unittest.TestCase):
   def test_byte_generation(self):
     expected = [
       0, 0, # channel index start
-      16, 0, # channel index end
+      0, 16, # channel index end
       10, # eirp
       86, # ccao
       255 # duty
@@ -65,7 +65,7 @@ class TestSubband(unittest.TestCase):
   def test_byte_generation_neg_eirp(self):
     expected = [
       0, 0, # channel index start
-      16, 0, # channel index end
+      0, 16, # channel index end
       0xF6, # eirp
       86, # ccao
       255 # duty
@@ -84,7 +84,7 @@ class TestSubband(unittest.TestCase):
   def test_parse_neg_eirp(self):
     bytes = [
       0, 0,  # channel index start
-      16, 0,  # channel index end
+      0, 16,  # channel index end
       0xF6,  # eirp
       86,  # ccao
       255  # duty

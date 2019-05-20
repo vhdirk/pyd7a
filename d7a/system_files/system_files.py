@@ -7,6 +7,7 @@ from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.uid import UidFile
 from d7a.system_files.engineering_mode import EngineeringModeFile
 from d7a.system_files.factory_settings import FactorySettingsFile
+from d7a.system_files.vid import VidFile
 
 
 class SystemFiles:
@@ -17,7 +18,7 @@ class SystemFiles:
     SystemFileIds.DEVICE_CAPACITY: NotImplementedFile(SystemFileIds.DEVICE_CAPACITY.value, 19),
     SystemFileIds.DEVICE_STATUS: NotImplementedFile(SystemFileIds.DEVICE_STATUS, 9),
     SystemFileIds.ENGINEERING_MODE: EngineeringModeFile(),
-    SystemFileIds.VID: NotImplementedFile(SystemFileIds.VID, 3),
+    SystemFileIds.VID: VidFile(),
     SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_07, 0),
     SystemFileIds.PHY_CONFIG: NotImplementedFile(SystemFileIds.PHY_CONFIG, 9),
     SystemFileIds.PHY_STATUS: NotImplementedFile(SystemFileIds.PHY_STATUS, 24),  # TODO assuming 3 channels for now

@@ -48,4 +48,3 @@ class FirmwareVersionFile(File, Validatable):
 
   def __str__(self):
     return "d7ap v{}, application_name={}, git_sha1={}".format(self.d7ap_version, self.application_name, self.git_sha1)
-    return "d7ap v{}, application_name={}, git_sha1={}".format(self.d7ap_version, self.application_name, self.git_sha1)

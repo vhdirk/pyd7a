@@ -70,7 +70,7 @@ class TestCommand(unittest.TestCase):
       0x62,                                           # Interface Status action
       0xD7,                                           # D7ASP interface
       32,                                              # channel header
-      16, 0,                                          # channel_id
+      0, 16,                                          # channel_id
       70,                                             # rxlevel (- dBm)
       80,                                             # link budget
       80,                                             # target rx level
@@ -140,7 +140,7 @@ class TestCommand(unittest.TestCase):
       0x62,  # Interface Status action
       0xD7,  # D7ASP interface
       32,  # channel header
-      16, 0,  # channel_id
+      0, 16,  # channel_id
       70,  # rxlevel (- dBm)
       80,  # link budget
       80,  # target rx level
