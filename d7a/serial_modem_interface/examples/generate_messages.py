@@ -12,7 +12,7 @@ from d7a.types.ct import CT
 def output_serial_frame(description, command):
   print("\n=== {0} ===\n".format(description))
 
-  serial_frame = Parser.build_serial_frame(command)
+  serial_frame = Parser().build_serial_frame(command)
   print("command:")
   pprint(command.as_dict())
   print("serial frame:")
