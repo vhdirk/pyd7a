@@ -69,7 +69,8 @@ class EngineeringModeFile(File, Validatable):
     yield self.timeout
     for byte in self.channel_id:
       yield byte
-    yield self.eirp
+
+    for byte in bytearray(struct.pack(">b", self.eirp)): yield byte
     yield 0
     yield 0
 

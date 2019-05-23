@@ -63,3 +63,21 @@ class TestEngineeringModeFile(unittest.TestCase):
     self.assertEqual(bytes[6], 6)
     self.assertEqual(bytes[7], 0)
     self.assertEqual(bytes[8], 0)
+
+    bytes = bytearray(EngineeringModeFile(mode=EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX, flags=9, timeout=8,
+                                          channel_id=ChannelID(
+                                            channel_header=ChannelHeader(ChannelCoding.CW, ChannelClass.HI_RATE,
+                                                                         ChannelBand.BAND_868),
+                                            channel_index=7),
+                                          eirp=-6))
+
+    self.assertEqual(len(bytes), 9)
+    self.assertEqual(bytes[0], 3)
+    self.assertEqual(bytes[1], 9)
+    self.assertEqual(bytes[2], 8)
+    self.assertEqual(bytes[3], 0x3F)
+    self.assertEqual(bytes[4], 0)
+    self.assertEqual(bytes[5], 7)
+    self.assertEqual(bytes[6], 0xFA)
+    self.assertEqual(bytes[7], 0)
+    self.assertEqual(bytes[8], 0)
