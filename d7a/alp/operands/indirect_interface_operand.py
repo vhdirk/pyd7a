@@ -11,7 +11,7 @@ class IndirectInterfaceOperand(Validatable):
     "interface_configuration_overload"    : Types.OBJECT(Addressee, nullable=True) # TODO assuming D7ASP interface
   }]
 
-  def __init__(self, interface_file_id, interface_configuration_overload):
+  def __init__(self, interface_file_id, interface_configuration_overload=None):
     self.interface_file_id = interface_file_id
     self.interface_configuration_overload = interface_configuration_overload
     super(IndirectInterfaceOperand, self).__init__()
