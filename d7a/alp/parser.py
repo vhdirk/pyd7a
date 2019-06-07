@@ -38,6 +38,7 @@ from d7a.alp.operands.tag_id import TagId
 from d7a.alp.operations.tag_request import TagRequest
 from d7a.alp.tag_request_action import TagRequestAction
 from d7a.phy.channel_header import ChannelHeader
+from d7a.alp.operations.file_management import CreateNewFile
 
 
 class Parser(object):
@@ -65,6 +66,7 @@ class Parser(object):
         1  :  self.parse_alp_read_file_data_action,
         4  :  self.parse_alp_write_file_data_action,
         9  :  self.parse_break_query_action,
+        17 :  self.parse_alp_create_file_action,
         32 :  self.parse_alp_return_file_data_action,
         33 :  self.parse_alp_return_file_header_action,
         34 :  self.parse_alp_return_status_action,
@@ -95,6 +97,12 @@ class Parser(object):
 
   def parse_break_query_action(self, b7, b6, s):
     return RegularAction(group=b7, resp=b6, operation=BreakQuery(operand=QueryOperand.parse(s)))
+
+  def parse_alp_create_file_action(self, b7, b6, s):
+    operand = FileHeaderOperand.parse(s)
+    return RegularAction(group=b7,
+                         resp=b6,
+                         operation=CreateNewFile(operand=operand))
 
   def parse_alp_return_file_data_action(self, b7, b6, s):
     operand = self.parse_alp_return_file_data_operand(s)
