@@ -16,6 +16,9 @@ from d7a.alp.operands.interface_configuration import InterfaceConfiguration
 from d7a.alp.operands.tag_id import TagId
 from d7a.alp.operations.file_management import CreateNewFile
 from d7a.alp.operations.forward import Forward
+from d7a.alp.operations.indirect_forward import IndirectForward
+from d7a.alp.operands.indirect_interface_operand import IndirectInterfaceOperand
+from d7a.alp.indirect_forward_action import IndirectForwardAction
 from d7a.alp.operations.requests import ReadFileData, ReadFileHeader
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.operations.tag_request import TagRequest
@@ -124,6 +127,22 @@ class Command(Validatable):
       pass
     else:
       raise ValueError("interface_type {} is not supported".format(interface_type))
+
+  def add_indirect_forward_action(self, interface_file_id=None, overload=False, overload_configuration=None):
+    if not overload and (overload_configuration is not None):
+      overload_configuration = None
+
+    self.actions.append(
+      IndirectForwardAction(
+        overload=overload,
+        operation=IndirectForward(
+          operand=IndirectInterfaceOperand(
+            interface_file_id=interface_file_id,
+            interface_configuration_overload=overload_configuration
+          )
+        )
+      )
+    )
 
   @staticmethod
   def create_with_read_file_action_system_file(file, interface_type=InterfaceType.HOST, interface_configuration=None):
