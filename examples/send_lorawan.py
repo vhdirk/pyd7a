@@ -69,7 +69,9 @@ if(config.over_the_air_activation):
 		  app_port=0x01,
 		  device_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X1B, 0X81],
 		  app_eui=[0xBE, 0X7A, 0X00, 0X00, 0X00, 0X00, 0X0D, 0X9F],
-		  app_key=[0X7E, 0XEF, 0X56, 0XEC, 0XDA, 0X1D, 0XD5, 0XA4, 0X70, 0X59, 0XFD, 0X35, 0X9C, 0XE6, 0X80, 0XCD]
+		  app_key=[0X7E, 0XEF, 0X56, 0XEC, 0XDA, 0X1D, 0XD5, 0XA4, 0X70, 0X59, 0XFD, 0X35, 0X9C, 0XE6, 0X80, 0XCD],
+		  adr_enabled=False,
+		  data_rate=0
 		)
 	  ),
 	  timeout_seconds=100
@@ -88,9 +90,15 @@ else:
 		  app_session_key=[0x53, 0x1b, 0xd9,0xc5, 0xec, 0x5d, 0x8b, 0xa5, 0xef, 0x3b, 0x26, 0x2c, 0xeb, 0xfb, 0x3e, 0x66],
 		  dev_addr=0x00112233,
 		  netw_id=0x000017,
+	      adr_enabled=False,
+		  data_rate=0
 		)
 	  ),
 	  timeout_seconds=100
 	)
 
-print result
+try:
+	while True:
+		pass
+except KeyboardInterrupt:
+	os._exit(0)
