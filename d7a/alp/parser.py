@@ -150,6 +150,7 @@ class Parser(object):
 
     if b6: # interface status
       interface_id = s.read("uint:8")
+      length = s.read("uint:8")
       try:
         interface_status_operation = {
           0x00 :  self.parse_alp_interface_status_host,
