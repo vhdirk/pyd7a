@@ -49,11 +49,11 @@ class EngineeringModeMode(Enum):
     raise NotImplementedError
 
   def __str__(self):
-    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF: return "OFF"
-    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_CONT_TX: return "CONT_TX"
-    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_TRANSIENT_TX: return "TRANSIENT_TX"
-    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX: return "PER_RX"
-    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_TX: return "PER_TX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF.value: return "OFF"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_CONT_TX.value: return "CONT_TX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_TRANSIENT_TX.value: return "TRANSIENT_TX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX.value: return "PER_RX"
+    if self.value == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_TX.value: return "PER_TX"
 
 class EngineeringModeFile(File, Validatable):
 
