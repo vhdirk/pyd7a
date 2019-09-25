@@ -35,8 +35,6 @@ class FactorySettingsFile(File, Validatable):
     "rx_bw_low_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "rx_bw_normal_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "rx_bw_high_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
-    "bitrate_ultra_lo_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
-    "fdev_ultra_lo_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "bitrate_lo_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "fdev_lo_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "bitrate_normal_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
@@ -46,21 +44,19 @@ class FactorySettingsFile(File, Validatable):
   }]
 
   def __init__(self, gain=0, rx_bw_low_rate=10468, rx_bw_normal_rate=78646, rx_bw_high_rate=125868,
-               bitrate_ultra_lo_rate=2400, fdev_ultra_lo_rate=1200, bitrate_lo_rate=9600, fdev_lo_rate=4800,
+               bitrate_lo_rate=9600, fdev_lo_rate=4800,
                bitrate_normal_rate=55555, fdev_normal_rate=50000, bitrate_hi_rate=166667, fdev_hi_rate=41667):
     self.gain = gain
     self.rx_bw_low_rate = rx_bw_low_rate
     self.rx_bw_normal_rate = rx_bw_normal_rate
     self.rx_bw_high_rate = rx_bw_high_rate
-    self.bitrate_ultra_lo_rate = bitrate_ultra_lo_rate
-    self.fdev_ultra_lo_rate = fdev_ultra_lo_rate
     self.bitrate_lo_rate = bitrate_lo_rate
     self.fdev_lo_rate = fdev_lo_rate
     self.bitrate_normal_rate = bitrate_normal_rate
     self.fdev_normal_rate = fdev_normal_rate
     self.bitrate_hi_rate = bitrate_hi_rate
     self.fdev_hi_rate = fdev_hi_rate
-    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 45)
+    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 37)
     Validatable.__init__(self)
 
   @staticmethod
@@ -69,8 +65,6 @@ class FactorySettingsFile(File, Validatable):
     rx_bw_low_rate = s.read("uint:32")
     rx_bw_normal_rate = s.read("uint:32")
     rx_bw_high_rate = s.read("uint:32")
-    bitrate_ultra_lo_rate = s.read("uint:32")
-    fdev_ultra_lo_rate = s.read("uint:32")
     bitrate_lo_rate = s.read("uint:32")
     fdev_lo_rate = s.read("uint:32")
     bitrate_normal_rate = s.read("uint:32")
@@ -79,7 +73,6 @@ class FactorySettingsFile(File, Validatable):
     fdev_hi_rate = s.read("uint:32")
 
     return FactorySettingsFile(gain=gain, rx_bw_low_rate=rx_bw_low_rate, rx_bw_normal_rate=rx_bw_normal_rate, rx_bw_high_rate=rx_bw_high_rate,
-                               bitrate_ultra_lo_rate=bitrate_ultra_lo_rate, fdev_ultra_lo_rate=fdev_ultra_lo_rate,
                                bitrate_lo_rate=bitrate_lo_rate, fdev_lo_rate=fdev_lo_rate,
                                bitrate_normal_rate=bitrate_normal_rate, fdev_normal_rate=fdev_normal_rate,
                                bitrate_hi_rate=bitrate_hi_rate, fdev_hi_rate=fdev_hi_rate)
@@ -91,10 +84,6 @@ class FactorySettingsFile(File, Validatable):
     for byte in bytearray(struct.pack(">I", self.rx_bw_normal_rate)):
       yield byte
     for byte in bytearray(struct.pack(">I", self.rx_bw_high_rate)):
-      yield byte
-    for byte in bytearray(struct.pack(">I", self.bitrate_ultra_lo_rate)):
-      yield byte
-    for byte in bytearray(struct.pack(">I", self.fdev_ultra_lo_rate)):
       yield byte
     for byte in bytearray(struct.pack(">I", self.bitrate_lo_rate)):
       yield byte
@@ -110,6 +99,6 @@ class FactorySettingsFile(File, Validatable):
       yield byte
 
   def __str__(self):
-    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, ultra low rate={} : {}, low rate={} : {}, normal rate={} : {}, high rate={} : {}".format(self.gain, hex(self.rx_bw_low_rate), hex(self.rx_bw_normal_rate), hex(self.rx_bw_high_rate),
-                                                                                         self.bitrate_ultra_lo_rate, self.fdev_ultra_lo_rate, self.bitrate_lo_rate, self.fdev_lo_rate,
+    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}".format(self.gain, hex(self.rx_bw_low_rate), hex(self.rx_bw_normal_rate), hex(self.rx_bw_high_rate),
+                                                                                         self.bitrate_lo_rate, self.fdev_lo_rate,
                                                                                          self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate)
