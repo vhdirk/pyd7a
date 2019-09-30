@@ -42,6 +42,8 @@ print("gain set to {}, rx low {}, normal {} and high {}".format(config.offset, c
 fsFile = FactorySettingsFile(gain=config.offset, rx_bw_low_rate=config.low_rx, rx_bw_normal_rate=config.normal_rx,
                              rx_bw_high_rate=config.high_rx, lora_bw=config.lora_bw, lora_SF=config.lora_SF)
 
+print(fsFile.__str__())
+
 print( '[{}]'.format(', '.join(hex(byte) for byte in list(fsFile))))
 
 modem.execute_command(
