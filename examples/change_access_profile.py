@@ -54,15 +54,13 @@ argparser.add_argument("-d", "--device", help="serial device /dev file modem",
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
 argparser.add_argument("-c", "--channel-id", help="for example 868LP000 ; format FFFRCIII where FFF={433, 868, 915}, R={L, N, H, R (LORA)}, C={P (PN9), F (FEC), C (CW)} III=000...280", default="868LP000")
-argparser.add_argument("-e", "--eirp", help="EIRP in dBm", type=int, default=0)
+argparser.add_argument("-e", "--eirp", help="EIRP in dBm", type=int, default=14)
 argparser.add_argument("-sp", "--scan-automation-period", help="period in ms of scanning (786 ~ total 1 sec), 0 is continuous scan ", default=0)
 argparser.add_argument("-sb", "--subband_bitmap", help="subband bitmap of subprofiles, 0 is default, 1 is scanning", default=0)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
 ch = ChannelID.from_string(config.channel_id)
-print("Using mode {} for channel {} with TX EIRP {} dBm".format(config.mode, config.channel_id, config.eirp))
-mode = EngineeringModeMode.from_string(config.mode)
 
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
 modem.connect()
