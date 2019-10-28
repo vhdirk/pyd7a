@@ -98,9 +98,9 @@ class Parser(object):
       try:
         s           = ConstBitStream(bytes=self.buffer)
         cmd_length, message_type = self.parse_serial_interface_header(s)
-        if message_type == MessageType.REBOOTED:
+        if message_type == MessageType.REBOOTED.value:
           print("modem rebooted with reason {}".format(s.read("uint:8")))
-        elif message_type == MessageType.LOGGING:
+        elif message_type == MessageType.LOGGING.value:
           print(s.readlist('bytes:b', b=cmd_length)[0])
         else:
           if self.skip_alp_parsing:
