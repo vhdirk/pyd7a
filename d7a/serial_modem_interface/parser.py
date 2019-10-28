@@ -39,6 +39,7 @@ class MessageType(enum.Enum):
   PING_REQUEST = 0X02
   PING_RESPONSE = 0X03
   LOGGING = 0X04
+  REBOOTED = 0x05
 
 class Parser(object):
 
@@ -97,7 +98,11 @@ class Parser(object):
       try:
         s           = ConstBitStream(bytes=self.buffer)
         cmd_length, message_type = self.parse_serial_interface_header(s)
-        if message_type != 4:
+        if message_type == MessageType.REBOOTED:
+          print("modem rebooted with reason {}".format(s.read("uint:8")))
+        elif message_type == MessageType.LOGGING:
+          print(s.readlist('bytes:b', b=cmd_length)[0])
+        else:
           if self.skip_alp_parsing:
             if s.length < cmd_length:
               raise ReadError
@@ -105,8 +110,6 @@ class Parser(object):
             cmd = s.read("bytes:" + str(cmd_length))
           else:
             cmd = AlpParser().parse(s, cmd_length)
-        else:  # logging mode
-          print(s.readlist('bytes:b', b=cmd_length)[0])
 
         bits_parsed = s.pos
         self.shift_buffer(bits_parsed/8)

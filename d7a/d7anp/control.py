@@ -29,7 +29,7 @@ class Control(Validatable):
   SCHEMA = [{
     "has_no_origin_access_id": Types.BOOLEAN(),
     "has_hopping": Types.BOOLEAN(),
-    "origin_id_type": Types.ENUM(IdType, allowedvalues=[IdType.UID, IdType.VID]),
+    "origin_id_type": Types.ENUM(IdType, allowedvalues=[IdType.UID, IdType.VID, IdType.NOID, IdType.NBID]),
     "nls_method": Types.ENUM(NlsMethod),
   }]
 
