@@ -58,7 +58,7 @@ class FactorySettingsFile(File, Validatable):
   def __init__(self, gain=0, rx_bw_low_rate=10468, rx_bw_normal_rate=78646, rx_bw_high_rate=125868,
                bitrate_lo_rate=9600, fdev_lo_rate=4800,
                bitrate_normal_rate=55555, fdev_normal_rate=50000, bitrate_hi_rate=166667, fdev_hi_rate=41667,
-               preamble_size_lo_rate=4, preamble_size_normal_rate=5, preamble_size_hi_rate=7,
+               preamble_size_lo_rate=5, preamble_size_normal_rate=5, preamble_size_hi_rate=7,
                preamble_detector_size_lo_rate=3, preamble_detector_size_normal_rate=3, preamble_detector_size_hi_rate=3,
                preamble_tol_lo_rate=15, preamble_tol_normal_rate=10, preamble_tol_hi_rate=10,
                rssi_smoothing=8, rssi_offset=0,
