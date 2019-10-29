@@ -38,9 +38,15 @@ from util.logger import configure_default_logger
 
 
 def received_command_callback(cmd):
-  logging.info(cmd)
+  if cmd.tag_id is None:
+    logging.info("modem rebooted")
+  else:
+    logging.info(cmd)
   if cmd.execution_completed:
       sys.exit(0)
+
+def rebooted_callback(cmd):
+  logging.info("modem rebooted with reason {}".format(cmd))
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
@@ -59,10 +65,12 @@ ch = ChannelID.from_string(config.channel_id)
 print("Using mode {} for channel {} with TX EIRP {} dBm".format(config.mode, config.channel_id, config.eirp))
 mode = EngineeringModeMode.from_string(config.mode)
 
-modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
+modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, rebooted_callback=rebooted_callback)
 modem.connect()
 
 emFile = EngineeringModeFile(mode=mode, flags=0, timeout=config.timeout, channel_id=ch, eirp=config.eirp)
+
+print(list(emFile))
 
 modem.execute_command(
   alp_command=Command.create_with_write_file_action(

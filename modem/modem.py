@@ -49,7 +49,7 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.system_file_ids import SystemFileIds
 
 class Modem:
-  def __init__(self, device, baudrate, unsolicited_response_received_callback=None, skip_alp_parsing=False):
+  def __init__(self, device, baudrate, unsolicited_response_received_callback=None, rebooted_callback=None, skip_alp_parsing=False):
     self.log = logging.getLogger(__name__)
     self.parser = Parser(skip_alp_parsing)
     self.config = {
@@ -66,6 +66,7 @@ class Modem:
     self._unsolicited_responses_received = []
     self._read_async_active = False
     self.unsolicited_response_received_callback = unsolicited_response_received_callback
+    self.rebooted_callback = rebooted_callback
     self.connected = False
     self.dev = serial.Serial(
       port     = self.config["device"],
@@ -200,13 +201,13 @@ class Modem:
 
       if len(data_received) > 0:
         self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
-        (cmds, info) = self.parser.parse(data_received)
+        (message_types, cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(map(lambda b: format(b, "02x"), bytearray(data_received)))
           self.log.warning("Parser error: {}".format(error))
-
+        cmd_cnt = 0
         for cmd in cmds:
-          if not self.skip_alp_parsing and self._sync_execution_tag_id == cmd.tag_id:
+          if not self.skip_alp_parsing and hasattr(cmd, 'tag_id') and self._sync_execution_tag_id == cmd.tag_id and message_types[cmd_cnt] < 4:
             self.log.info("Received response for sync execution")
             self._sync_execution_response_cmds.append(cmd)
             if cmd.execution_completed:
@@ -215,11 +216,16 @@ class Modem:
             else:
               self.log.info("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
-          elif self.unsolicited_response_received_callback != None and self.connected: # skip responses until connected
+          elif self.unsolicited_response_received_callback != None and self.connected and message_types[cmd_cnt] < 4: # skip responses until connected
             self.unsolicited_response_received_callback(cmd)
-          else:
+          elif self.rebooted_callback != None and self.connected and message_types[cmd_cnt] == 5:
+            self.rebooted_callback(cmd)
+          elif  message_types[cmd_cnt] == 4:
+            self.log.info("logging: {}".format(cmd))
+          elif message_types[cmd_cnt] < 4:
             self.log.info("Received a response which was not requested synchronously or no async callback provided")
             self._unsolicited_responses_received.append(cmd)
+          cmd_cnt += 1
 
     self.log.info("end read thread")
 
