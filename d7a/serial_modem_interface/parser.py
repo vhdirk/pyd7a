@@ -28,7 +28,6 @@ import binascii
 from bitstring                    import ConstBitStream, ReadError
 from d7a.alp.parser               import Parser as AlpParser
 from d7a.parse_error              import ParseError
-from d7a.alp.command              import Command
 import enum
 from d7a.support.Crc import calculate_crc
 from pprint import pprint
