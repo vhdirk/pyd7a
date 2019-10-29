@@ -37,8 +37,12 @@ argparser.add_argument("-hr", "--high_rx", help="rx bandwidth for high rate", de
 argparser.add_argument("-hb", "--high_bitrate", help="bitrate for high rate", default=166667, type=int, required=False)
 argparser.add_argument("-hf", "--high_fdev", help="frequency deviation for high rate", default=41667, type=int, required=False)
 argparser.add_argument("-hp", "--high_preamble_size", help="preamble size for high rate", default=7, type=int, required=False)
-argparser.add_argument("-pd", "--detector_preamble_size", help="preamble detector size", default=3, type=int, required=False)
-argparser.add_argument("-pt", "--preamble_tol", help="preamble tolerance", default=15, type=int, required=False)
+argparser.add_argument("-pdl", "--detector_preamble_size_lo_rate", help="preamble detector size for low rate", default=3, type=int, required=False)
+argparser.add_argument("-pdn", "--detector_preamble_size_normal_rate", help="preamble detector size for normal rate", default=3, type=int, required=False)
+argparser.add_argument("-pdh", "--detector_preamble_size_hi_rate", help="preamble detector size for high rate", default=3, type=int, required=False)
+argparser.add_argument("-ptl", "--preamble_tol_lo_rate", help="preamble tolerance of low rate", default=15, type=int, required=False)
+argparser.add_argument("-ptn", "--preamble_tol_normal_rate", help="preamble tolerance of normal rate", default=10, type=int, required=False)
+argparser.add_argument("-pth", "--preamble_tol_hi_rate", help="preamble tolerance of high rate", default=10, type=int, required=False)
 argparser.add_argument("-rs", "--rssi_smoothing", help="rssi_smoothing (average of X samples)", default=8, type=int, required=False)
 argparser.add_argument("-ro", "--rssi_offset", help="rssi_offset", default=0, type=int, required=False)
 argparser.add_argument("-lbw", "--lora_bw", help="bandwidth for lora", default=125000, type=int, required=False)
@@ -60,7 +64,12 @@ fsFile = FactorySettingsFile(gain=config.offset, rx_bw_low_rate=config.low_rx, r
                              preamble_size_lo_rate=config.low_preamble_size,
                              preamble_size_normal_rate=config.normal_preamble_size,
                              preamble_size_hi_rate=config.high_preamble_size,
-                             preamble_detector_size=config.detector_preamble_size, preamble_tol=config.preamble_tol,
+                             preamble_detector_size_lo_rate=config.detector_preamble_size_lo_rate,
+                             preamble_detector_size_normal_rate=config.detector_preamble_size_normal_rate,
+                             preamble_detector_size_hi_rate=config.detector_preamble_size_hi_rate,
+                             preamble_tol_lo_rate=config.preamble_tol_lo_rate,
+                             preamble_tol_normal_rate=config.preamble_tol_normal_rate,
+                             preamble_tol_hi_rate=config.preamble_tol_hi_rate,
                              rssi_smoothing=config.rssi_smoothing, rssi_offset=config.rssi_offset,
                              lora_bw=config.lora_bw, lora_SF=config.lora_SF)
 

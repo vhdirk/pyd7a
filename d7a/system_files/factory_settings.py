@@ -45,7 +45,9 @@ class FactorySettingsFile(File, Validatable):
     "preamble_size_lo_rate": Types.INTEGER(min=0, max=255),
     "preamble_size_normal_rate": Types.INTEGER(min=0, max=255),
     "preamble_size_hi_rate": Types.INTEGER(min=0, max=255),
-    "preamble_detector_size": Types.INTEGER(min=0, max=255),
+    "preamble_detector_size_lo_rate": Types.INTEGER(min=0, max=255),
+    "preamble_detector_size_normal_rate": Types.INTEGER(min=0, max=255),
+    "preamble_detector_size_hi_rate": Types.INTEGER(min=0, max=255),
     "preamble_tol": Types.INTEGER(min=0, max=255),
     "rssi_smoothing": Types.INTEGER(min=0, max=255),
     "rssi_offset": Types.INTEGER(min=-126, max=125),
@@ -57,7 +59,8 @@ class FactorySettingsFile(File, Validatable):
                bitrate_lo_rate=9600, fdev_lo_rate=4800,
                bitrate_normal_rate=55555, fdev_normal_rate=50000, bitrate_hi_rate=166667, fdev_hi_rate=41667,
                preamble_size_lo_rate=4, preamble_size_normal_rate=5, preamble_size_hi_rate=7,
-               preamble_detector_size=3, preamble_tol=15,
+               preamble_detector_size_lo_rate=3, preamble_detector_size_normal_rate=3, preamble_detector_size_hi_rate=3,
+               preamble_tol_lo_rate=15, preamble_tol_normal_rate=10, preamble_tol_hi_rate=10,
                rssi_smoothing=8, rssi_offset=0,
                lora_bw=125000, lora_SF=9):
     self.gain = gain
@@ -73,13 +76,17 @@ class FactorySettingsFile(File, Validatable):
     self.preamble_size_lo_rate = preamble_size_lo_rate
     self.preamble_size_normal_rate = preamble_size_normal_rate
     self.preamble_size_hi_rate = preamble_size_hi_rate
-    self.preamble_detector_size = preamble_detector_size
-    self.preamble_tol = preamble_tol
+    self.preamble_detector_size_lo_rate = preamble_detector_size_lo_rate
+    self.preamble_detector_size_normal_rate = preamble_detector_size_normal_rate
+    self.preamble_detector_size_hi_rate = preamble_detector_size_hi_rate
+    self.preamble_tol_lo_rate = preamble_tol_lo_rate
+    self.preamble_tol_normal_rate = preamble_tol_normal_rate
+    self.preamble_tol_hi_rate = preamble_tol_hi_rate
     self.rssi_smoothing = int(ceil(log(rssi_smoothing, 2)))-1
     self.rssi_offset = rssi_offset
     self.lora_bw = lora_bw
     self.lora_SF = lora_SF
-    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 49)
+    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 53)
     Validatable.__init__(self)
 
   @staticmethod
@@ -99,8 +106,12 @@ class FactorySettingsFile(File, Validatable):
     preamble_size_normal_rate = s.read("uint:8")
     preamble_size_hi_rate = s.read("uint:8")
 
-    preamble_detector_size = s.read("uint:8")
-    preamble_tol = s.read("uint:8")
+    preamble_detector_size_lo_rate = s.read("uint:8")
+    preamble_detector_size_normal_rate = s.read("uint:8")
+    preamble_detector_size_hi_rate = s.read("uint:8")
+    preamble_tol_lo_rate = s.read("uint:8")
+    preamble_tol_normal_rate = s.read("uint:8")
+    preamble_tol_hi_rate = s.read("uint:8")
 
     rssi_smoothing = s.read("uint:8")
     rssi_offset = s.read("uint:8")
@@ -113,8 +124,10 @@ class FactorySettingsFile(File, Validatable):
                                bitrate_normal_rate=bitrate_normal_rate, fdev_normal_rate=fdev_normal_rate,
                                bitrate_hi_rate=bitrate_hi_rate, fdev_hi_rate=fdev_hi_rate,
                                preamble_size_lo_rate=preamble_size_lo_rate, preamble_size_normal_rate=preamble_size_normal_rate,
-                               preamble_size_hi_rate=preamble_size_hi_rate,
-                               preamble_detector_size=preamble_detector_size, preamble_tol=preamble_tol,
+                               preamble_size_hi_rate=preamble_size_hi_rate, preamble_detector_size_lo_rate = preamble_detector_size_lo_rate,
+                               preamble_detector_size_normal_rate=preamble_detector_size_normal_rate, preamble_detector_size_hi_rate = preamble_detector_size_hi_rate,
+                               preamble_tol_lo_rate = preamble_tol_lo_rate, preamble_tol_normal_rate = preamble_tol_normal_rate,
+                               preamble_tol_hi_rate = preamble_tol_hi_rate,
                                rssi_smoothing=rssi_smoothing, rssi_offset=rssi_offset,
                                lora_bw = lora_bw, lora_SF = lora_SF)
 
@@ -141,8 +154,12 @@ class FactorySettingsFile(File, Validatable):
     yield self.preamble_size_lo_rate
     yield self.preamble_size_normal_rate
     yield self.preamble_size_hi_rate
-    yield self.preamble_detector_size
-    yield self.preamble_tol
+    yield self.preamble_detector_size_lo_rate
+    yield self.preamble_detector_size_normal_rate
+    yield self.preamble_detector_size_hi_rate
+    yield self.preamble_tol_lo_rate
+    yield self.preamble_tol_normal_rate
+    yield self.preamble_tol_hi_rate
     yield self.rssi_smoothing
     yield self.rssi_offset
     for byte in bytearray(struct.pack(">I", self.lora_bw)):
@@ -150,10 +167,11 @@ class FactorySettingsFile(File, Validatable):
     yield self.lora_SF
 
   def __str__(self):
-    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} with tol {}, rssi smoothing {} with offset {}. Lora BW {} with SF {}".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
+    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} : {} : {} with tol {} : {} : {}, rssi smoothing {} with offset {}".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
                                                                                          self.bitrate_lo_rate, self.fdev_lo_rate,
                                                                                          self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate,
                                                                                          self.preamble_size_lo_rate, self.preamble_size_normal_rate, self.preamble_size_hi_rate,
-                                                                                         self.preamble_detector_size, self.preamble_tol,
+                                                                                         self.preamble_detector_size_lo_rate, self.preamble_detector_size_normal_rate, self.preamble_detector_size_hi_rate,
+                                                                                         self.preamble_tol_lo_rate, self.preamble_tol_normal_rate, self.preamble_tol_hi_rate,
                                                                                          self.rssi_smoothing, self.rssi_offset,
                                                                                          self.lora_bw, self.lora_SF)
