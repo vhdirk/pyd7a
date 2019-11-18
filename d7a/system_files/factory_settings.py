@@ -40,12 +40,15 @@ class FactorySettingsFile(File, Validatable):
     "bitrate_normal_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "fdev_normal_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
     "bitrate_hi_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
-    "fdev_hi_rate": Types.INTEGER(min=0, max=0xFFFFFFFF)
+    "fdev_hi_rate": Types.INTEGER(min=0, max=0xFFFFFFFF),
+    "lora_bw": Types.INTEGER(min=0, max=0xFFFFFFFF),
+    "lora_SF": Types.INTEGER(min=6, max=12)
   }]
 
   def __init__(self, gain=0, rx_bw_low_rate=10468, rx_bw_normal_rate=78646, rx_bw_high_rate=125868,
                bitrate_lo_rate=9600, fdev_lo_rate=4800,
-               bitrate_normal_rate=55555, fdev_normal_rate=50000, bitrate_hi_rate=166667, fdev_hi_rate=41667):
+               bitrate_normal_rate=55555, fdev_normal_rate=50000, bitrate_hi_rate=166667, fdev_hi_rate=41667,
+               lora_bw=125000, lora_SF=9):
     self.gain = gain
     self.rx_bw_low_rate = rx_bw_low_rate
     self.rx_bw_normal_rate = rx_bw_normal_rate
@@ -56,7 +59,9 @@ class FactorySettingsFile(File, Validatable):
     self.fdev_normal_rate = fdev_normal_rate
     self.bitrate_hi_rate = bitrate_hi_rate
     self.fdev_hi_rate = fdev_hi_rate
-    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 37)
+    self.lora_bw = lora_bw
+    self.lora_SF = lora_SF
+    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 42)
     Validatable.__init__(self)
 
   @staticmethod
@@ -71,11 +76,14 @@ class FactorySettingsFile(File, Validatable):
     fdev_normal_rate = s.read("uint:32")
     bitrate_hi_rate = s.read("uint:32")
     fdev_hi_rate = s.read("uint:32")
+    lora_bw = s.read("uint:32")
+    lora_SF = s.read("uint:8")
 
     return FactorySettingsFile(gain=gain, rx_bw_low_rate=rx_bw_low_rate, rx_bw_normal_rate=rx_bw_normal_rate, rx_bw_high_rate=rx_bw_high_rate,
                                bitrate_lo_rate=bitrate_lo_rate, fdev_lo_rate=fdev_lo_rate,
                                bitrate_normal_rate=bitrate_normal_rate, fdev_normal_rate=fdev_normal_rate,
-                               bitrate_hi_rate=bitrate_hi_rate, fdev_hi_rate=fdev_hi_rate)
+                               bitrate_hi_rate=bitrate_hi_rate, fdev_hi_rate=fdev_hi_rate,
+                               lora_bw=lora_bw, lora_SF=lora_SF)
 
   def __iter__(self):
     yield self.gain
@@ -97,8 +105,12 @@ class FactorySettingsFile(File, Validatable):
       yield byte
     for byte in bytearray(struct.pack(">I", self.fdev_hi_rate)):
       yield byte
+    for byte in bytearray(struct.pack(">I", self.lora_bw)):
+      yield byte
+    yield self.lora_SF
 
   def __str__(self):
-    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}".format(self.gain, hex(self.rx_bw_low_rate), hex(self.rx_bw_normal_rate), hex(self.rx_bw_high_rate),
+    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}. Lora BW {} with SF {}".format(self.gain, hex(self.rx_bw_low_rate), hex(self.rx_bw_normal_rate), hex(self.rx_bw_high_rate),
                                                                                          self.bitrate_lo_rate, self.fdev_lo_rate,
-                                                                                         self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate)
+                                                                                         self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate,
+                                                                                         self.lora_bw, self.lora_SF)

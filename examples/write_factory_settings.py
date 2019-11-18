@@ -28,6 +28,8 @@ argparser.add_argument("-o", "--offset", help="offset of gain", default=0, type=
 argparser.add_argument("-lr", "--low_rx", help="rx bandwidth for low rate", default=10468, type=int, required=False)
 argparser.add_argument("-nr", "--normal_rx", help="rx bandwidth for normal rate", default=78646, type=int, required=False)
 argparser.add_argument("-hr", "--high_rx", help="rx bandwidth for high rate", default=125868, type=int, required=False)
+argparser.add_argument("-lb", "--lora_bw", help="bandwidth for lora", default=125000, type=int, required=False)
+argparser.add_argument("-lsf", "--lora_SF", help="Spreading factor for lora", default=9, type=int, required=False)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
@@ -38,7 +40,7 @@ modem.connect()
 print("gain set to {}, rx low {}, normal {} and high {}".format(config.offset, config.low_rx, config.normal_rx, config.high_rx))
 
 fsFile = FactorySettingsFile(gain=config.offset, rx_bw_low_rate=config.low_rx, rx_bw_normal_rate=config.normal_rx,
-                             rx_bw_high_rate=config.high_rx)
+                             rx_bw_high_rate=config.high_rx, lora_bw=config.lora_bw, lora_SF=config.lora_SF)
 
 print( '[{}]'.format(', '.join(hex(byte) for byte in list(fsFile))))
 
