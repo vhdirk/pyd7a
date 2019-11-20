@@ -26,9 +26,26 @@ argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=i
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
 argparser.add_argument("-o", "--offset", help="offset of gain", default=0, type=int, required=False)
 argparser.add_argument("-lr", "--low_rx", help="rx bandwidth for low rate", default=10468, type=int, required=False)
+argparser.add_argument("-lb", "--low_bitrate", help="bitrate for low rate", default=9600, type=int, required=False)
+argparser.add_argument("-lf", "--low_fdev", help="frequency deviation for low rate", default=4800, type=int, required=False)
+argparser.add_argument("-lp", "--low_preamble_size", help="preamble size for low rate", default=4, type=int, required=False)
 argparser.add_argument("-nr", "--normal_rx", help="rx bandwidth for normal rate", default=78646, type=int, required=False)
+argparser.add_argument("-nb", "--normal_bitrate", help="bitrate for normal rate", default=55555, type=int, required=False)
+argparser.add_argument("-nf", "--normal_fdev", help="frequency deviation for normal rate", default=50000, type=int, required=False)
+argparser.add_argument("-np", "--normal_preamble_size", help="preamble size for normal rate", default=5, type=int, required=False)
 argparser.add_argument("-hr", "--high_rx", help="rx bandwidth for high rate", default=125868, type=int, required=False)
-argparser.add_argument("-lb", "--lora_bw", help="bandwidth for lora", default=125000, type=int, required=False)
+argparser.add_argument("-hb", "--high_bitrate", help="bitrate for high rate", default=166667, type=int, required=False)
+argparser.add_argument("-hf", "--high_fdev", help="frequency deviation for high rate", default=41667, type=int, required=False)
+argparser.add_argument("-hp", "--high_preamble_size", help="preamble size for high rate", default=7, type=int, required=False)
+argparser.add_argument("-pdl", "--detector_preamble_size_lo_rate", help="preamble detector size for low rate", default=3, type=int, required=False)
+argparser.add_argument("-pdn", "--detector_preamble_size_normal_rate", help="preamble detector size for normal rate", default=3, type=int, required=False)
+argparser.add_argument("-pdh", "--detector_preamble_size_hi_rate", help="preamble detector size for high rate", default=3, type=int, required=False)
+argparser.add_argument("-ptl", "--preamble_tol_lo_rate", help="preamble tolerance of low rate", default=15, type=int, required=False)
+argparser.add_argument("-ptn", "--preamble_tol_normal_rate", help="preamble tolerance of normal rate", default=10, type=int, required=False)
+argparser.add_argument("-pth", "--preamble_tol_hi_rate", help="preamble tolerance of high rate", default=10, type=int, required=False)
+argparser.add_argument("-rs", "--rssi_smoothing", help="rssi_smoothing (average of X samples)", default=8, type=int, required=False)
+argparser.add_argument("-ro", "--rssi_offset", help="rssi_offset", default=0, type=int, required=False)
+argparser.add_argument("-lbw", "--lora_bw", help="bandwidth for lora", default=125000, type=int, required=False)
 argparser.add_argument("-lsf", "--lora_SF", help="Spreading factor for lora", default=9, type=int, required=False)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
@@ -40,7 +57,23 @@ modem.connect()
 print("gain set to {}, rx low {}, normal {} and high {}".format(config.offset, config.low_rx, config.normal_rx, config.high_rx))
 
 fsFile = FactorySettingsFile(gain=config.offset, rx_bw_low_rate=config.low_rx, rx_bw_normal_rate=config.normal_rx,
-                             rx_bw_high_rate=config.high_rx, lora_bw=config.lora_bw, lora_SF=config.lora_SF)
+                             rx_bw_high_rate=config.high_rx, bitrate_lo_rate=config.low_bitrate,
+                             bitrate_normal_rate=config.normal_bitrate, bitrate_hi_rate=config.high_bitrate,
+                             fdev_lo_rate=config.low_fdev, fdev_normal_rate=config.normal_fdev,
+                             fdev_hi_rate=config.high_fdev,
+                             preamble_size_lo_rate=config.low_preamble_size,
+                             preamble_size_normal_rate=config.normal_preamble_size,
+                             preamble_size_hi_rate=config.high_preamble_size,
+                             preamble_detector_size_lo_rate=config.detector_preamble_size_lo_rate,
+                             preamble_detector_size_normal_rate=config.detector_preamble_size_normal_rate,
+                             preamble_detector_size_hi_rate=config.detector_preamble_size_hi_rate,
+                             preamble_tol_lo_rate=config.preamble_tol_lo_rate,
+                             preamble_tol_normal_rate=config.preamble_tol_normal_rate,
+                             preamble_tol_hi_rate=config.preamble_tol_hi_rate,
+                             rssi_smoothing=config.rssi_smoothing, rssi_offset=config.rssi_offset,
+                             lora_bw=config.lora_bw, lora_SF=config.lora_SF)
+
+print(fsFile.__str__())
 
 print( '[{}]'.format(', '.join(hex(byte) for byte in list(fsFile))))
 
