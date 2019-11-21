@@ -34,12 +34,12 @@ from pprint import pprint
 
 
 
-class MessageType(enum.Enum):
-  ALP_DATA = 0X01
-  PING_REQUEST = 0X02
-  PING_RESPONSE = 0X03
-  LOGGING = 0X04
-  REBOOTED = 0x05
+class MessageType(enum.IntEnum):
+  ALP_DATA = 1
+  PING_REQUEST = 2
+  PING_RESPONSE = 3
+  LOGGING = 4
+  REBOOTED = 5
 
 class Parser(object):
 
@@ -77,31 +77,34 @@ class Parser(object):
     parsed = 0
     cmds   = []
     errors = []
+    message_types = []
 
     while True:
-      (cmd, info) = self.parse_one_command_from_buffer()
+      (message_type, cmd, info) = self.parse_one_command_from_buffer()
       errors.extend(info["errors"])
       if cmd is None: break
       parsed += info["parsed"]
+      message_types.append(message_type)
       cmds.append(cmd)
 
     info["parsed"] = parsed
     info["errors"] = errors
-    return (cmds, info)
+    return (message_types, cmds, info)
 
   def parse_one_command_from_buffer(self):
     retry       = True    # until we have one or don't have enough
     errors      = []
     cmd         = None
+    message_type = None
     bits_parsed = 0
     while retry and len(self.buffer) > 0:
       try:
         s           = ConstBitStream(bytes=self.buffer)
         cmd_length, message_type = self.parse_serial_interface_header(s)
         if message_type == MessageType.REBOOTED.value:
-          print("modem rebooted with reason {}".format(s.read("uint:8")))
+          cmd = s.read("uint:8")
         elif message_type == MessageType.LOGGING.value:
-          print(s.readlist('bytes:b', b=cmd_length)[0])
+          cmd = (s.readlist('bytes:b', b=cmd_length)[0])
         else:
           if self.skip_alp_parsing:
             if s.length < cmd_length:
@@ -129,7 +132,7 @@ class Parser(object):
       "buffer" : len(self.buffer) * 8,
       "errors" : errors
     }
-    return (cmd, info)
+    return (message_type, cmd, info)
 
   def skip_bad_buffer_content(self):
     # skip until we find 0xc0, which might be a valid starting point
