@@ -34,12 +34,12 @@ from pprint import pprint
 
 
 
-class MessageType(enum.Enum):
-  ALP_DATA = 0X01
-  PING_REQUEST = 0X02
-  PING_RESPONSE = 0X03
-  LOGGING = 0X04
-  REBOOTED = 0x05
+class MessageType(enum.IntEnum):
+  ALP_DATA = 1
+  PING_REQUEST = 2
+  PING_RESPONSE = 3
+  LOGGING = 4
+  REBOOTED = 5
 
 class Parser(object):
 

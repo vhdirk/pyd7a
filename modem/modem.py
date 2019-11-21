@@ -40,7 +40,7 @@ from d7a.alp.operands.offset import Offset
 from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
 from d7a.alp.regular_action import RegularAction
-from d7a.serial_modem_interface.parser import Parser
+from d7a.serial_modem_interface.parser import Parser, MessageType
 
 from d7a.alp.command import Command
 from d7a.system_files.firmware_version import FirmwareVersionFile
@@ -214,7 +214,7 @@ class Modem:
           self.log.warning("Parser error: {}".format(error))
         cmd_cnt = 0
         for cmd in cmds:
-          if not self.skip_alp_parsing and hasattr(cmd, 'tag_id') and self._sync_execution_tag_id == cmd.tag_id and message_types[cmd_cnt] < 4:
+          if not self.skip_alp_parsing and hasattr(cmd, 'tag_id') and self._sync_execution_tag_id == cmd.tag_id and message_types[cmd_cnt] <= MessageType.PING_RESPONSE:
             self.log.info("Received response for sync execution")
             self._sync_execution_response_cmds.append(cmd)
             if cmd.execution_completed:
@@ -223,16 +223,16 @@ class Modem:
             else:
               self.log.info("cmd with tag {} not done yet, expecting more responses".format(cmd.tag_id))
 
-          elif self.unsolicited_response_received_callback != None and self.connected and message_types[cmd_cnt] < 4: # skip responses until connected
+          elif self.unsolicited_response_received_callback != None and self.connected and message_types[cmd_cnt] <= MessageType.PING_RESPONSE: # skip responses until connected
             self.unsolicited_response_received_callback(cmd)
-          elif message_types[cmd_cnt] == 5:
+          elif message_types[cmd_cnt] == MessageType.REBOOTED:
             if self.rebooted_callback != None:
               self.rebooted_callback(cmd)
             else:
               self._rebooted_received.append(cmd)
-          elif  message_types[cmd_cnt] == 4:
+          elif  message_types[cmd_cnt] == MessageType.LOGGING:
             self.log.info("logging: {}".format(cmd))
-          elif message_types[cmd_cnt] < 4:
+          elif message_types[cmd_cnt] <= MessageType.PING_RESPONSE:
             self.log.info("Received a response which was not requested synchronously or no async callback provided")
             self._unsolicited_responses_received.append(cmd)
           cmd_cnt += 1
