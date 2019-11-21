@@ -125,7 +125,7 @@ class Addressee(Validatable):
     l     = Addressee.length_for(id_type)
     id    = s.read("uint:"+str(l*8)) if l > 0 else None
     if id_type == IdType.NBID:
-      id = CT(id)  # max value is 7 of NBID? compressed?
+      id = CT(id)
 
     return Addressee(id_type=id_type, access_class=cl, id=id, nls_method=nls_method)
 
