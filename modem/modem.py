@@ -64,6 +64,7 @@ class Modem:
     self._sync_execution_tag_id = None
     self._sync_execution_completed = False
     self._unsolicited_responses_received = []
+    self._rebooted_received = []
     self._read_async_active = False
     self.unsolicited_response_received_callback = unsolicited_response_received_callback
     self.rebooted_callback = rebooted_callback
@@ -187,6 +188,12 @@ class Modem:
   def clear_unsolicited_responses_received(self):
     self._unsolicited_responses_received = []
 
+  def get_rebooted_received(self):
+    return self._rebooted_received
+
+  def clear_rebooted_received(self):
+    self._rebooted_received = []
+
   def _read_async(self):
     self.log.info("starting read thread")
     data_received = bytearray()
@@ -218,8 +225,11 @@ class Modem:
 
           elif self.unsolicited_response_received_callback != None and self.connected and message_types[cmd_cnt] < 4: # skip responses until connected
             self.unsolicited_response_received_callback(cmd)
-          elif self.rebooted_callback != None and self.connected and message_types[cmd_cnt] == 5:
-            self.rebooted_callback(cmd)
+          elif message_types[cmd_cnt] == 5:
+            if self.rebooted_callback != None:
+              self.rebooted_callback(cmd)
+            else:
+              self._rebooted_received.append(cmd)
           elif  message_types[cmd_cnt] == 4:
             self.log.info("logging: {}".format(cmd))
           elif message_types[cmd_cnt] < 4:
