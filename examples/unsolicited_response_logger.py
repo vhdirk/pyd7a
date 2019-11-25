@@ -27,6 +27,7 @@ import argparse
 
 import logging
 import sys
+import time
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -62,6 +63,7 @@ modem.connect()
 
 try:
   while True:
+    time.sleep(0.1)
     pass
 except KeyboardInterrupt:
   sys.exit(0)
