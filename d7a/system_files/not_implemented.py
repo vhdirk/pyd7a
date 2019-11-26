@@ -29,10 +29,14 @@ from d7a.system_files.system_file_ids import SystemFileIds
 
 
 class NotImplementedFile(File):
-  def __init__(self, file_id, length=0):
+  def __init__(self, file_id, length=0, data=None):
     self.length = length
+    if data is not None:
+      self.data = data
+    else:
+      self.data = [0] * length
     File.__init__(self, file_id, length)
 
   def __iter__(self):
-    for i in range(self.length):
-      yield 0
+    for byte in self.data:
+      yield byte
