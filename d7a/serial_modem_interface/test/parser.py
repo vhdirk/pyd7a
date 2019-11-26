@@ -58,12 +58,12 @@ class TestParser(unittest.TestCase):
 
     ] + alp_cmd_bytes
 
-    (cmds, info) = self.parser.parse(frame)
+    (message_type, cmds, info) = self.parser.parse(frame)
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
     self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
   def test_bad_identifier(self):
-    (cmds, info) = self.parser.parse([
+    (message_type, cmds, info) = self.parser.parse([
       0x0c, # that's 0c not c0 ! ;-)
       0x04, 0x00, 0x00, 0x00,
       0x20,
@@ -109,7 +109,7 @@ class TestParser(unittest.TestCase):
   # |sync|sync|counter|message type|length|crc1|crc2|
   def test_bad_identifier_with_identifier_in_body(self):
     self.counter = self.counter + 1
-    (cmds, info) = self.parser.parse(bytearray([
+    (message_type, cmds, info) = self.parser.parse(bytearray([
       0x0c, # that's 0c not c0 ! ;-)
       0x04, 0x00, 0x00, 0x00,
       0x20,
@@ -136,7 +136,7 @@ class TestParser(unittest.TestCase):
       0x00, 0xf3, 0x00, 0x00                          # data
     ])
 
-    (cmds, info) = self.parser.parse(bytearray([
+    (message_type, cmds, info) = self.parser.parse(bytearray([
       0xc0,                                           # interface start
       0,
       self.counter, 0x01, 2 * len(alp_action_bytes), 0xDC, 0xF8  # expect 2 ALP actions but only one in buffer
@@ -147,7 +147,7 @@ class TestParser(unittest.TestCase):
 
   def test_continue_partial_command(self): # ?
     self.test_partial_command() # incomplete command, add second ALP action to complete it ...
-    (cmds, info) = self.parser.parse(bytearray([
+    (message_type, cmds, info) = self.parser.parse(bytearray([
       0x20,                                           # action=32/ReturnFileData
       0x40,                                           # File ID
       0x00,                                           # offset
@@ -185,12 +185,12 @@ class TestParser(unittest.TestCase):
     ]
     self.counter = self.counter + 1
     # first frame should parse
-    (cmds, info) = self.parser.parse(frame)
+    (message_type, cmds, info) = self.parser.parse(frame)
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
     self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
     # and now complete the second frame and check this is parsed as well
-    (cmds, info) = self.parser.parse(alp_cmd_bytes) # the missing bytes only, without the frame header
+    (message_type, cmds, info) = self.parser.parse(alp_cmd_bytes) # the missing bytes only, without the frame header
     self.assertEqual(cmds[0].actions[0].operation.op, 32)
     self.assertEqual(cmds[0].actions[0].operation.operand.length.value, 4)
 
