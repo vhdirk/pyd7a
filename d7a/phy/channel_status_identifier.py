@@ -28,8 +28,8 @@ from d7a.support.schema import Validatable, Types
 from enum import Enum
 
 class Bandwidth(Enum):
-  kHz25 = 0x00
-  kHz200 = 0x01
+  kHz25 = 0x01
+  kHz200 = 0x00
 
   def to_string(self):
     return self.name
@@ -43,7 +43,7 @@ class ChannelStatusIdentifier(Validatable):
     "channel_index": Types.INTEGER(min=0, max=1039)
   }]
 
-  def __init__(self, channel_band=ChannelBand.BAND_868, channel_bandwidth=Bandwidth.kHz25, channel_index=0):
+  def __init__(self, channel_band=ChannelBand.NOT_IMPL, channel_bandwidth=Bandwidth.kHz25, channel_index=0):
     self.channel_band = channel_band
     self.channel_bandwidth = channel_bandwidth
     self.channel_index = channel_index

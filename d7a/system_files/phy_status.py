@@ -57,7 +57,7 @@ class PhyStatusFile(File, Validatable):
     if len(channel_noise_floor) != channel_status_list_length:
       self.channel_noise_floor.extend([0] * (channel_status_list_length - len(channel_noise_floor)))
 
-    File.__init__(self, SystemFileIds.PHY_STATUS, 15 + (3 * channel_status_list_length))
+    File.__init__(self, SystemFileIds.PHY_STATUS.value, 15 + (3 * channel_status_list_length))
     Validatable.__init__(self)
 
   @staticmethod
