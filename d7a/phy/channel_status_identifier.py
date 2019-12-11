@@ -21,7 +21,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-import struct
 
 from d7a.phy.channel_header import ChannelBand
 from d7a.support.schema import Validatable, Types

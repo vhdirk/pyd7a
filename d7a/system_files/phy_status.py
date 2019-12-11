@@ -23,9 +23,6 @@
 #
 import struct
 
-import numpy as np
-
-from d7a.dll.access_profile import AccessProfile
 from d7a.support.schema import Validatable, Types
 from d7a.system_files.file import File
 from d7a.system_files.system_file_ids import SystemFileIds
