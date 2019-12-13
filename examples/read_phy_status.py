@@ -45,6 +45,7 @@ argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
+argparser.add_argument("-l", "--length", help="length of scanned channels. If this is not right, it will still show data but not parse it", default=1, type=int)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
@@ -53,7 +54,7 @@ modem.connect()
 
 answers = modem.execute_command(
   alp_command=Command.create_with_read_file_action_system_file(
-    file=PhyStatusFile()
+    file=PhyStatusFile(channel_status_list_length=config.length)
   )
 )
 

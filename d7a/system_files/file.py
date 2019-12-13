@@ -23,6 +23,11 @@
 #
 
 class File:
-  def __init__(self, id, length):
+  def __init__(self, id, length, allocated_length=None):
     self.id = id
     self.length = length
+    if (allocated_length is None) or (length > allocated_length):
+      self.allocated_length = length
+    else:
+      self.allocated_length = allocated_length
+

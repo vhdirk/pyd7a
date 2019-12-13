@@ -30,7 +30,6 @@ class Length(Validatable):
 
   SCHEMA = [
     {
-      "length": Types.BITS(2),
       "value": Types.INTEGER(min=0, max=0x3FFFFFFF)
     }
   ]
