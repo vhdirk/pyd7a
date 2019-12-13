@@ -51,7 +51,7 @@ class ReturnFileData(Operation):
     except:
       return
     # if the file size is between allocated and original length, try to parse it
-    if (systemfile_type is not None) and ((systemfile_type.length == self.operand.length.value) or (systemfile_type.allocated_length >= self.operand.length.value >= systemfile_type.length)):
+    if (systemfile_type is not None) and (systemfile_type.length >= self.operand.length.value):
       self.systemfile_type = systemfile_type
       try:
         self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
