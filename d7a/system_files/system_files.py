@@ -25,6 +25,7 @@ from d7a.system_files.access_profile import AccessProfileFile
 from d7a.system_files.dll_config import DllConfigFile
 from d7a.system_files.firmware_version import FirmwareVersionFile
 from d7a.system_files.not_implemented import NotImplementedFile
+from d7a.system_files.phy_status import PhyStatusFile
 from d7a.system_files.security_key import SecurityKeyFile
 from d7a.system_files.system_file_ids import SystemFileIds
 from d7a.system_files.uid import UidFile
@@ -44,7 +45,7 @@ class SystemFiles:
     SystemFileIds.VID: VidFile(),
     SystemFileIds.RFU_07: NotImplementedFile(SystemFileIds.RFU_07, 0),
     SystemFileIds.PHY_CONFIG: NotImplementedFile(SystemFileIds.PHY_CONFIG, 9),
-    SystemFileIds.PHY_STATUS: NotImplementedFile(SystemFileIds.PHY_STATUS, 24),  # TODO assuming 3 channels for now
+    SystemFileIds.PHY_STATUS: PhyStatusFile(),  # TODO assuming 3 channels for now
     SystemFileIds.DLL_CONFIG: DllConfigFile(),
     SystemFileIds.DLL_STATUS: NotImplementedFile(SystemFileIds.DLL_STATUS, 12),
     SystemFileIds.NWL_ROUTING: NotImplementedFile(SystemFileIds.NWL_ROUTING, 1),  # TODO variable routing table

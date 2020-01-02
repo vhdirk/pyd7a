@@ -55,7 +55,7 @@ if args.type == "systemfile":
   print(file_type.parse(ConstBitStream(data)))
   exit(0)
 
-message_type, cmds, info = parser.parse(data)
+cmds, info = parser.parse(data)
 for cmd in cmds:
   print cmd
 

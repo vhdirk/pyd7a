@@ -30,7 +30,7 @@ from d7a.support.schema import Validatable, Types
 class IndirectInterfaceOperand(Validatable):
 
   SCHEMA = [{
-    "interface_file_id"        : Types.INTEGER(min=0x40, max=0xFF),
+    "interface_file_id"        : Types.INTEGER(min=0, max=0xFF),
     "interface_configuration_overload"    : Types.OBJECT(Addressee, nullable=True) # TODO assuming D7ASP interface
   }]
 

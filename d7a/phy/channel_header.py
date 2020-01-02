@@ -66,6 +66,7 @@ class ChannelClass(Enum):
     raise NotImplementedError
 
 class ChannelBand(Enum):
+  NOT_IMPL = 0x00
   BAND_433 = 0x02
   BAND_868 = 0x03
   BAND_915 = 0x04

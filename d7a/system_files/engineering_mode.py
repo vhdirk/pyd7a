@@ -74,7 +74,7 @@ class EngineeringModeFile(File, Validatable):
     self.timeout = timeout
     self.channel_id = channel_id
     self.eirp = eirp
-    File.__init__(self, SystemFileIds.ENGINEERING_MODE, 9)
+    File.__init__(self, SystemFileIds.ENGINEERING_MODE.value, 9)
     Validatable.__init__(self)
 
   @staticmethod

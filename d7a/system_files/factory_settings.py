@@ -86,7 +86,7 @@ class FactorySettingsFile(File, Validatable):
     self.rssi_offset = rssi_offset
     self.lora_bw = lora_bw
     self.lora_SF = lora_SF
-    File.__init__(self, SystemFileIds.FACTORY_SETTINGS, 53)
+    File.__init__(self, SystemFileIds.FACTORY_SETTINGS.value, 53)
     Validatable.__init__(self)
 
   @staticmethod
@@ -167,7 +167,7 @@ class FactorySettingsFile(File, Validatable):
     yield self.lora_SF
 
   def __str__(self):
-    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} : {} : {} with tol {} : {} : {}, rssi smoothing {} with offset {}".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
+    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} : {} : {} with tol {} : {} : {}, rssi smoothing {} with offset {}\nlora sf set to {}, bw to {}".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
                                                                                          self.bitrate_lo_rate, self.fdev_lo_rate,
                                                                                          self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate,
                                                                                          self.preamble_size_lo_rate, self.preamble_size_normal_rate, self.preamble_size_hi_rate,
