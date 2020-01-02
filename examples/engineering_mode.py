@@ -43,7 +43,9 @@ def received_command_callback(cmd):
       sys.exit(0)
 
 def rebooted_callback(cmd):
+  global stop
   logging.info("modem rebooted with reason {}".format(cmd))
+  stop = True
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
@@ -55,7 +57,7 @@ modes = ["OFF", "CONT_TX", "TRANSIENT_TX", "PER_RX", "PER_TX"]
 argparser.add_argument("-m", "--mode", choices=modes, required=True)
 argparser.add_argument("-e", "--eirp", help="EIRP in dBm", type=int, default=0)
 argparser.add_argument("-t", "--timeout", help="timeout", type=int, default=0)
-argparser.add_argument("-x", "--not_exe", help="Don't execute the command on the modem", default=False, action="store_true")
+argparser.add_argument("-x", "--not_exe", help="Don't execute the command on the modem, just print the resulting bytes", default=False, action="store_true")
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
@@ -65,6 +67,8 @@ mode = EngineeringModeMode.from_string(config.mode)
 
 emFile = EngineeringModeFile(mode=mode, flags=0, timeout=config.timeout, channel_id=ch, eirp=config.eirp)
 
+stop = False
+
 print(list(emFile))
 
 if not config.not_exe:
@@ -72,15 +76,18 @@ if not config.not_exe:
                 rebooted_callback=rebooted_callback)
   modem.connect()
 
-  modem.execute_command(
-    alp_command=Command.create_with_write_file_action(
-      file_id=5,
-      data=list(emFile),
-    )
+  cmd = Command.create_with_write_file_action(
+    file_id=5,
+    data=list(emFile)
   )
 
-  try:
-      while True:
-          pass
-  except KeyboardInterrupt:
-      sys.exit(0)
+  modem.execute_command(
+    alp_command=cmd
+  )
+
+  if (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX) or (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF):
+    try:
+        while not stop:
+            pass
+    except KeyboardInterrupt:
+        sys.exit(0)
