@@ -49,6 +49,9 @@ from util.logger import configure_default_logger
 def received_command_callback(cmd):
   logging.info(cmd)
 
+def rebooted_callback(cmd):
+  logging.info("rebooted with reason: {}".format(cmd))
+
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
@@ -58,7 +61,7 @@ config = argparser.parse_args()
 
 configure_default_logger(config.verbose)
 
-modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
+modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback, rebooted_callback=rebooted_callback)
 modem.connect()
 
 try:
