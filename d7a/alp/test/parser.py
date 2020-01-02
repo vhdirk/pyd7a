@@ -50,6 +50,7 @@ class TestParser(unittest.TestCase):
     self.interface_status_action = [
       0x62,                                           # Interface Status action
       0xD7,                                           # D7ASP interface
+      12,                                             # interface status length
       32,                                              # channel_header
       0, 0,                                             # channel_id
       0,                                              # rxlevel (- dBm)
@@ -190,6 +191,7 @@ class TestParser(unittest.TestCase):
     alp_action_bytes = [
       34 + 0b01000000,                                 # action=34 + inf status
       0xd7,                                           # interface ID
+      12,                                             # interface status length
       32,                                           # channel_header
       0, 16,                                          # channel_index
       70,                                             # rx level
