@@ -26,6 +26,7 @@
 import argparse
 import sys
 import logging
+import time
 
 from d7a.alp.command import Command
 
@@ -88,6 +89,7 @@ if not config.not_exe:
   if (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX) or (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF):
     try:
         while not stop:
-            pass
+          time.sleep(0.1)
+          pass
     except KeyboardInterrupt:
         sys.exit(0)
