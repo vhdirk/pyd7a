@@ -61,9 +61,10 @@ class TestOffset(unittest.TestCase):
     self.assertEqual(offset.offset.value, 65)
 
   def test_parse_three_bytes(self):
-    offset_bytes = [0x20, 0x40, 0x41]
+    offset_bytes = [0x01, 0x80, 0xfe, 0x60]
     offset = Offset.parse(ConstBitStream(bytes=offset_bytes))
-    self.assertEqual(offset.offset.value, 65)
+    self.assertEqual(offset.id, 1)
+    self.assertEqual(offset.offset.value, 65120)
 
   def test_to_str(self):
     Offset().__str__()
