@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "pyd7a"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^2.7"
+bitstring = "^3.1.6"
+Cerberus = "1.1"
+PyCRC = "^1.21"
+pyserial = ">=3.4.0"
+unittest2 = "^1.1.0"
+coverage = "^5.0.2"
+enum34 = "^1.1.6"
+jsonpickle = "^1.2"
+paho-mqtt = "^1.5.0"
+traceback2 = "^1.4.0"
+cogapp = "^3.0.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
