@@ -51,7 +51,7 @@ class TestParser(unittest.TestCase):
       0x62,                                           # Interface Status action
       0xD7,                                           # D7ASP interface
       32,                                              # channel_header
-      0, 0,                                           # channel_id
+      0, 0,                                             # channel_id
       0,                                              # rxlevel (- dBm)
       0,                                              # link budget
       80,                                             # target rx level
@@ -74,18 +74,6 @@ class TestParser(unittest.TestCase):
 
     cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(len(cmd.actions), 1)
-    self.assertEqual(cmd.actions[0].operation.op, 32)
-    self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
-
-  def test_basic_valid_message_actions_swapped(self):
-    cmd_data = self.interface_status_action + [
-      0x20,                                           # action=32/ReturnFileData
-      0x40,                                           # File ID
-      0x00,                                           # offset
-      0x04,                                           # length
-      0x00, 0xf3, 0x00, 0x00                          # data
-    ]
-    cmd = Parser().parse(ConstBitStream(bytes=cmd_data), len(cmd_data))
     self.assertEqual(cmd.actions[0].operation.op, 32)
     self.assertEqual(cmd.actions[0].operation.operand.length.value, 4)
 
