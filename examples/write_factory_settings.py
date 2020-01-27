@@ -5,9 +5,14 @@ import sys
 import logging
 
 from d7a.alp.command import Command
+from d7a.alp.interface import InterfaceType
+from d7a.d7anp.addressee import Addressee, IdType
 
 from d7a.phy.channel_id import ChannelID
+from d7a.sp.configuration import Configuration
+from d7a.sp.qos import QoS, ResponseMode, RetryMode
 from d7a.system_files.factory_settings import FactorySettingsFile
+from d7a.types.ct import CT
 
 from modem.modem import Modem
 
@@ -47,6 +52,9 @@ argparser.add_argument("-rs", "--rssi_smoothing", help="rssi_smoothing (average 
 argparser.add_argument("-ro", "--rssi_offset", help="rssi_offset", default=0, type=int, required=False)
 argparser.add_argument("-lbw", "--lora_bw", help="bandwidth for lora", default=125000, type=int, required=False)
 argparser.add_argument("-lsf", "--lora_SF", help="Spreading factor for lora", default=9, type=int, required=False)
+argparser.add_argument("-g", "--gaussian", help="gaussian filter for radio chip. BT=1/gaussian", default=2, type=int, required=False)
+argparser.add_argument("-p", "--paramp", help="paramp in microseconds used for sending packages", default=40, type=int, required=False)
+argparser.add_argument("-f", "--forward", help="forward write file to interface", default=False, action="store_true")
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
@@ -71,16 +79,33 @@ fsFile = FactorySettingsFile(gain=config.offset, rx_bw_low_rate=config.low_rx, r
                              preamble_tol_normal_rate=config.preamble_tol_normal_rate,
                              preamble_tol_hi_rate=config.preamble_tol_hi_rate,
                              rssi_smoothing=config.rssi_smoothing, rssi_offset=config.rssi_offset,
-                             lora_bw=config.lora_bw, lora_SF=config.lora_SF)
+                             lora_bw=config.lora_bw, lora_SF=config.lora_SF,
+                             paramp=config.paramp, gaussian=config.gaussian)
 
 print(fsFile.__str__())
 
 print( '[{}]'.format(', '.join(hex(byte) for byte in list(fsFile))))
 
+interface_type = InterfaceType.HOST
+interface_configuration = None
+
+if config.forward:
+  interface_type = InterfaceType.D7ASP
+  interface_configuration = Configuration(
+    qos=QoS(resp_mod=ResponseMode.RESP_MODE_PREFERRED, retry_mod=RetryMode.RETRY_MODE_NO),
+    addressee=Addressee(
+      access_class=0x11,
+      id_type=IdType.NBID,
+      id=CT.compress(2)
+    )
+  )
+
 modem.execute_command(
   alp_command=Command.create_with_write_file_action(
     file_id=1,
     data=list(fsFile),
+    interface_type=interface_type,
+    interface_configuration=interface_configuration
   )
 )
 

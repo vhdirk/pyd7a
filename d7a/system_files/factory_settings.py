@@ -52,7 +52,9 @@ class FactorySettingsFile(File, Validatable):
     "rssi_smoothing": Types.INTEGER(min=0, max=255),
     "rssi_offset": Types.INTEGER(min=-126, max=125),
     "lora_bw": Types.INTEGER(min=0, max=0xFFFFFFFF),
-    "lora_SF": Types.INTEGER(min=6, max=12)
+    "lora_SF": Types.INTEGER(min=6, max=12),
+    "gaussian" : Types.INTEGER(min=0, max=3),
+    "paramp" : Types.INTEGER(min=0, max=0xFFFF)
   }]
 
   def __init__(self, gain=0, rx_bw_low_rate=10468, rx_bw_normal_rate=78646, rx_bw_high_rate=125868,
@@ -62,7 +64,8 @@ class FactorySettingsFile(File, Validatable):
                preamble_detector_size_lo_rate=3, preamble_detector_size_normal_rate=3, preamble_detector_size_hi_rate=3,
                preamble_tol_lo_rate=15, preamble_tol_normal_rate=10, preamble_tol_hi_rate=10,
                rssi_smoothing=8, rssi_offset=0,
-               lora_bw=125000, lora_SF=9):
+               lora_bw=125000, lora_SF=9,
+               gaussian=2, paramp=40):
     self.gain = gain
     self.rx_bw_low_rate = rx_bw_low_rate
     self.rx_bw_normal_rate = rx_bw_normal_rate
@@ -86,7 +89,9 @@ class FactorySettingsFile(File, Validatable):
     self.rssi_offset = rssi_offset
     self.lora_bw = lora_bw
     self.lora_SF = lora_SF
-    File.__init__(self, SystemFileIds.FACTORY_SETTINGS.value, 53)
+    self.gaussian = gaussian
+    self.paramp = paramp
+    File.__init__(self, SystemFileIds.FACTORY_SETTINGS.value, 56)
     Validatable.__init__(self)
 
   @staticmethod
@@ -119,6 +124,9 @@ class FactorySettingsFile(File, Validatable):
     lora_bw = s.read("uint:32")
     lora_SF = s.read("uint:8")
 
+    gaussian = s.read("uint:8")
+    paramp = s.read("uint:16")
+
     return FactorySettingsFile(gain=gain, rx_bw_low_rate=rx_bw_low_rate, rx_bw_normal_rate=rx_bw_normal_rate, rx_bw_high_rate=rx_bw_high_rate,
                                bitrate_lo_rate=bitrate_lo_rate, fdev_lo_rate=fdev_lo_rate,
                                bitrate_normal_rate=bitrate_normal_rate, fdev_normal_rate=fdev_normal_rate,
@@ -129,7 +137,8 @@ class FactorySettingsFile(File, Validatable):
                                preamble_tol_lo_rate = preamble_tol_lo_rate, preamble_tol_normal_rate = preamble_tol_normal_rate,
                                preamble_tol_hi_rate = preamble_tol_hi_rate,
                                rssi_smoothing=rssi_smoothing, rssi_offset=rssi_offset,
-                               lora_bw = lora_bw, lora_SF = lora_SF)
+                               lora_bw=lora_bw, lora_SF=lora_SF,
+                               gaussian=gaussian, paramp=paramp)
 
   def __iter__(self):
     yield self.gain
@@ -165,13 +174,17 @@ class FactorySettingsFile(File, Validatable):
     for byte in bytearray(struct.pack(">I", self.lora_bw)):
       yield byte
     yield self.lora_SF
+    yield self.gaussian
+    for byte in bytearray(struct.pack(">H", self.paramp)):
+      yield byte
 
   def __str__(self):
-    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} : {} : {} with tol {} : {} : {}, rssi smoothing {} with offset {}\nlora sf set to {}, bw to {}".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
+    return "gain={}, rx_bw_low_rate={}, rx_bw_normal_rate={}, rx_bw_high_rate={}, low rate={} : {}, normal rate={} : {}, high rate={} : {}, preamble sizes {} : {} : {}, preamble detector size {} : {} : {} with tol {} : {} : {}, rssi smoothing {} with offset {}\nlora sf set to {}, bw to {}\ngaussian set to {} and paramp to {} microseconds".format(self.gain, self.rx_bw_low_rate, self.rx_bw_normal_rate, self.rx_bw_high_rate,
                                                                                          self.bitrate_lo_rate, self.fdev_lo_rate,
                                                                                          self.bitrate_normal_rate, self.fdev_normal_rate, self.bitrate_hi_rate, self.fdev_hi_rate,
                                                                                          self.preamble_size_lo_rate, self.preamble_size_normal_rate, self.preamble_size_hi_rate,
                                                                                          self.preamble_detector_size_lo_rate, self.preamble_detector_size_normal_rate, self.preamble_detector_size_hi_rate,
                                                                                          self.preamble_tol_lo_rate, self.preamble_tol_normal_rate, self.preamble_tol_hi_rate,
                                                                                          self.rssi_smoothing, self.rssi_offset,
-                                                                                         self.lora_bw, self.lora_SF)
+                                                                                         self.lora_bw, self.lora_SF,
+                                                                                         self.gaussian, self.paramp)
