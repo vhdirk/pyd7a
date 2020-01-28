@@ -23,7 +23,6 @@
 #
 import unittest
 import binascii
-from PyCRC.CRCCCITT import CRCCCITT
 from d7a.alp.operands.file import DataRequest, Data
 from d7a.alp.operations.requests import ReadFileData
 from d7a.alp.operations.responses import ReturnFileData
@@ -92,7 +91,8 @@ class TestForegroundFrameParser(unittest.TestCase):
     self.assertEqual(alp_action.operand.length, 8)
     # TODO self.assertEqual(len(frame.payload), 16)
     hexstring = binascii.hexlify(bytearray(read_id_command[:-2])).decode('hex') # TODO there must be an easier way...
-    self.assertEqual(frame.crc16, CRCCCITT(version='FFFF').calculate(hexstring))
+    crc = calculate_crc(hexstring)
+    self.assertEqual(frame.crc16, (crc[0] << 8) + crc[1])
 
   # TODO tmp
   def test_read_id_response_frame(self):

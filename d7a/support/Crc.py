@@ -21,10 +21,11 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from PyCRC.CRCCCITT import CRCCCITT
+import crcmod.predefined
 import binascii
 
 
 def calculate_crc(bytes):
-    crc = CRCCCITT(version='FFFF').calculate(binascii.hexlify(bytearray(bytes)).decode('hex'))
+    crc16_func = crcmod.predefined.mkCrcFun('crc-ccitt-false')
+    crc = crc16_func(binascii.hexlify(bytearray(bytes)).decode('hex'))
     return [(crc >> 8) & 0xff, crc & 0xff]

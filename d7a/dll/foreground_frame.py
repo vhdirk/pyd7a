@@ -28,7 +28,6 @@ from d7a.support.schema           import Validatable, Types
 from d7a.dll.foreground_frame_control import ForegroundFrameControl
 from d7a.d7anp.frame import Frame as D7anpFrame
 
-from PyCRC.CRCCCITT import CRCCCITT
 
 class ForegroundFrame(Validatable):
 
@@ -59,7 +58,7 @@ class ForegroundFrame(Validatable):
   #   raw_data.append(self.control)
   #   raw_data.append(self.target_address)
   #   raw_data.append(self.payload)
-  #   crc = CRCCCITT().calculate(raw_data)
+  #   crc = calculate_crc(raw_data)
 
 
   @staticmethod

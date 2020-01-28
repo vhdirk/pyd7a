@@ -44,7 +44,7 @@ class FileProperties(Validatable):
   SCHEMA = [{
     "act_enabled": Types.BOOLEAN(),
     "act_cond": Types.ENUM(ActionCondition),
-    "storage_class": Types.ENUM(StorageClass)
+    "storage_class": Types.ENUM(StorageClass),
   }]
 
   def __init__(self, act_enabled, act_condition, storage_class):
