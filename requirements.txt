@@ -9,7 +9,7 @@ unittest2
 coverage
 enum34
 jsonpickle
-paho-mqtt
+paho-mqtt==1.4.0
 traceback2
 cogapp
 crcmod
