@@ -52,7 +52,7 @@ class ChannelStatusIdentifier(Validatable):
     byte = self.channel_band.value << 5
     byte += self.channel_bandwidth.value << 4
     byte += 0 << 3  # RFU
-    byte += (self.channel_index << 8) & 0x07
+    byte += (self.channel_index >> 8) & 0x07
     yield byte
     yield self.channel_index & 0xFF
 
