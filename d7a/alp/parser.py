@@ -153,9 +153,10 @@ class Parser(object):
       length = s.read("uint:8")
       try:
         interface_status_operation = {
-          0x00 :  self.parse_alp_interface_status_host,
-          0xd7 :  self.parse_alp_interface_status_d7asp,
-        }[interface_id](s)
+          0x00: self.parse_alp_interface_status_host,
+          0xD7: self.parse_alp_interface_status_d7asp,
+          0x01: self.parse_alp_interface_status_serial
+        }[interface_id](s, length)
         return StatusAction(operation=interface_status_operation,
                             status_operand_extension=StatusActionOperandExtensions.INTERFACE_STATUS)
       except KeyError:
@@ -204,15 +205,20 @@ class Parser(object):
 
     return ForwardAction(resp=b6, operation=Forward(operand=InterfaceConfiguration(interface_id=interface_id,
                                                                                    interface_configuration=interface_config)))
-  def parse_alp_interface_status_host(self, s):
+  def parse_alp_interface_status_host(self, s, length):
     pass # no interface status defined for host interface
 
-  def parse_alp_interface_status_d7asp(self, s):
-    status = Status.parse(s)
+  def parse_alp_interface_status_d7asp(self, s, length):
+    status = None
+    if length > 0:
+      status = Status.parse(s)
 
     return InterfaceStatus(
       operand=InterfaceStatusOperand(interface_id=0xd7, interface_status=status)
     )
+
+  def parse_alp_interface_status_serial(self, s, length):
+    return InterfaceStatus(operand=InterfaceStatusOperand(interface_id=0x01, interface_status=None))
 
   def parse_offset(self, s):
     return Offset.parse(s)

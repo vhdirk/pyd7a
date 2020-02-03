@@ -29,7 +29,7 @@ class InterfaceStatusOperand(Validatable):
 
   SCHEMA = [{
     "interface_id"        : Types.BYTE(),
-    "interface_status"    : Types.OBJECT(Status)
+    "interface_status"    : Types.OBJECT(Status, nullable=True)
   }]
 
   def __init__(self, interface_id, interface_status):
