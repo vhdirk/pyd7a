@@ -48,6 +48,7 @@ class Parser(object):
     self.skip_alp_parsing = skip_alp_parsing
     self.up_counter = 0
     self.down_counter = 0
+    self.error_counter = 0
 
   def shift_buffer(self, start):
     self.buffer = self.buffer[start:]
@@ -169,6 +170,7 @@ class Parser(object):
     if self.down_counter > 255:
       self.down_counter = 0
     if counter != self.down_counter:
+      self.error_counter += 1
       pprint("counters not equal") #TODO consequence?
       self.down_counter = counter #reset counter
     if crc[0] != crc1 or crc[1] != crc2:
