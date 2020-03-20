@@ -207,7 +207,7 @@ class Modem:
         self._connect_serial_modem()
 
       if len(data_received) > 0:
-        self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
+        # self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (message_types, cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
           error["buffer"] = " ".join(map(lambda b: format(b, "02x"), bytearray(data_received)))
