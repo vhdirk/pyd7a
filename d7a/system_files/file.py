@@ -27,3 +27,7 @@ class File:
     self.id = id
     self.length = length
 
+
+  @property
+  def name(self):
+    return self.__class__.__name__
