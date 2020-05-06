@@ -29,12 +29,13 @@ from d7a.system_files.system_file_ids import SystemFileIds
 
 
 class NotImplementedFile(File):
-  def __init__(self, file_id, length=0, data=None):
+  def __init__(self, file_id, length=0, data=None, name="NotImplemented"):
     self.length = length
     if data is not None:
       self.data = data
     else:
       self.data = [0] * length
+    self.name = name
     File.__init__(self, file_id, length)
 
   def __iter__(self):
