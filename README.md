@@ -49,27 +49,3 @@ A parser for frames used by the serial console interface by OSS-7 nodes
 ### OSS-7 Modem interface
 
 Allows to use a serial connected OSS-7 node as a modem. By sending ALP commands you can access the node's filesystem, or use the node's DASH7 interface to access the filesystem of nodes in the network.
-
-### OSS-7 Modem webgui
-
-Enables you to query the serially attached node and the nodes in the environment through a webgui.
-
-Start using:
-```bash
-$ PYTHONPATH=. python modem-webgui/modem-webgui.py -d /dev/ttyACM0
- * Restarting with stat
- * Debugger is active!
- * Debugger pin code: 327-070-848
-(1929) wsgi starting up on http://0.0.0.0:5000
-(1929) accepted ('127.0.0.1', 57740)
-Sending command of size  17
-> 41 54 24 44 c0 00 0a b4 68 01 00 00 08 01 02 00 0f
-< c0 00 21 20 00 00 08 00 0b 57
-< 00 00 09 14 18 20 02 00 0f 01 01 67 61 74 65 77 61 39 35 36 31 36 61 38 23 68
-connected to /dev/ttyACM0, node UID 0xb570000091418 running D7AP v1.1, application "gatewa" with git sha1 95616a8
-starting read thread
-modem: 3191882256028696
-```
-
-And open the displayed link in a browser.
-The GUI is still work in progress.
