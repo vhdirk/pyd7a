@@ -27,6 +27,7 @@ import argparse
 import sys
 import logging
 import time
+import signal
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
@@ -59,6 +60,22 @@ def rebooted_callback(cmd):
   logging.info("modem rebooted with reason {}".format(cmd))
   stop = True
 
+def cleanup(sig, frame):
+  cmd = Command()
+  emFile.mode = EngineeringModeMode.ENGINEERING_MODE_MODE_OFF
+  cmd.add_action(
+    RegularAction(
+      operation=WriteFileData(
+        operand=Data(
+          offset=Offset(id=emFile.id),
+          data=list(emFile)
+        )
+      )
+    )
+  )
+  modem.execute_command(cmd)
+  sys.exit(0)
+
 argparser = argparse.ArgumentParser()
 argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
@@ -71,8 +88,8 @@ argparser.add_argument("-e", "--eirp", help="EIRP in dBm", type=int, default=0)
 argparser.add_argument("-t", "--timeout", help="timeout", type=int, default=0)
 argparser.add_argument("-x", "--not_exe", help="Don't execute the command on the modem, just print the resulting bytes", default=False, action="store_true")
 argparser.add_argument("-f", "--forward", help="forward write to engineering mode on access profile 0x01 using broadcast", default=False, action="store_true")
-argparser.add_argument("-fp", "--factory-paramp", help="first set factory settings paramp", type=int, default=40)
-argparser.add_argument("-fg", "--factory-gaussian", help="first set factory settings gaussian", type=int, default=2)
+argparser.add_argument("-fp", "--factory-paramp", help="first set factory settings paramp", type=int, default=0xFF)
+argparser.add_argument("-fg", "--factory-gaussian", help="first set factory settings gaussian", type=int, default=0xFF)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
@@ -80,9 +97,14 @@ ch = ChannelID.from_string(config.channel_id)
 print("Using mode {} for channel {} with TX EIRP {} dBm".format(config.mode, config.channel_id, config.eirp))
 mode = EngineeringModeMode.from_string(config.mode)
 
+if (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_TX) and (config.timeout == 0):
+  config.timeout = 255
+
 emFile = EngineeringModeFile(mode=mode, flags=0, timeout=config.timeout, channel_id=ch, eirp=config.eirp)
 
 stop = False
+
+signal.signal(signal.SIGINT, cleanup)
 
 print(list(emFile))
 
@@ -106,17 +128,23 @@ if not config.not_exe:
       )
     )
 
-  fact = FactorySettingsFile(gaussian=config.factory_gaussian, paramp=config.factory_paramp)
-  cmd.add_action(
-    RegularAction(
-      operation=WriteFileData(
-        operand=Data(
-          offset=Offset(id=fact.id),
-          data=list(fact)
+  if (config.factory_gaussian != 0xFF) or (config.factory_paramp != 0xFF):
+    if (config.factory_gaussian != 0xFF) or (config.factory_paramp != 0xFF):
+      fact = FactorySettingsFile(gaussian=config.factory_gaussian, paramp=config.factory_paramp)
+    elif config.factory_gaussian != 0xFF:
+      fact = FactorySettingsFile(gaussian=config.factory_gaussian)
+    else:
+      fact = FactorySettingsFile(paramp=config.factory_paramp)
+    cmd.add_action(
+      RegularAction(
+        operation=WriteFileData(
+          operand=Data(
+            offset=Offset(id=fact.id),
+            data=list(fact)
+          )
         )
       )
     )
-  )
 
   cmd.add_action(
     RegularAction(
@@ -143,10 +171,7 @@ if not config.not_exe:
       else:
         logging.info("command {}completed with{} error".format('not ' if not answer.execution_completed else '', 'out' if not answer.completed_with_error else ''))
 
-  if (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_PER_RX) or (mode == EngineeringModeMode.ENGINEERING_MODE_MODE_OFF):
-    try:
-        while not stop:
-          time.sleep(0.1)
-          pass
-    except KeyboardInterrupt:
-        sys.exit(0)
+if mode != EngineeringModeMode.ENGINEERING_MODE_MODE_OFF:
+  while not stop:
+    time.sleep(0.1)
+    pass
