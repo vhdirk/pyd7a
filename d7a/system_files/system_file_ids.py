@@ -72,4 +72,4 @@ class SystemFileIds(Enum):
   ACCESS_PROFILE_12 = 0x2C
   ACCESS_PROFILE_13 = 0x2D
   ACCESS_PROFILE_14 = 0x2E
-  # 0x2F RFU
+  RFU_2F = 0x2F
