@@ -42,7 +42,7 @@ class SecurityKeyFile(File, Validatable):
   @staticmethod
   def parse(s):
     key = s.read("bytes:16")
-    return SecurityKeyFile(key)
+    return SecurityKeyFile(key=key)
 
   def __iter__(self):
     for byte in [(self.key & (0xff << pos * 8)) >> pos * 8 for pos in range(16)]:
