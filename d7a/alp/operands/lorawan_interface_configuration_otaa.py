@@ -39,14 +39,11 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     # "app_key": Types.BYTES()
   }]
 
-  def __init__(self, adr_enabled, request_ack, app_port, data_rate, device_eui, app_eui, app_key):
+  def __init__(self, adr_enabled, request_ack, app_port, data_rate):
     self.adr_enabled = adr_enabled
     self.request_ack = request_ack
     self.app_port = app_port
     self.data_rate = data_rate
-    self.device_eui = device_eui
-    self.app_eui = app_eui
-    self.app_key = app_key
     super(LoRaWANInterfaceConfigurationOTAA, self).__init__()
 
   def __iter__(self):
@@ -60,15 +57,6 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     yield byte
     yield self.app_port
     yield self.data_rate
-    
-    for byte in self.device_eui:
-      yield byte
-
-    for byte in self.app_eui:
-      yield byte
-
-    for byte in self.app_key:
-      yield byte
 
 
   def __str__(self):
@@ -82,18 +70,12 @@ class LoRaWANInterfaceConfigurationOTAA(Validatable):
     _rfu = s.read("bits:1")
     app_port = s.read("uint:8")
     data_rate = s.read("uint:8")
-    device_eui = s.read("bytes:8")
-    app_eui = s.read("bytes:8")
-    app_key = s.read("bytes:16")
 
     return LoRaWANInterfaceConfigurationOTAA(
       request_ack=request_ack,
       adr_enabled=adr_enabled,
       app_port=app_port,
-      data_rate=data_rate,
-      device_eui=device_eui,
-      app_eui=app_eui,
-      app_key=app_key
+      data_rate=data_rate
     )
 
 

@@ -44,6 +44,7 @@ class FirmwareVersionFileTest(unittest.TestCase):
   def test_parsing(self):
     file_contents = [
       1, 1,                                         # D7AP v1.1
+      0, 0,                                         # FS version 0
       0x74, 0x68, 0x72, 0x6f, 0x75, 0x67,           # app name: throug(hput_test)
       0x39, 0x61, 0x61, 0x62, 0x66, 0x61, 0x61      # git sha1
      ]
@@ -51,18 +52,22 @@ class FirmwareVersionFileTest(unittest.TestCase):
     f = FirmwareVersionFile.parse(ConstBitStream(bytes=file_contents))
     self.assertEqual(f.d7a_protocol_version_major, 1)
     self.assertEqual(f.d7a_protocol_version_minor, 1)
+    self.assertEqual(f.filesystem_version_major, 0)
+    self.assertEqual(f.filesystem_version_minor, 0)
     self.assertEqual(f.application_name, "throug")
     self.assertEqual(f.git_sha1, "9aabfaa")
 
   def test_byte_generation(self):
     expected = [
       1, 1,                                         # D7AP v1.1
+      2, 0,                                         # FS version 0
       0x74, 0x68, 0x72, 0x6f, 0x75, 0x67,           # app name: throug(hput_test)
       0x39, 0x61, 0x61, 0x62, 0x66, 0x61, 0x61      # git sha1
      ]
 
     bytes = bytearray(FirmwareVersionFile(d7a_protocol_version_major=1, d7a_protocol_version_minor=1,
+                                          filesystem_version_major=2, filesystem_version_minor=0,
                                           application_name="throug", git_sha1="9aabfaa"))
-    self.assertEqual(len(bytes), 15)
+    self.assertEqual(len(bytes), 17)
     for i in xrange(len(bytes)):
       self.assertEqual(bytes[i], expected[i])

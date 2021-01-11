@@ -40,13 +40,11 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
     # "netw_id": Types.BYTES(),
   }]
 
-  def __init__(self, adr_enabled, request_ack, app_port, data_rate, netw_session_key, app_session_key, dev_addr, netw_id):
+  def __init__(self, adr_enabled, request_ack, app_port, data_rate, dev_addr, netw_id):
     self.adr_enabled = adr_enabled
     self.request_ack = request_ack
     self.app_port = app_port
     self.data_rate = data_rate
-    self.netw_session_key = netw_session_key
-    self.app_session_key = app_session_key
     self.dev_addr = dev_addr
     self.netw_id = netw_id
     super(LoRaWANInterfaceConfigurationABP, self).__init__()
@@ -62,12 +60,6 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
     yield byte
     yield self.app_port
     yield self.data_rate
-
-    for byte in self.netw_session_key:
-      yield byte
-
-    for byte in self.app_session_key:
-      yield byte
 
     for byte in bytearray(struct.pack(">I", self.dev_addr)):
       yield byte
@@ -86,8 +78,6 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
     _rfu = s.read("bits:1")
     app_port = s.read("uint:8")
     data_rate = s.read("uint:8")
-    netw_session_key = s.read("bytes:16")
-    app_session_key = s.read("bytes:16")
     dev_addr = s.read("uint:32")
     netw_id = s.read("uint:32")
 
@@ -96,8 +86,6 @@ class LoRaWANInterfaceConfigurationABP(Validatable):
       adr_enabled=adr_enabled,
       app_port=app_port,
       data_rate=data_rate,
-      netw_session_key=netw_session_key,
-      app_session_key=app_session_key,
       dev_addr=dev_addr,
       netw_id=netw_id,
     )

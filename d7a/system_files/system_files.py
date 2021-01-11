@@ -33,6 +33,8 @@ from d7a.system_files.uid import UidFile
 from d7a.system_files.engineering_mode import EngineeringModeFile
 from d7a.system_files.factory_settings import FactorySettingsFile
 from d7a.system_files.vid import VidFile
+from d7a.system_files.root_authentication_key import RootAuthenticationKeyFile
+from d7a.system_files.user_authentication_key import UserAuthenticationKeyFile
 
 
 class SystemFiles:
@@ -61,8 +63,8 @@ class SystemFiles:
     SystemFileIds.RFU_15: NotImplementedFile(SystemFileIds.RFU_15, 0),
     SystemFileIds.RFU_16: NotImplementedFile(SystemFileIds.RFU_16, 0),
     SystemFileIds.LOCATION_DATA: NotImplementedFile(SystemFileIds.LOCATION_DATA, 1),  # TODO 0 recorded locations
-    SystemFileIds.D7AALP_RFU_18: NotImplementedFile(SystemFileIds.D7AALP_RFU_18, 0),
-    SystemFileIds.D7AALP_RFU_19: NotImplementedFile(SystemFileIds.D7AALP_RFU_19, 0),
+    SystemFileIds.ALP_ROOT_AUTHENTICATION_KEY: RootAuthenticationKeyFile(),
+    SystemFileIds.ALP_USER_AUTHENTICATION_KEY: UserAuthenticationKeyFile(),
     SystemFileIds.D7AALP_RFU_1A: NotImplementedFile(SystemFileIds.D7AALP_RFU_1A, 0),
     SystemFileIds.D7AALP_RFU_1B: NotImplementedFile(SystemFileIds.D7AALP_RFU_1B, 0),
     SystemFileIds.D7AALP_RFU_1C: NotImplementedFile(SystemFileIds.D7AALP_RFU_1C, 0),
