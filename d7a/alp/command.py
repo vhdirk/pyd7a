@@ -239,16 +239,16 @@ class Command(Validatable):
     return cmd
 
   @staticmethod
-  def create_with_return_file_data_action(file_id, data, interface_type=InterfaceType.HOST, interface_configuration=None):
+  def create_with_return_file_data_action(file_id, data, offset=0, tag_id=None, interface_type=InterfaceType.HOST, interface_configuration=None):
     # default to host interface, when D7ASP interface is used prepend with Forward action
-    cmd = Command()
+    cmd = Command(tag_id=tag_id)
     cmd.add_forward_action(interface_type, interface_configuration)
     cmd.add_action(
       RegularAction(
         operation=ReturnFileData(
           operand=Data(
             data=data,
-            offset=Offset(id=file_id)
+            offset=Offset(id=file_id, offset=Length(offset))
           )
         )
       )

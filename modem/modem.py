@@ -86,9 +86,13 @@ class Modem:
 
     self.start_reading()
 
-  def connect(self):
+  def connect(self, check_alive=True):
     if self.connected:
       return
+
+    if not check_alive:
+      self.connected = True
+      return True
 
     read_modem_info_action = Command.create_with_read_file_action_system_file(UidFile())
     read_modem_info_action.add_action(
