@@ -40,14 +40,14 @@ class TestPermission(unittest.TestCase):
     self.assertEqual(permission.encrypted, True)
     self.assertEqual(permission.executable, True)
     self.assertEqual(permission.user_readable, True)
-    self.assertEqual(permission.user_writeable, True)
-    self.assertEqual(permission.user_executeable, True)
+    self.assertEqual(permission.user_writable, True)
+    self.assertEqual(permission.user_executable, True)
     self.assertEqual(permission.guest_readable, True)
-    self.assertEqual(permission.guest_writeable, False)
-    self.assertEqual(permission.guest_executeable, False)
+    self.assertEqual(permission.guest_writable, False)
+    self.assertEqual(permission.guest_executable, False)
 
   def test_byte_generation(self):
-    p = FilePermissions(encrypted=True, executeable=True, user_readable=True, user_writeable=True, user_executeable=True,
-                   guest_readable=True, guest_writeable=False, guest_executeable=False)
+    p = FilePermissions(encrypted=True, executable=True, user_readable=True, user_writable=True, user_executable=True,
+                   guest_readable=True, guest_writable=False, guest_executable=False)
     bytes = bytearray(p)
     self.assertEqual(bytes, bytearray([0xFC]))
