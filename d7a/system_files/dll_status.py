@@ -56,7 +56,7 @@ class DllStatusFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=16):
     last_rx_packet_level = s.read("uint:8")
     last_rx_packet_link_budget = s.read("uint:8")
     noise_floor = s.read("uint:8")

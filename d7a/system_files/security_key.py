@@ -40,7 +40,7 @@ class SecurityKeyFile(File, Validatable):
     File.__init__(self, SystemFileIds.NWL_SECURITY_KEY.value, 16)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=16):
     key = s.read("bytes:16")
     return SecurityKeyFile(key=key)
 

@@ -40,7 +40,7 @@ class UidFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=8):
     uid = s.read("uint:64")
     return UidFile(uid=uid)
 

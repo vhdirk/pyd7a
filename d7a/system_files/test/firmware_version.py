@@ -57,6 +57,21 @@ class FirmwareVersionFileTest(unittest.TestCase):
     self.assertEqual(f.application_name, "throug")
     self.assertEqual(f.git_sha1, "9aabfaa")
 
+  def test_parsing_short(self):
+    file_contents = [
+      1, 1,                                         # D7AP v1.1
+      0, 0,                                         # FS version 0
+      0x74
+     ]
+
+    f = FirmwareVersionFile.parse(ConstBitStream(bytes=file_contents), offset=0, length=5)
+    self.assertEqual(f.d7a_protocol_version_major, 1)
+    self.assertEqual(f.d7a_protocol_version_minor, 1)
+    self.assertEqual(f.filesystem_version_major, 0)
+    self.assertEqual(f.filesystem_version_minor, 0)
+    self.assertEqual(f.application_name, "")
+    self.assertEqual(f.git_sha1, "")
+
   def test_byte_generation(self):
     expected = [
       1, 1,                                         # D7AP v1.1

@@ -44,7 +44,7 @@ class AccessProfileFile(File, Validatable):
       yield byte
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=65):
     return AccessProfileFile(access_specifier=0, access_profile=AccessProfile.parse(s)) # TODO access_specifier?
 
   def __str__(self):

@@ -51,7 +51,7 @@ class SELConfigFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=6):
     autoscaling_ctrl = AutoscalingCtrl.parse(s)
     autoscaling_parameter = s.read("uint:8")
     retry = s.read("uint:8")

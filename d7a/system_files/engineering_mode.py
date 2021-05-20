@@ -78,7 +78,7 @@ class EngineeringModeFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=9):
     mode = EngineeringModeMode(int(s.read("uint:8")))
     flags = s.read("uint:8")
     timeout = s.read("uint:8")

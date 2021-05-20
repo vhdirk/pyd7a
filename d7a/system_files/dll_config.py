@@ -48,7 +48,7 @@ class DllConfigFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=7):
     ac = s.read("uint:8")
     _rfu = s.read("uint:16")
     lq_filter = s.read("uint:8")

@@ -142,14 +142,14 @@ class TestCommandFactory(unittest.TestCase):
   def test_create_with_write_file_header(self):
     file_header = FileHeader(
       permissions=FilePermissions(
-        executeable=True,
+        executable=True,
         encrypted=False,
         user_readable=True,
-        user_writeable=True,
-        user_executeable=False,
+        user_writable=True,
+        user_executable=False,
         guest_readable=True,
-        guest_executeable=False,
-        guest_writeable=False
+        guest_executable=False,
+        guest_writable=False
       ),
       properties=FileProperties(act_enabled=False, act_condition=ActionCondition.WRITE, storage_class=StorageClass.PERMANENT),
       alp_command_file_id=0x41,
@@ -169,14 +169,14 @@ class TestCommandFactory(unittest.TestCase):
   def test_create_with_create_file(self):
     file_header = FileHeader(
       permissions=FilePermissions(
-        executeable=True,
+        executable=True,
         encrypted=False,
         user_readable=True,
-        user_writeable=True,
-        user_executeable=False,
+        user_writable=True,
+        user_executable=False,
         guest_readable=True,
-        guest_executeable=False,
-        guest_writeable=False
+        guest_executable=False,
+        guest_writable=False
       ),
       properties=FileProperties(act_enabled=False, act_condition=ActionCondition.WRITE, storage_class=StorageClass.PERMANENT),
       alp_command_file_id=0x41,

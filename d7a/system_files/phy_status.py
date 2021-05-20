@@ -58,7 +58,7 @@ class PhyStatusFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=15 + (3 * 10)):
     up_time = s.read("uint:32")
     rx_time = s.read("uint:32")
     tx_time = s.read("uint:32")
