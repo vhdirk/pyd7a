@@ -42,7 +42,7 @@ class RootAuthenticationKeyFile(File, Validatable):
     File.__init__(self, SystemFileIds.ALP_ROOT_AUTHENTICATION_KEY.value, 40)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=40):
     key = s.read("bytes:16") 
     _rfu = s.read("bytes:24")
     return RootAuthenticationKeyFile(key)

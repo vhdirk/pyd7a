@@ -48,11 +48,11 @@ class TestFileHeader(unittest.TestCase):
     self.assertEqual(permission.encrypted, True)
     self.assertEqual(permission.executable, True)
     self.assertEqual(permission.user_readable, True)
-    self.assertEqual(permission.user_writeable, True)
-    self.assertEqual(permission.user_executeable, True)
+    self.assertEqual(permission.user_writable, True)
+    self.assertEqual(permission.user_executable, True)
     self.assertEqual(permission.guest_readable, True)
-    self.assertEqual(permission.guest_writeable, False)
-    self.assertEqual(permission.guest_executeable, False)
+    self.assertEqual(permission.guest_writable, False)
+    self.assertEqual(permission.guest_executable, False)
     prop = file_header.properties
     self.assertEqual(prop.act_enabled, True)
     self.assertEqual(prop.act_condition, ActionCondition.WRITE_FLUSH)
@@ -65,8 +65,8 @@ class TestFileHeader(unittest.TestCase):
 
   def test_byte_generation(self):
     file_header = FileHeader(
-      permissions=FilePermissions(encrypted=True, executeable=True, user_readable=True, user_writeable=True, user_executeable=True,
-                   guest_readable=True, guest_writeable=False, guest_executeable=False),
+      permissions=FilePermissions(encrypted=True, executable=True, user_readable=True, user_writable=True, user_executable=True,
+                   guest_readable=True, guest_writable=False, guest_executable=False),
       properties=FileProperties(act_enabled=True, act_condition=ActionCondition.WRITE_FLUSH, storage_class=StorageClass.PERMANENT),
       alp_command_file_id=0x41,
       interface_file_id=0x42,

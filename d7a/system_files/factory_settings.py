@@ -95,7 +95,7 @@ class FactorySettingsFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=56):
     gain = s.read("int:8")
     rx_bw_low_rate = s.read("uint:32")
     rx_bw_normal_rate = s.read("uint:32")

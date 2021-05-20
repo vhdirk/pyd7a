@@ -123,7 +123,7 @@ class Modem:
           if action.operand.offset.id == SystemFileIds.UID.value:
             self.uid = '{:x}'.format(struct.unpack(">Q", str(bytearray(action.operand.data)))[0])
           if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
-            self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)))
+            self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)), action.operand.offset.offset.value, action.operand.length.value)
 
     if self.uid and self.firmware_version:
       self.connected = True

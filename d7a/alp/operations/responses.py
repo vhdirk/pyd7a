@@ -54,7 +54,7 @@ class ReturnFileData(Operation):
     if (systemfile_type is not None) and (systemfile_type.length >= self.operand.length.value):
       self.systemfile_type = systemfile_type
       try:
-        self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)))
+        self.file_data_parsed = systemfile_type.parse(ConstBitStream(bytearray(self.operand.data)), self.operand.offset.offset.value, self.operand.length.value)
       except:
         self.systemfile_type = None
         self.file_data_parsed = None

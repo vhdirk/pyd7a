@@ -42,7 +42,7 @@ class VidFile(File, Validatable):
     Validatable.__init__(self)
 
   @staticmethod
-  def parse(s):
+  def parse(s, offset=0, length=3):
     vid = s.read("uint:16")
     control = s.read("uint:8")
     return VidFile(vid=vid, control=control)

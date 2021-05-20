@@ -59,16 +59,21 @@ class FirmwareVersionFile(File, Validatable):
     return str(self.filesystem_version_major) + '.' + str(self.filesystem_version_minor)
 
   @staticmethod
-  def parse(s):
-    major = s.read("uint:8")
-    minor = s.read("uint:8")
-    file_major = s.read("uint:8")
-    file_minor = s.read("uint:8")
-    application_name = s.read("bytes:6").decode("ascii")
-    git_sha1 = s.read("bytes:7").decode("ascii")
-    return FirmwareVersionFile(d7a_protocol_version_major=major, d7a_protocol_version_minor=minor,
-                               filesystem_version_major=file_major, filesystem_version_minor=file_minor,
-                               application_name=application_name, git_sha1=git_sha1)
+  def parse(s, offset=0, length=17):
+    version_file = FirmwareVersionFile()
+    if (offset <= 0) and (length + offset >= 1):
+      version_file.d7a_protocol_version_major = s.read("uint:8")
+    if (offset <= 1) and (length + offset >= 2):
+      version_file.d7a_protocol_version_minor = s.read("uint:8")
+    if (offset <= 2) and (length + offset >= 3):
+      version_file.filesystem_version_major = s.read("uint:8")
+    if (offset <= 3) and (length + offset >= 4):
+      version_file.filesystem_version_minor = s.read("uint:8")
+    if (offset <= 4) and (length + offset >= 10):
+      version_file.application_name = s.read("bytes:6").decode("ascii")
+    if (offset <= 10) and (length + offset >= 17):
+      version_file.git_sha1 = s.read("bytes:7").decode("ascii")
+    return version_file
 
   def __iter__(self):
     yield self.d7a_protocol_version_major
