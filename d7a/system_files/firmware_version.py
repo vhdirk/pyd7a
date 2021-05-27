@@ -70,7 +70,11 @@ class FirmwareVersionFile(File, Validatable):
     if (offset <= 3) and (length + offset >= 4):
       version_file.filesystem_version_minor = s.read("uint:8")
     if (offset <= 4) and (length + offset >= 10):
-      version_file.application_name = s.read("bytes:6").decode("ascii")
+      try:
+        version_file.application_name = s.read("bytes:6").decode("ascii")
+      except UnicodeDecodeError:
+        version_file.application_name = "DecErr"
+        pass
     if (offset <= 10) and (length + offset >= 17):
       version_file.git_sha1 = s.read("bytes:7").decode("ascii")
     return version_file
