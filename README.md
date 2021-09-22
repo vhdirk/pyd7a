@@ -1,6 +1,6 @@
 # DASH7 Python Support
 A collection of Python modules, supporting the DASH7 Alliance Protocol in general,
-and [OSS-7](https://github.com/MOSAIC-LoPoW/dash7-ap-open-source-stack) in particular.
+and [Sub-IoT](https://github.com/Sub-Iot/Sub-IoT-Stack) in particular.
 
 ## Introduction
 
@@ -12,7 +12,7 @@ We are currently targeting python v2.7.
 Use the following commands to get started:
 
 ```bash
-$ git clone https://github.com/MOSAIC-LoPoW/pyd7a.git
+$ git clone https://github.com/Sub-IoT/pyd7a.git
 $ cd pyd7a
 $ sudo pip install -r requirements.txt
 ```
@@ -42,10 +42,10 @@ Any application action, data exchange method or protocol is mapped into manipula
 
 A parser for D7AP frames as transmitted over the air.
 
-### OSS-7 Serial console interface parser
+### Sub-Iot Serial console interface parser
 
-A parser for frames used by the serial console interface by OSS-7 nodes
+A parser for frames used by the serial console interface by Sub-IoT-Stack nodes
 
-### OSS-7 Modem interface
+### Sub-IoT Modem interface
 
-Allows to use a serial connected OSS-7 node as a modem. By sending ALP commands you can access the node's filesystem, or use the node's DASH7 interface to access the filesystem of nodes in the network.
+Allows to use a serial connected Sub-IoT-Stack node as a modem. By sending ALP commands you can access the node's filesystem, or use the node's DASH7 interface to access the filesystem of nodes in the network.

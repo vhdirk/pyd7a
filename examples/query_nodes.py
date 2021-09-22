@@ -3,7 +3,7 @@
 # Copyright (c) 2015-2019 University of Antwerp, Aloxy NV.
 #
 # This file is part of pyd7a
-# (see https://github.com/MOSAIC-LoPoW/pyd7a).
+# (see https://github.com/Sub-IoT/pyd7a).
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -38,7 +38,7 @@ from d7a.sp.qos import QoS, ResponseMode
 from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
-# This example can be used with a node running the gateway app included in OSS-7, which is connect using the supplied serial device.
+# This example can be used with a node running the gateway app included in Sub-IoT, which is connect using the supplied serial device.
 # It will query the sensor file (file 0x40) from other nodes running sensor_pull, using adhoc synchronization and print the results.
 from util.logger import configure_default_logger
 

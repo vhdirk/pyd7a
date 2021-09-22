@@ -3,7 +3,7 @@
 # Copyright (c) 2015-2019 University of Antwerp, Aloxy NV.
 #
 # This file is part of pyd7a
-# (see https://github.com/MOSAIC-LoPoW/pyd7a).
+# (see https://github.com/Sub-IoT/pyd7a).
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -39,7 +39,7 @@ from modem.modem import Modem
 
 
 
-# This example can be used with a node running the gateway app included in OSS-7.
+# This example can be used with a node running the gateway app included in Sub-IoT.
 # The gateway is continuously listening for foreground frames.
 # Messages pushed by other nodes (running for example the sensor_push app) will be received by the gateway node,
 # transmitted over serial and the received_command_callback() function below will be called.

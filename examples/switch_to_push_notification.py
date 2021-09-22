@@ -3,7 +3,7 @@
 # Copyright (c) 2015-2019 University of Antwerp, Aloxy NV.
 #
 # This file is part of pyd7a
-# (see https://github.com/MOSAIC-LoPoW/pyd7a).
+# (see https://github.com/Sub-IoT/pyd7a).
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -51,7 +51,7 @@ from modem.modem import Modem
 from util.logger import configure_default_logger
 
 
-# This example can be used with a node running the modem app included in OSS-7.
+# This example can be used with a node running the modem app included in Sub-IoT.
 # It will remotely reconfigure other nodes running sensor_pull so that they will push (using D7AActpP),
 # the temperature value when it exceeds the supplied threshold value
 

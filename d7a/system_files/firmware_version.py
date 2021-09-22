@@ -2,7 +2,7 @@
 # Copyright (c) 2015-2019 University of Antwerp, Aloxy NV.
 #
 # This file is part of pyd7a
-# (see https://github.com/MOSAIC-LoPoW/pyd7a).
+# (see https://github.com/Sub-IoT/pyd7a).
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -33,7 +33,7 @@ class FirmwareVersionFile(File, Validatable):
   SCHEMA = [{
     "d7a_protocol_version_major": Types.INTEGER(min=0, max=255),
     "d7a_protocol_version_minor": Types.INTEGER(min=0, max=255),
-    # custom fields, specific to oss7
+    # custom fields, specific to Sub-IoT
     "filesystem_version_major": Types.INTEGER(min=0, max=255),
     "filesystem_version_minor": Types.INTEGER(min=0, max=255),
     "application_name": Types.STRING(maxlength=6),
