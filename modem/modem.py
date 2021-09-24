@@ -204,11 +204,11 @@ class Modem:
     while self._read_async_active:
       try:
         data_received = self.dev.read()
-      except serial.SerialException:
-        self.log.warning("SerialException received, trying to reconnect")
+      except serial.SerialException as e:
+        self.log.warning("SerialException {} received, trying to reconnect".format(e.errno))
         self.dev.close()
         time.sleep(5)
-        self._connect_serial_modem()
+        self.dev.open()
 
       if len(data_received) > 0:
         # self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
