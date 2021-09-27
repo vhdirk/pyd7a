@@ -218,7 +218,7 @@ class Modem:
           self.log.warning("Parser error: {}".format(error))
         cmd_cnt = 0
         for cmd in cmds:
-          if not self.skip_alp_parsing and hasattr(cmd, 'tag_id') and self._sync_execution_tag_id == cmd.tag_id and message_types[cmd_cnt] <= MessageType.PING_RESPONSE:
+          if not self.skip_alp_parsing and hasattr(cmd, 'tag_id') and self._sync_execution_tag_id != None and self._sync_execution_tag_id == cmd.tag_id and message_types[cmd_cnt] <= MessageType.PING_RESPONSE:
             self.log.info("Received response for sync execution")
             self._sync_execution_response_cmds.append(cmd)
             if cmd.execution_completed:
