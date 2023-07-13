@@ -29,6 +29,9 @@ import inspect
 class ObjectValidator(Validator):
   def _validate_isinstance(self, clazz, field, value):
     """ {'nullable': True } """ # dummy validation schema to avoid warning ;-)
+    if value is None:
+      # it is checked in validator.py if nullable is allowed, if not it will return error earlier
+      return
     if not isinstance(value, clazz):
       self._error(field, "Should be instance of " + clazz.__name__)
 
@@ -47,7 +50,7 @@ class Validatable(object):
 
   def as_dict(self):
     d = { "__CLASS__" : self.__class__.__name__ }
-    for k, v in self.__dict__.iteritems():
+    for k, v in list(self.__dict__.items()):
       if inspect.isclass(v): continue   # skip classes
       if isinstance(v, list):
         l = []
@@ -82,8 +85,8 @@ class Validatable(object):
 
 class Types(object):
   @staticmethod
-  def BOOLEAN(value=None):
-    b = { "type": "boolean", "nullable": False }
+  def BOOLEAN(value=None, nullable=False):
+    b = { "type": "boolean", "nullable": nullable }
     if value is not None: b["allowed"] = [value]
     return b
 
@@ -100,10 +103,11 @@ class Types(object):
     return s
 
   @staticmethod
-  def BYTES():
+  def BYTES(nullable=False):
     return {
       "type": "list",
-      "schema": { "type": "integer", "min": 0, "max": 0xFF}
+      "schema": { "type": "integer", "min": 0, "max": 0xFF},
+      "nullable": nullable
     }
 
   @staticmethod
@@ -113,8 +117,8 @@ class Types(object):
     return o
 
   @staticmethod
-  def INTEGER(values=None, min=None, max=None):
-    i = { "type": "integer", "nullable": False }
+  def INTEGER(values=None, min=None, max=None, nullable=False):
+    i = { "type": "integer", "nullable": nullable }
     if min    is not None: i["min"]     = min
     if max    is not None: i["max"]     = max
     if values is not None:

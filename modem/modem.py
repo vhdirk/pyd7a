@@ -95,7 +95,7 @@ class Modem:
         operation=ReadFileData(
           operand=DataRequest(
             offset=Offset(id=FirmwareVersionFile().id, offset=Length(0)),  # TODO offset size
-            length=FirmwareVersionFile().length
+            length=Length(FirmwareVersionFile().length)
           )
         )
       )
@@ -116,7 +116,7 @@ class Modem:
     for action in resp_cmd[0].actions:
       if type(action) is RegularAction and type(action.operation) is ReturnFileData:
           if action.operand.offset.id == SystemFileIds.UID.value:
-            self.uid = '{:x}'.format(struct.unpack(">Q", str(bytearray(action.operand.data)))[0])
+            self.uid = "".join([f'{b:02X}' for b in bytes(action.operand.data)])
           if action.operand.offset.id == SystemFileIds.FIRMWARE_VERSION.value:
             self.firmware_version = FirmwareVersionFile.parse(ConstBitStream(bytearray(action.operand.data)), action.operand.offset.offset.value, action.operand.length.value)
 
@@ -154,7 +154,7 @@ class Modem:
       self.dev.write(data)
       self.dev.flush()
     self.log.info("Sending command of size %s" % len(data))
-    self.log.debug("> " + " ".join(map(lambda b: format(b, "02x"), data)))
+    self.log.debug("> " + " ".join([format(b, "02x") for b in data]))
     if timeout_seconds == 0:
       return []
 
@@ -209,7 +209,7 @@ class Modem:
         # self.log.debug("< " + " ".join(map(lambda b: format(b, "02x"), bytearray(data_received))))
         (message_types, cmds, info) = self.parser.parse(data_received)
         for error in info["errors"]:
-          error["buffer"] = " ".join(map(lambda b: format(b, "02x"), bytearray(data_received)))
+          error["buffer"] = " ".join([format(b, "02x") for b in bytearray(data_received)])
           self.log.warning("Parser error: {}".format(error))
         cmd_cnt = 0
         for cmd in cmds:

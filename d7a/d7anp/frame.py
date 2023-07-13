@@ -50,10 +50,10 @@ class Frame(Validatable):
 
     if not control.has_no_origin_access_id:
       if control.origin_id_type == IdType.VID:
-        origin_access_id = map(ord, bitstream.read("bytes:2"))
+        origin_access_id = list(map(ord, bitstream.read("bytes:2")))
         payload_length = payload_length - 2
       elif control.origin_id_type == IdType.UID:
-        origin_access_id = map(ord, bitstream.read("bytes:8"))
+        origin_access_id = list(bitstream.read("bytes:8"))
         payload_length = payload_length - 8
       else:
         assert False

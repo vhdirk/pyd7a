@@ -50,7 +50,7 @@ class Data(Validatable):
   def __iter__(self):
     for byte in self.offset: yield byte
     for byte in self.length: yield byte
-    for byte in self.data: yield chr(byte)
+    for byte in self.data: yield byte
 
   def __str__(self):
     return "{}, length={}, data={}".format(self.offset, self.length, self.data)
@@ -63,9 +63,9 @@ class DataRequest(Validatable):
     "length" : Types.OBJECT(Length)
   }]
 
-  def __init__(self, length, offset=Offset()):
+  def __init__(self, length=Length(), offset=Offset()):
     self.offset = offset
-    self.length = Length(length)
+    self.length = length
     super(DataRequest, self).__init__()
 
   def __iter__(self):

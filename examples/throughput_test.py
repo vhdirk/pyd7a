@@ -24,9 +24,8 @@ from collections import defaultdict
 
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
-from d7a.alp.operations.status import InterfaceStatus
 from d7a.d7anp.addressee import Addressee, IdType
-from d7a.dll.access_profile import AccessProfile, CsmaCaMode
+from d7a.dll.access_profile import AccessProfile
 from d7a.dll.sub_profile import SubProfile
 from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelClass, ChannelCoding
 from d7a.phy.subband import SubBand
@@ -119,7 +118,7 @@ class ThroughtPutTest:
 
   def start(self):
     self.received_commands = defaultdict(list)
-    payload = range(self.config.payload_size)
+    payload = list(range(self.config.payload_size))
 
     if self.receiver_modem != None:
       addressee_id = int(self.receiver_modem.uid, 16)
@@ -217,25 +216,25 @@ class ThroughtPutTest:
       start = time.time()
       total_recv = 0
       while total_recv < self.config.msg_count and time.time() - start < self.config.receiver_timeout:
-        total_recv = sum(len(v) for v in self.received_commands.values())
+        total_recv = sum(len(v) for v in list(self.received_commands.values()))
         time.sleep(2)
         print("waiting for receiver to finish ... (current nr of recv msgs: {})".format(total_recv))
 
       print("finished receiving or timeout")
       payload_has_errors = False
-      for sender_cmd in self.received_commands.values():
+      for sender_cmd in list(self.received_commands.values()):
         for cmd in sender_cmd:
           if type(cmd.actions[0].op) != ReturnFileData and cmd.actions[0].operand.data != payload:
             payload_has_errors = True
-            print ("receiver: received unexpected command: {}".format(cmd))
+            print("receiver: received unexpected command: {}".format(cmd))
 
       if payload_has_errors == False and total_recv == self.config.msg_count:
         print("receiver: OK: received {} messages with correct payload:".format(total_recv))
-        for sender, cmds in self.received_commands.items():
+        for sender, cmds in list(self.received_commands.items()):
           print("\t{}: {}".format(sender, len(cmds)))
       else:
         print("receiver: NOK: received messages {}:".format(total_recv))
-        for sender, cmds in self.received_commands.items():
+        for sender, cmds in list(self.received_commands.items()):
           print("\t{}: {}".format(sender, len(cmds)))
 
   def receiver_cmd_callback(self, cmd):

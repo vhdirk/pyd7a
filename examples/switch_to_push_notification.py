@@ -19,7 +19,6 @@
 #
 
 import argparse
-from time import sleep
 import logging
 import struct
 
@@ -74,7 +73,7 @@ query_sensor_file_cmd.add_action(
       mask_present=False,
       params=ArithQueryParams(signed_data_type=False, comp_type=ArithComparisonType.GREATER_THAN),
       compare_length = Length(2),
-      compare_value=[ord(b) for b in struct.pack(">H", int(config.temperature * 10))],
+      compare_value=struct.pack(">H", int(config.temperature * 10)),
       file_a_offset=Offset(id=0x40, offset=Length(0))))
   )
 )

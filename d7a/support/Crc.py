@@ -22,5 +22,5 @@ import binascii
 
 def calculate_crc(bytes):
     crc16_func = crcmod.predefined.mkCrcFun('crc-ccitt-false')
-    crc = crc16_func(binascii.hexlify(bytearray(bytes)).decode('hex'))
+    crc = crc16_func(bytes)
     return [(crc >> 8) & 0xff, crc & 0xff]

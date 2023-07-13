@@ -23,14 +23,12 @@ import sys
 import logging
 
 from d7a.phy.channel_id import ChannelID
-from d7a.system_files.engineering_mode import EngineeringModeFile, EngineeringModeMode
 from d7a.alp.command import Command
 from d7a.dll.access_profile import AccessProfile
 from d7a.dll.sub_profile import SubProfile
-from d7a.phy.channel_header import ChannelHeader, ChannelBand, ChannelCoding, ChannelClass
+from d7a.phy.channel_header import ChannelHeader
 from d7a.phy.subband import SubBand
 from d7a.system_files.access_profile import AccessProfileFile
-from d7a.system_files.dll_config import DllConfigFile
 from d7a.types.ct import CT
 
 from modem.modem import Modem

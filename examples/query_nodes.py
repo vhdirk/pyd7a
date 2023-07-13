@@ -30,7 +30,6 @@ from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import Addressee, IdType
 from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode
-from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
 # This example can be used with a node running the gateway app included in Sub-IoT, which is connect using the supplied serial device.

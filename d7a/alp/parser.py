@@ -112,7 +112,7 @@ class Parser(object):
   def parse_alp_file_data_request_operand(self, s):
     offset = self.parse_offset(s)
     length = Length.parse(s)
-    return DataRequest(length=length.value, offset=offset)
+    return DataRequest(length=length, offset=offset)
 
   def parse_break_query_action(self, b7, b6, s):
     return RegularAction(group=b7, resp=b6, operation=BreakQuery(operand=QueryOperand.parse(s)))
@@ -139,7 +139,7 @@ class Parser(object):
     offset = self.parse_offset(s)
     length = Length.parse(s)
     data   = s.read("bytes:" + str(length.value))
-    return Data(offset=offset, data=map(ord,data))
+    return Data(offset=offset, data=[int(d) for d in data])
 
   def parse_alp_return_status_action(self, b7, b6, s):
     if b7:

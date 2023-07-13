@@ -26,3 +26,7 @@ class File:
   @property
   def name(self):
     return self.__class__.__name__
+  
+  @name.setter
+  def name(self, value):
+    self.__class__.__name__ = value

@@ -34,9 +34,9 @@ argparser.add_argument('data', help="The data to be parsed, input as an hexstrin
 args = argparser.parse_args()
 
 hexstring = args.data.strip().replace(' ', '')
-data = bytearray(hexstring.decode("hex"))
+data = bytearray(bytes.fromhex(hexstring))
 if args.type == "alp":
-  print AlpParser().parse(ConstBitStream(data), len(data))
+  print(AlpParser().parse(ConstBitStream(data), len(data)))
   exit(0)
 if args.type == "serial":
   parser = SerialParser()
@@ -47,11 +47,11 @@ if args.type == "bg":
 if args.type == "systemfile":
   file = SystemFileIds(args.file_id)
   file_type = SystemFiles().files[file]
-  print(file_type.parse(ConstBitStream(data)))
+  print((file_type.parse(ConstBitStream(data))))
   exit(0)
 
 msgtype, cmds, info = parser.parse(data)
 for cmd in cmds:
-  print cmd
+  print(cmd)
 
-print info
+print(info)

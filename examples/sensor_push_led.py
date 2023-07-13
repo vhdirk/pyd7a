@@ -32,7 +32,6 @@ import signal
 import sys
 import traceback
 
-import serial
 import time
 import json
 

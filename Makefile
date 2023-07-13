@@ -1,20 +1,18 @@
-COVERAGE=PYTHONPATH=. $(shell which coverage2)
-
-TESTFILES=$(shell grep -lr TestCase d7a | grep '\.py$$')
+COVERAGE=PYTHONPATH=. $(shell which coverage3)
 
 all: clean test coverage
 
 test:
 	@echo "*** running all tests"
-	-@$(COVERAGE) run -m unittest2 $(TESTFILES)
+	@PYTHONPATH="../" $(COVERAGE) run -m pytest test/ --junitxml=unittest-result.xml
 
 test-%:
 	@echo "*** performing tests for d7a-$(subst _,/,$(subst test-,,$@))"
-	$(COVERAGE) run  -m unittest2 d7a/$(subst -,/,$(subst test-,,$@))/test/*.py
+	@PYTHONPATH="../" $(COVERAGE) run -m pytest test/d7a/$(subst -,/,$(subst test-,,$@))/*.py --junitxml=unittest-result.xml
 
 coverage:
 	@echo "*** generating unittest coverage report (based on last test run)"
-	@$(COVERAGE) report -m --omit '/System/*,*__init__.py,*/test/*,*site-packages*,*/support/*'
+	@$(COVERAGE) report -m --omit '/System/*,*__init__.py,test/*,*site-packages*,*/support/*,/usr/*'
 
 clean:
 	@rm -f .coverage

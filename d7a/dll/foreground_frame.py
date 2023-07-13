@@ -63,11 +63,11 @@ class ForegroundFrame(Validatable):
     control = ForegroundFrameControl.parse(s)
     payload_length = length - 4 # substract subnet, control, crc
     if control.id_type == IdType.VID:
-      target_address = map(ord, s.read("bytes:2"))
+      target_address = list(s.read("bytes:2"))
       payload_length = payload_length - 2
     elif control.id_type == IdType.UID:
-        target_address = map(ord, s.read("bytes:8"))
-        payload_length = payload_length - 8
+      target_address = list(s.read("bytes:8"))
+      payload_length = payload_length - 8
     else:
       target_address = []
 

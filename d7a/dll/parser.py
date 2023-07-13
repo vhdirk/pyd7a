@@ -56,7 +56,7 @@ class Parser(object):
     info["parsed"] = parsed
     return (frames, info)
 
-  def shift_buffer(self, start):
+  def shift_buffer(self, start: int):
     self.buffer = self.buffer[start:]
     return self
 
@@ -73,7 +73,7 @@ class Parser(object):
         else:
           frame = BackgroundFrame.parse(self.s)
         bits_parsed = self.s.pos
-        self.shift_buffer(bits_parsed/8)
+        self.shift_buffer(bits_parsed//8)
         retry = False         # got one, carry on
       except ReadError as e:       # not enough to read, carry on and wait for more
         retry = False

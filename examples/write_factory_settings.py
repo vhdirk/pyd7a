@@ -26,7 +26,6 @@ from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.d7anp.addressee import Addressee, IdType
 
-from d7a.phy.channel_id import ChannelID
 from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode, RetryMode
 from d7a.system_files.factory_settings import FactorySettingsFile

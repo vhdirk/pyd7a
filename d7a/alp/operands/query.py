@@ -98,7 +98,7 @@ class QueryOperand(Validatable):
     assert(mask_present is False) # TODO implement this
     params = ArithQueryParams.parse(s)
     compare_length = Length.parse(s)
-    compare_value = map(ord, s.read("bytes:" + str(compare_length.value)))
+    compare_value = list(s.read(f'bytes: {compare_length.value}'))
     file_a_offset = Offset.parse(s)
     return QueryOperand(type=type, mask_present=mask_present, params=params, compare_length=compare_length,
                         compare_value=compare_value, file_a_offset=file_a_offset)

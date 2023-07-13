@@ -27,8 +27,6 @@ from d7a.alp.command import Command
 from d7a.system_files.interface_configuration import InterfaceConfigurationFile
 from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.interface_configuration import InterfaceConfiguration
-from d7a.alp.operands.lorawan_interface_configuration_otaa import LoRaWANInterfaceConfigurationOTAA
-from d7a.alp.operands.lorawan_interface_configuration_abp import LoRaWANInterfaceConfigurationABP
 from d7a.sp.configuration import Configuration
 from d7a.sp.qos import QoS, ResponseMode, RetryMode
 from d7a.d7anp.addressee import Addressee, IdType, NlsMethod
@@ -50,14 +48,13 @@ argparser.add_argument("-d", "--device", help="serial device /dev file modem",
                             default="/dev/ttyUSB0")
 argparser.add_argument("-r", "--rate", help="baudrate for serial device", type=int, default=115200)
 argparser.add_argument("-v", "--verbose", help="verbose", default=False, action="store_true")
-argparser.add_argument("-f", "--file_id", help="File where we're writing the interface configuration", default=0x1D)
+argparser.add_argument("-f", "--file_id", help="File where we're writing the interface configuration", type=int, default=0x1D)
 argparser.add_argument("-t", "--timeout", help="timeout", type=int, default=0)
 config = argparser.parse_args()
 configure_default_logger(config.verbose)
 
 modem = Modem(config.device, config.rate, unsolicited_response_received_callback=received_command_callback)
 modem.connect()
-
 # D7 Example
 interface_file = InterfaceConfigurationFile(
     interface_configuration=InterfaceConfiguration(
@@ -72,7 +69,7 @@ interface_file = InterfaceConfigurationFile(
             dorm_to=CT(),
             addressee=Addressee(
                 nls_method=NlsMethod.NONE,
-                id_type=IdType.UID,
+                id_type=IdType.NBID,
                 access_class=0x01,
                 id=CT(mant=3, exp=0)
             )
@@ -95,7 +92,6 @@ interface_file = InterfaceConfigurationFile(
 #         )
 #     )
 # )
-
 
 modem.execute_command(
   alp_command=Command.create_with_write_file_action(

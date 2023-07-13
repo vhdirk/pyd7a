@@ -112,14 +112,14 @@ class Parser(object):
             cmd = self.alp_parser.parse(s, cmd_length)
 
         bits_parsed = s.pos
-        self.shift_buffer(bits_parsed/8)
+        self.shift_buffer(int(bits_parsed/8))
         retry = False         # got one, carry on
       except ReadError:       # not enough to read, carry on and wait for more
         retry = False
       except Exception as e: # actual problem with current buffer, need to skip
         errors.append({
           "error"   : e.args[0],
-          "buffer"  : " ".join(map(lambda b: format(b, "02x"), self.buffer)),
+          "buffer"  : " ".join([format(b, "02x") for b in self.buffer]),
           "pos"     : s.pos,
           "skipped" : self.skip_bad_buffer_content()
         })

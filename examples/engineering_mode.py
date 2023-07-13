@@ -27,7 +27,6 @@ import signal
 from d7a.alp.command import Command
 from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.file import Data
-from d7a.alp.operands.length import Length
 from d7a.alp.operands.offset import Offset
 from d7a.alp.operations.write_operations import WriteFileData
 from d7a.alp.regular_action import RegularAction

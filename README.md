@@ -26,24 +26,19 @@ This repository contains a collection of Python modules that can help when worki
 
 ## Installation
 
-We are currently targeting python v2.7.
+We are currently targeting python v3.8.
 Use the following commands to get started:
 
 ```bash
 $ git clone https://github.com/Sub-IoT/pyd7a.git
 $ cd pyd7a
-$ sudo pip install -r requirements.txt
+$ sudo python3 -m pip install -r requirements.txt
 ```
 
 You can verify that the installation succeeded by running the unit tests:
 ```bash
+$ python3 -m pip install pytest
 $ make test
-*** running all tests
-.................................................................................................................................
-----------------------------------------------------------------------
-Ran 129 tests in 1.064s
-
-OK
 ```
 If all tests ran without any errors, you're good to go.
 
@@ -69,6 +64,8 @@ A parser for frames used by the serial console interface by Sub-IoT-Stack nodes
 Allows to use a serial connected Sub-IoT-Stack node as a modem. By sending ALP commands you can access the node's filesystem, or use the node's DASH7 interface to access the filesystem of nodes in the network.
 
 ## Examples
+
+Can be found in 'examples' and 'tools' directories.
 
 ### Gateway_hass
 

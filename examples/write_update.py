@@ -21,24 +21,14 @@
 import argparse
 import sys
 import logging
-import time
 import os
 
 from d7a.alp.command import Command
-from d7a.alp.interface import InterfaceType
 from d7a.alp.operands.file import Data
 from d7a.alp.operands.length import Length
 from d7a.alp.operands.offset import Offset
 from d7a.alp.operations.write_operations import WriteFileData
 from d7a.alp.regular_action import RegularAction
-from d7a.d7anp.addressee import Addressee, IdType
-
-from d7a.phy.channel_id import ChannelID
-from d7a.sp.configuration import Configuration
-from d7a.sp.qos import ResponseMode, QoS, RetryMode
-from d7a.system_files.engineering_mode import EngineeringModeFile, EngineeringModeMode
-from d7a.system_files.factory_settings import FactorySettingsFile
-from d7a.types.ct import CT
 
 from modem.modem import Modem
 

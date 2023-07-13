@@ -24,9 +24,7 @@ from abc import ABCMeta
 
 from d7a.support.schema import Validatable
 
-class Operation(Validatable):
-  __metaclass__ = ABCMeta
-
+class Operation(Validatable, metaclass=ABCMeta):
   def __init__(self, operand=None):
     if self.operand_class is None and operand is not None:
       raise ValueError("{0} doesn't require an operand.".format(

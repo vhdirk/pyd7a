@@ -24,12 +24,6 @@ import logging
 import sys
 import time
 
-from d7a.alp.command import Command
-from d7a.alp.interface import InterfaceType
-from d7a.d7anp.addressee import Addressee, IdType
-from d7a.sp.configuration import Configuration
-from d7a.sp.qos import QoS, ResponseMode
-from d7a.system_files.uid import UidFile
 from modem.modem import Modem
 
 

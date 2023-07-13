@@ -67,15 +67,16 @@ class Command(Validatable):
 
     for action in actions:
       if type(action) == StatusAction and action.status_operand_extension == StatusActionOperandExtensions.INTERFACE_STATUS:
-        if self.interface_status != None: raise ParseError("An ALP command can contain one and only one Interface Status action")
         self.interface_status = action
       elif type(action) == TagRequestAction:
-        if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Request Action")
+        if (self.tag_id != None) and (self.tag_id != action.operand.tag_id):
+          raise ParseError("tag request action has different tag id than previous action")
         self.tag_id = action.operand.tag_id
         self.send_tag_response_when_completed = action.respond_when_completed
         # we don't add this to self.actions but prepend it on serializing
       elif type(action) == TagResponseAction:
-        if self.tag_id != None: raise ParseError("An ALP command can contain one and only one Tag Response Action")
+        if (self.tag_id != None) and (self.tag_id != action.operand.tag_id):
+          raise ParseError("tag response action has different tag id than previous action")
         self.tag_id = action.operand.tag_id
         self.completed_with_error = action.error # TODO distinguish between commands and responses?
         self.execution_completed = action.eop
@@ -145,6 +146,30 @@ class Command(Validatable):
     else:
       raise ValueError("interface_type {} is not supported".format(interface_type))
 
+  def prepend_forward_action(self, interface_type=InterfaceType.HOST, interface_configuration=None):
+    self.actions.insert(0, 
+      RegularAction(
+        operation=Forward(
+          operand=InterfaceConfiguration(
+            interface_id=interface_type,
+            interface_configuration=interface_configuration
+          )
+        )
+      )
+    )
+
+  def add_tag_request_action(self, tag_id=None, send_tag_when_completed=None):
+    tag_id = self.tag_id if tag_id is None else tag_id
+    send_tag_when_completed = self.send_tag_response_when_completed if send_tag_when_completed is None else send_tag_when_completed
+    self.actions.append(
+      TagRequestAction(
+        respond_when_completed=send_tag_when_completed,
+        operation=TagRequest(
+          operand=TagId(tag_id=tag_id)
+        )
+      )
+    )
+
   def add_indirect_forward_action(self, interface_file_id=None, overload=False, overload_configuration=None):
     if not overload and (overload_configuration is not None):
       overload_configuration = None
@@ -171,7 +196,7 @@ class Command(Validatable):
         operation=ReadFileData(
           operand=DataRequest(
             offset=Offset(id=file.id, offset=Length(0)), # TODO offset size
-            length=file.length
+            length=Length(file.length)
           )
         )
       )
@@ -189,7 +214,7 @@ class Command(Validatable):
         operation=ReadFileData(
           operand=DataRequest(
             offset=Offset(id=file_id, offset=Length(offset)), # TODO offset size
-            length=length
+            length=Length(length)
           )
         )
       )

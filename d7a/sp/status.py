@@ -113,8 +113,8 @@ class Status(Validatable):
     if self.retry:  byte |= 1 << 5
     if self.unicast:  byte |= 1 << 4
     yield byte
-    yield chr(self.fifo_token)
-    yield chr(self.seq_nr)
+    yield self.fifo_token
+    yield self.seq_nr
     for byte in self.response_to: yield byte
     for byte in self.addressee: yield byte
 
